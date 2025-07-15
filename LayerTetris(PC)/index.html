@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Layer Tetris</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="visualizer-canvas"></canvas>
+    <div class="container">
+        <div class="left-panel">
+            <div class="info-box" id="hold-box">
+                <h2>HOLD</h2>
+                <canvas id="hold" width="125" height="100"></canvas>
+            </div>
+            <div class="info-box">
+                <h2>SCORE</h2>
+                <p id="score">0</p>
+            </div>
+            <div class="info-box">
+                <h2>LINES</h2>
+                <p id="lines">0</p>
+            </div>
+            <div class="info-box">
+                <h2>LEVEL</h2>
+                <p id="level">0</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-area" id="game-container">
+                <div class="layer-wrapper" id="layer-wrapper-0"><canvas id="tetris-0" width="300" height="600"></canvas></div>
+                <div class="layer-wrapper" id="layer-wrapper-1"><canvas id="tetris-1" width="300" height="600"></canvas></div>
+                <div class="layer-wrapper" id="layer-wrapper-2"><canvas id="tetris-2" width="300" height="600"></canvas></div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="info-box" id="layer-speed-box">
+                <h2>LAYER SPEED</h2>
+                <p id="layer-speed">NORMAL</p>
+            </div>
+            <div class="info-box" id="next-box">
+                <h2>NEXT</h2>
+                <canvas id="next" width="125" height="100"></canvas>
+            </div>
+            <div class="info-box" id="controls-box">
+                <h2>CONTROLS</h2>
+                <ul id="controls-list">
+                     <li><span>← →</span>: Move</li>
+                    <li><span>↑</span>: Rotate</li>
+                    <li><span>↓</span>: Soft Drop</li>
+                    <li><span>Space</span>: Hard Drop</li>
+                    <li><span>C</span>: Hold</li>
+                    <li class="layer-control"><span>Q / E</span>: Switch Layer</li>
+                    <li><span>P</span>: Pause</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="title-screen">
+        <h1 id="title-main-text">CYBER LAYER TETRIS</h1>
+        <p id="final-score"></p>
+        <div id="game-description">
+            <p>3つのレイヤーでプレイする新感覚テトリス。</p>
+            <p>ラインを消すと他のレイヤーにお邪魔ブロックが出現します。</p>
+            <p>他のレイヤーには消したラインの「エコー」が発生。エコーがあるラインを消すと、連鎖して下のラインも消える「レゾナンス」が発動！</p>
+            <p>お邪魔ブロックとエコーをうまく利用して、ハイスコアを目指そう！</p>
+        </div>
+        <div id="mode-selection">
+            <button id="start-single-button" class="mode-button menu-button">SINGLE LAYER</button>
+            <button id="start-layer-button" class="mode-button menu-button">LAYER MODE</button>
+            <button id="start-spectate-button" class="mode-button menu-button">SPECTATE AI</button>
+        </div>
+        <div id="bgm-selection" class="mode-selection">
+            <button id="bgm-file-button" class="mode-button menu-button">BGMを1曲選択</button>
+            <input type="file" id="bgm-upload" accept="audio/*" style="display: none;">
+            <button id="bgm-folder-button" class="mode-button menu-button">BGMフォルダを選択</button>
+            <input type="file" id="bgm-folder-upload" webkitdirectory directory style="display: none;">
+        </div>
+        <div id="volume-controls">
+            <div class="volume-slider">
+                <label for="bgm-volume">BGM Volume:</label>
+                <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="volume-slider">
+                <label for="se-volume">SE Volume:</label>
+                <input type="range" id="se-volume" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+    </div>
+    <div id="pause-menu" class="hidden">
+        <div class="pause-menu-content">
+            <h1>PAUSED</h1>
+            <button id="resume-button" class="mode-button menu-button">RESUME</button>
+            <button id="back-to-menu-button" class="mode-button menu-button">BACK TO MENU</button>
+        </div>
+    </div>
+    <audio id="bgm-player" loop></audio>
+    <!-- Sound Effects (SE) -->
+    <audio id="se-land" src="se/land.mp3"></audio>
+    <audio id="se-hard-drop" src="se/hard_drop.mp3"></audio>
+    <audio id="se-line-clear" src="se/line_clear.mp3"></audio>
+    <audio id="se-rotate" src="se/rotate.mp3"></audio>
+    <audio id="se-hold" src="se/hold.mp3"></audio>
+
+    <script src="script.js"></script>
+    <script src="ai.js"></script>
+</body>
+</html>

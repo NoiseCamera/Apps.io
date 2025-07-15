@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Layer Tetris</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- スマホ特化レイアウト（再構築） --- */
+        :root {
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        /* レイアウトはstyle.cssで管理します */
+    </style>
+</head>
+<body>
+    <canvas id="visualizer-canvas"></canvas>
+    <div class="container">
+        <div class="top-info">
+            <div id="bgm-controls" style="display: none;">
+                <button id="prev-track-button">◀◀</button>
+                <div id="track-info-container">
+                    <div id="track-info-text"></div>
+                </div>
+                <button id="next-track-button">▶▶</button>
+                <button id="game-menu-button">MENU</button>
+            </div>
+            <!-- Row 1 -->
+            <div class="info-box" id="hold-box">
+                <h2>HOLD</h2>
+                <canvas id="hold" width="125" height="75"></canvas>
+            </div>
+            <div class="info-box" id="score-box">
+                <h2>SCORE</h2>
+                <p id="score">0</p>
+            </div>
+            <div class="info-box" id="level-box">
+                <h2>LEVEL</h2>
+                <p id="level">0</p>
+            </div>
+            <!-- Row 2 -->
+            <div class="info-box" id="next-box">
+                <h2>NEXT</h2>
+                <canvas id="next" width="125" height="75"></canvas>
+            </div>
+            <div class="info-box" id="layer-speed-box">
+                <h2>LAYER SPEED</h2>
+                <p id="layer-speed">NORMAL</p>
+            </div>
+            <div class="info-box" id="lines-box">
+                <h2>LINES</h2>
+                <p id="lines">0</p>
+            </div>
+        </div>
+
+        <div class="middle-content">
+            <div class="game-area" id="game-container">
+                <div class="layer-wrapper" id="layer-wrapper-0"><canvas id="tetris-0" width="300" height="600"></canvas></div>
+                <div class="layer-wrapper" id="layer-wrapper-1"><canvas id="tetris-1" width="300" height="600"></canvas></div>
+                <div class="layer-wrapper" id="layer-wrapper-2"><canvas id="tetris-2" width="300" height="600"></canvas></div>
+            </div>
+        </div>
+
+        <div id="touch-controls" class="hidden">
+            <div class="touch-dpad">
+                <button id="touch-hold" class="touch-btn">HOLD</button>
+                <button id="touch-left" class="touch-btn">←</button>
+                <button id="touch-right" class="touch-btn">→</button>
+                <button id="touch-down" class="touch-btn">↓</button>
+            </div>
+            <div class="touch-actions">
+                <button id="touch-layer-prev" class="touch-btn touch-layer-btn layer-control">L-</button>
+                <button id="touch-layer-next" class="touch-btn touch-layer-btn layer-control">L+</button>
+                <button id="touch-rotate" class="touch-btn touch-main-btn">↻</button>
+                <button id="touch-drop" class="touch-btn touch-main-btn">DROP</button>
+            </div>
+        </div>
+    </div>
+    <div id="title-screen">
+        <h1 id="title-main-text">CYBER LAYER TETRIS</h1>
+        <p id="final-score"></p>
+        <div id="game-description">
+            <p>3つのレイヤーでプレイする新感覚テトリス。</p>
+            <p>ラインを消すと他のレイヤーにお邪魔ブロックが出現します。</p>
+            <p>他のレイヤーには消したラインの「エコー」が発生。エコーがあるラインを消すと、連鎖して下のラインも消える「レゾナンス」が発動！</p>
+            <p>お邪魔ブロックとエコーをうまく利用して、ハイスコアを目指そう！</p>
+        </div>
+        <div id="mode-selection">
+            <button id="start-single-button" class="mode-button menu-button">SINGLE LAYER</button>
+            <button id="start-layer-button" class="mode-button menu-button">LAYER MODE</button>
+            <button id="start-spectate-button" class="mode-button menu-button">SPECTATE AI</button>
+        </div>
+    </div>
+    <div id="pause-menu" class="hidden">
+        <div class="pause-menu-content">
+            <h1>PAUSED</h1>
+            <button id="resume-button" class="mode-button menu-button">RESUME</button>
+            <button id="back-to-menu-button" class="mode-button menu-button">BACK TO MENU</button>
+            <div id="volume-controls">
+                <div class="volume-slider">
+                    <label for="bgm-volume">BGM Volume:</label>
+                    <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="1">
+                </div>
+                <div class="volume-slider">
+                    <label for="se-volume">SE Volume:</label>
+                    <input type="range" id="se-volume" min="0" max="1" step="0.01" value="0.5">
+                </div>
+            </div>
+        </div>
+    </div>
+    <audio id="bgm-player" loop></audio>
+        <!-- Sound Effects (SE) -->
+        <audio id="se-land" src="se/land.mp3"></audio>
+        <audio id="se-hard-drop" src="se/hard_drop.mp3"></audio>
+        <audio id="se-rotate" src="se/rotate.mp3"></audio>
+
+    <script src="script.js"></script>
+    <script src="ai.js"></script>
+</body>
+</html>

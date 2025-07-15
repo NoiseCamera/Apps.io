@@ -1,0 +1,570 @@
+:root {
+    --bg-color: #0d0221;
+    --base-bg-color: #333;
+    --text-color: #00f0ff;
+    --border-color: #ff00ff;
+}
+
+#visualizer-canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Place it behind all other content */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    font-family: 'Orbitron', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--base-bg-color);
+    padding: 10px;
+}
+
+/* --- Mobile First Layout (Default) --- */
+.container {
+    height: 95vh;
+    aspect-ratio: 390 / 844;
+    max-width: 100%;
+    max-height: 844px;
+    border: 8px solid #111;
+    border-radius: 40px;
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* BGMコントロールの配置 */
+#bgm-controls {
+    /* position: absolute; を削除し、info-column内の要素としてレイアウト */
+    display: grid; /* script.jsがgridを期待しているため */
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    grid-column: 1 / -1; /* BGMコントロールを全列にまたがらせる */
+    margin-bottom: 5px; /* 下のボックスとの間にスペースを追加 */
+}
+#bgm-controls button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.8rem; /* 少し小さく */
+    cursor: pointer;
+    padding: 0 4px;
+}
+#track-info-container {
+    font-size: 0.6rem; /* 少し小さく */
+    text-align: center;
+    overflow: hidden;
+}
+
+.top-info {
+    display: grid;
+    /* 中央の列(Score, LayerSpeed)が広くなるように幅を戻す */
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.middle-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1;
+    margin: 15px 0;
+    min-height: 0;
+}
+
+.game-area {
+    width: 85%;
+    aspect-ratio: 1 / 2;
+    perspective: 1000px; /* 3D効果のためにperspectiveを再設定 */
+    max-height: 100%;
+    position: relative;
+}
+
+.game-area .layer-wrapper,
+.game-area .layer-wrapper canvas {
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+}
+
+/* --- Info Boxes (Mobile) --- */
+.info-box {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;   /* すべてのボックスを2段表示に */
+    justify-content: center;  /* 垂直方向に中央揃え */
+    align-items: center;      /* 水平方向に中央揃え */
+    gap: 2px;                 /* ラベルと値の間のスペース */
+    padding: 4px 8px;
+    min-height: 60px;         /* 高さを少し縮小 */
+    text-align: center;
+}
+
+.info-box h2 {
+    font-size: clamp(0.6rem, 1.8vh, 0.8rem); /* 文字を少し小さく */
+    margin: 0; /* 既存のマージンをリセット */
+}
+
+.info-box p {
+    font-size: clamp(0.9rem, 2.2vh, 1.2rem); /* 文字を少し小さく */
+    margin: 0; /* 既存のマージンをリセット */
+    /* 1行表示用のオーバーフロー対策をリセット */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+#hold-box canvas, #next-box canvas {
+    width: auto;  /* アスペクト比を維持 */
+    height: 36px; /* プレビュー画面を縮小して高さを統一 */
+    border: none;
+    background-color: rgba(0,0,0,0.3);
+}
+
+/* --- Single Mode Specific Styles (Mobile) --- */
+.game-area.single-mode {
+    perspective: none;
+}
+
+.game-area.single-mode .layer-wrapper.active {
+    transform: none;
+}
+
+.game-area.single-mode .layer-wrapper.inactive-left,
+.game-area.single-mode .layer-wrapper.inactive-right {
+    display: none;
+}
+
+.layer-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transform-style: preserve-3d;
+}
+
+canvas {
+    display: block;
+    border: 2px solid var(--border-color);
+    background-color: #000;
+}
+
+.layer-wrapper.active {
+    /* アクティブなレイヤーを前面に、少し大きく表示して見やすくする */
+    transform: translateZ(50px);
+    opacity: 1;
+    z-index: 10;
+}
+
+/* NEW: Reset transform for the active layer in single mode */
+.game-area.single-mode .layer-wrapper.active {
+    transform: none;
+}
+
+.layer-wrapper.inactive-left {
+    transform: translateX(-60%) translateZ(-150px) scale(0.8);
+    opacity: 0.4;
+}
+
+.layer-wrapper.inactive-right {
+    transform: translateX(60%) translateZ(-150px) scale(0.8);
+    opacity: 0.4;
+}
+
+.layer-wrapper.switch-failed canvas {
+    animation: switch-fail-glow 0.4s ease-out;
+}
+
+@keyframes switch-fail-glow {
+    50% {
+        border-color: #ff4500;
+        box-shadow: 0 0 20px #ff4500;
+    }
+}
+
+/* NEW: Styles for the layer speed indicator */
+#layer-speed {
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+#layer-speed.slow {
+    color: #00f0ff; /* Cyan */
+}
+
+#layer-speed.normal {
+    color: #ffffff; /* White */
+}
+
+#layer-speed.fast {
+    color: #ff4500; /* OrangeRed */
+}
+
+#next {
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+#hold {
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+/* NEW: Controls List Styles */
+#controls-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+#controls-list li {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+#controls-list li span {
+    display: inline-block;
+    width: 80px; /* Align the descriptions */
+    font-weight: bold;
+    color: var(--border-color);
+}
+
+.layer-control.hidden {
+    display: none;
+}
+
+/* --- Title Screen --- */
+#title-screen {
+    position: fixed; /* Use fixed to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 2, 33, 0.95);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 0.5s ease, visibility 0.5s;
+    opacity: 1;
+    visibility: visible;
+    padding: 20px; /* 小画面で端にコンテンツが寄らないようにパディングを追加 */
+    text-align: center; /* 中の要素のテキストを中央揃えに */
+}
+
+#title-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#title-screen h1 {
+    /* フォントサイズを画面幅に応じて可変に */
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    text-shadow: 0 0 15px var(--text-color);
+    margin-bottom: 20px;
+}
+
+#final-score {
+    font-size: 1.5rem;
+    color: var(--border-color);
+    margin-bottom: 20px;
+    min-height: 2rem;
+}
+
+/* NEW: Game Description Styles */
+#game-description {
+    padding: 15px 25px;
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 90%; /* レスポンシブ対応のためパーセント指定に */
+    max-width: 550px; /* ただしPCなど大画面では広がりすぎないように上限を設定 */
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    line-height: 1.7;
+}
+
+#game-description p {
+    margin-bottom: 8px;
+}
+
+#game-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* NEW: Styles for mode selection buttons */
+#mode-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    align-items: center;
+    width: 100%; /* コンテナの幅いっぱいに広げる */
+}
+
+.mode-button {
+    padding: 15px 30px;
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    border: 2px solid var(--text-color);
+    background-color: transparent;
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s;
+    width: 80%; /* レスポンシブ対応のためパーセント指定に */
+    max-width: 280px; /* 大画面での上限を設定 */
+    text-align: center;
+    box-shadow: 0 0 15px var(--text-color);
+}
+
+.mode-button:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+}
+
+/* NEW: Style for controller/keyboard selected menu items */
+.menu-button.selected {
+    background-color: var(--border-color); /* Use the pink border color */
+    color: #fff;
+    box-shadow: 0 0 15px var(--border-color), 0 0 5px #fff;
+    transform: scale(1.05);
+}
+
+/* Game Over specific styles */
+#title-screen.game-over #title-main-text {
+    color: #ff4500;
+    text-shadow: 0 0 20px #ff4500;
+}
+#title-screen.game-over .mode-button {
+    border-color: #ff4500;
+    color: #ff4500;
+    box-shadow: 0 0 15px #ff4500;
+}
+
+#title-screen.game-over .mode-button:hover {
+    background-color: #ff4500;
+    color: var(--bg-color);
+}
+
+/* NEW: BGM Selection styles */
+#bgm-selection {
+    margin-top: 30px;
+    font-size: 1.2rem;
+}
+
+#bgm-selection label {
+    margin-right: 10px;
+}
+
+/* NEW: Pause Menu Styles */
+#pause-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 2, 33, 0.9);
+    z-index: 90; /* Below title screen, but above game */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    padding: 20px; /* パディングを追加 */
+    text-align: center; /* テキストを中央揃えに */
+}
+
+#pause-menu.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.pause-menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%; /* コンテナの幅いっぱいに広げる */
+    align-items: center; /* 中のボタンを中央揃えに */
+}
+
+/* PAUSEDテキストのスタイル */
+.pause-menu-content h1 {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    text-shadow: 0 0 15px var(--text-color);
+}
+
+/* NEW: Volume Controls Styles */
+#volume-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%; /* レスポンシブ対応のためパーセント指定に */
+    max-width: 350px; /* 大画面での上限を設定 */
+}
+
+.volume-slider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.2rem;
+}
+
+.volume-slider label {
+    margin-right: 10px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1; /* スライダーが利用可能なスペースを埋めるようにする */
+    min-width: 100px; /* 小さくなりすぎないように最小幅を設定 */
+    height: 8px;
+    background: #0d0221;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--bg-color);
+}
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--bg-color);
+}
+
+/* --- Touch Controls (Glassmorphism) --- */
+#touch-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    z-index: 50;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    flex-shrink: 0;
+    padding: 1vh 0 var(--safe-area-inset-bottom);
+}
+
+#touch-controls.hidden {
+    display: none;
+}
+
+.touch-dpad {
+    display: grid;
+    grid-template-areas:
+        "left rotate right"
+        ".    down    .";
+    gap: 1.5vh;
+}
+
+.touch-actions {
+    display: grid;
+    grid-template-areas:
+        "layer-prev layer-next"
+        "hold drop";
+    gap: 1.5vh; /* ボタン間のスペースをさらに詰める */
+    align-items: center;
+    justify-items: center;
+}
+
+.touch-btn {
+    /* Glassmorphism Style */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* for Safari */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    font-family: 'Orbitron', sans-serif;
+    color: var(--text-color);
+    user-select: none;
+    pointer-events: auto;
+    transition: all 0.15s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.touch-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.touch-dpad .touch-btn {
+    width: 6vh; height: 6vh;
+    max-width: 50px; max-height: 50px;
+    border-radius: 12px; /* 円形から四角形に変更 */
+    font-size: 2.8vh;
+}
+
+/* The new HOLD button is in the d-pad, so it needs a smaller font */
+.touch-dpad #touch-hold {
+    font-size: clamp(0.6rem, 1.5vh, 0.8rem); /* さらにフォントを小さくしてボタンに収める */
+}
+
+/* Rotate button is now in the action area, so it needs a larger font */
+#touch-rotate {
+    grid-area: layer-next; /* L+の位置に移動 */
+    font-size: clamp(1.5rem, 3vh, 1.8rem); /* Make the symbol larger */
+}
+#touch-left   { grid-area: left; }
+#touch-right  { grid-area: rotate; } /* Swapped with HOLD */
+#touch-down   { grid-area: down; }
+
+#touch-layer-prev { grid-area: hold; }       /* DROPの位置に移動 */
+#touch-layer-next { grid-area: drop; }       /* 回転の位置に移動 */
+#touch-hold       { grid-area: right; } /* Swapped with Right */
+#touch-drop       { grid-area: layer-prev; } /* L-の位置に移動 */
+.touch-main-btn {
+    width: 8vh; height: 8vh;
+    max-width: 68px; max-height: 68px;
+    border-radius: 12px; /* 円形から四角形に変更 */
+    font-size: clamp(0.8rem, 1.8vh, 1rem);
+}
+
+.touch-layer-btn {
+    width: 7.5vh; height: 4.5vh;
+    max-width: 60px; max-height: 38px;
+    border-radius: 12px; /* 円形から四角形に変更 */
+    font-size: clamp(0.6rem, 1.6vh, 0.8rem);
+}

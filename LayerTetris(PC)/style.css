@@ -1,0 +1,402 @@
+:root {
+    --bg-color: #0d0221;
+    --text-color: #00f0ff;
+    --border-color: #ff00ff;
+}
+
+#visualizer-canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Place it behind all other content */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.left-panel, .right-panel {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 80px; /* Align with top of game area */
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Give the main content area a fixed width to contain the visual overflow of the 3D transformed layers */
+    /* This prevents the side layers from overlapping the info panels. */
+    width: 700px;
+}
+
+.game-area {
+    position: relative;
+    width: 300px; /* COLS * BLOCK_SIZE */
+    height: 600px; /* ROWS * BLOCK_SIZE */
+    perspective: 1000px;
+}
+
+/* NEW: Styles for single layer mode to disable 3D effects */
+.game-area.single-mode {
+    perspective: none; /* 3D効果を無効化 */
+    transform: scale(1.4); /* ゲームエリアの拡大率を調整 */
+}
+
+.layer-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transform-style: preserve-3d;
+}
+
+canvas {
+    display: block;
+    border: 2px solid var(--border-color);
+    background-color: #000;
+}
+
+.layer-wrapper.active {
+    transform: translateZ(50px) scale(1.1);
+    opacity: 1;
+    z-index: 10;
+}
+
+/* NEW: Reset transform for the active layer in single mode */
+.game-area.single-mode .layer-wrapper.active {
+    transform: none;
+}
+
+.layer-wrapper.inactive-left {
+    transform: translateX(-60%) translateZ(-150px) scale(0.8);
+    opacity: 0.4;
+}
+
+.layer-wrapper.inactive-right {
+    transform: translateX(60%) translateZ(-150px) scale(0.8);
+    opacity: 0.4;
+}
+
+.layer-wrapper.switch-failed canvas {
+    animation: switch-fail-glow 0.4s ease-out;
+}
+
+@keyframes switch-fail-glow {
+    50% {
+        border-color: #ff4500;
+        box-shadow: 0 0 20px #ff4500;
+    }
+}
+
+.info-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    width: 100%;
+}
+
+.info-box h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: var(--border-color);
+}
+
+.info-box p {
+    font-size: 1.8rem;
+}
+
+/* NEW: Styles for the layer speed indicator */
+#layer-speed {
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+#layer-speed.slow {
+    color: #00f0ff; /* Cyan */
+}
+
+#layer-speed.normal {
+    color: #ffffff; /* White */
+}
+
+#layer-speed.fast {
+    color: #ff4500; /* OrangeRed */
+}
+
+#next {
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+#next-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Give it some vertical space to center the content */
+}
+
+#hold-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+}
+
+#hold {
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+/* NEW: Controls List Styles */
+#controls-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+#controls-list li {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+#controls-list li span {
+    display: inline-block;
+    width: 80px; /* Align the descriptions */
+    font-weight: bold;
+    color: var(--border-color);
+}
+
+.layer-control.hidden {
+    display: none;
+}
+
+/* --- Title Screen --- */
+#title-screen {
+    position: fixed; /* Use fixed to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 2, 33, 0.95);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 0.5s ease, visibility 0.5s;
+    opacity: 1;
+    visibility: visible;
+}
+
+#title-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#title-screen h1 {
+    font-size: 3.5rem;
+    text-shadow: 0 0 15px var(--text-color);
+    margin-bottom: 20px;
+}
+
+#final-score {
+    font-size: 1.5rem;
+    color: var(--border-color);
+    margin-bottom: 20px;
+    min-height: 2rem;
+}
+
+/* NEW: Game Description Styles */
+#game-description {
+    padding: 15px 25px;
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-width: 550px;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+#game-description p {
+    margin-bottom: 8px;
+}
+
+#game-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* NEW: Styles for mode selection buttons */
+#mode-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.mode-button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    border: 2px solid var(--text-color);
+    background-color: transparent;
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.2s;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 0 15px var(--text-color);
+}
+
+.mode-button:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+}
+
+/* NEW: Style for controller/keyboard selected menu items */
+.menu-button.selected {
+    background-color: var(--border-color); /* Use the pink border color */
+    color: #fff;
+    box-shadow: 0 0 15px var(--border-color), 0 0 5px #fff;
+    transform: scale(1.05);
+}
+
+/* Game Over specific styles */
+#title-screen.game-over #title-main-text {
+    color: #ff4500;
+    text-shadow: 0 0 20px #ff4500;
+}
+#title-screen.game-over .mode-button {
+    border-color: #ff4500;
+    color: #ff4500;
+    box-shadow: 0 0 15px #ff4500;
+}
+
+#title-screen.game-over .mode-button:hover {
+    background-color: #ff4500;
+    color: var(--bg-color);
+}
+
+/* NEW: BGM Selection styles */
+#bgm-selection {
+    margin-top: 30px;
+    font-size: 1.2rem;
+}
+
+#bgm-selection label {
+    margin-right: 10px;
+}
+
+/* NEW: Pause Menu Styles */
+#pause-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 2, 33, 0.9);
+    z-index: 90; /* Below title screen, but above game */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+#pause-menu.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.pause-menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* NEW: Volume Controls Styles */
+#volume-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+}
+
+.volume-slider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.2rem;
+}
+
+.volume-slider label {
+    margin-right: 10px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px;
+    height: 8px;
+    background: #0d0221;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--bg-color);
+}
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--text-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--bg-color);
+}
