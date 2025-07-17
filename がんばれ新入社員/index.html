@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お花見場所取り大作戦！</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+  <body>
+    <div id="game-container">
+        <div id="ui" style="display: none;">
+          <div id="timer">残り時間: <span>60</span>秒</div>
+          <div id="area">確保面積: <span>100</span>%</div>
+          <div id="rank">階級: <span>新入社員</span></div>
+
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    <div id="start-screen">
+      <h1>お花見場所取り大作戦！</h1>
+      <p>
+        マウスで自分の社員を操作し、ライバル会社の新人にぶつけて撃退しよう！<br />60秒間ブルーシートを守り切れ！
+      </p>
+      <button id="start-button">場所取り開始！</button>
+    </div>
+
+    <div id="game-over-screen">
+      <h2>ゲームオーバー</h2>
+      <p id="final-score">スコア: <span>0</span></p>
+      <p id="final-rank">最終階級: <span id="display-rank"></span></p>
+      <button id="restart-button">もう一度！</button>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
