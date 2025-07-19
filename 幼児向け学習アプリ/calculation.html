@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>すうじのけいさん</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>すうじの けいさん</h1>
+        <p>もんだいを といてみよう！</p>
+    </header>
+
+    <nav>
+        <a href="index.html">えらぶがめんへ</a>
+        <a href="hiragana.html" class="nav-link-other">ひらがな</a>
+        <a href="katakana.html" class="nav-link-other">カタカナ</a>
+    </nav>
+
+    <div id="mode-selector">
+        <button class="mode-btn selected" id="mode-mixed">まぜこぜ</button>
+        <button class="mode-btn" id="mode-addition">たしざん</button>
+        <button class="mode-btn" id="mode-subtraction">ひきざん</button>
+    </div>
+
+
+    <main id="app-container">
+        <div id="calculation-container">
+            <div class="problem">
+                <span id="num1"></span>
+                <span id="operator"></span>
+                <span id="num2"></span>
+                <span>=</span>
+            </div>
+            <input type="number" id="answer-input" placeholder="こたえ" inputmode="numeric">
+            <div id="number-buttons">
+                <button class="number-btn">1</button><button class="number-btn">2</button><button class="number-btn">3</button><button class="number-btn">4</button><button class="number-btn">5</button>
+                <button class="number-btn">6</button><button class="number-btn">7</button><button class="number-btn">8</button><button class="number-btn">9</button><button class="number-btn">0</button>
+            </div>
+            <div class="buttons">
+                <button id="clear-btn">けす</button><button id="check-btn">こたえあわせ</button><button id="next-btn">つぎのもんだい</button>
+            </div>
+            <div id="feedback"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/* このファイルはカタカナ練習ページ専用のスタイルです。 */
+/* bodyなどの共通スタイルは style.css で定義されています。 */
+
+#katakana-container {
+    /* グループ(div)が自然に縦に並ぶように、gridやflexの設定を削除します */
+    max-width: 480px; /* 「ヤユヨ」などが広がりすぎないように最大幅を調整 */
+    margin: 20px auto;
+    padding: 0 10px; /* 画面が狭いときのための余白 */
+}
+/* カタカナの各グループ */
+.katakana-group {
+    display: flex;
+    justify-content: flex-start; /* グループを左揃え */
+    gap: 10px;
+    margin-bottom: 10px; /* グループ間の余白 */
+}
+
+.katakana-group button {
+    font-family: inherit; /* bodyのフォントを継承 */
+    font-size: 2.0em; /* ボタン内の文字サイズを調整 */
+    font-weight: bold;
+    color: #555;
+    background-color: #fff;
+    border: 3px solid #81c784; /* 明るい緑 */
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+    min-width: 50px; /* ボタンの最小幅を固定 */
+}
+
+.katakana-group button:hover {
+    background-color: #e8f5e9; /* 薄い緑 */
+    transform: scale(1.05);
+}
