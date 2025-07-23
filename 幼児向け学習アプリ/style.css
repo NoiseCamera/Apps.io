@@ -400,3 +400,66 @@ button {
 .incorrect {
     color: #4169e1; /* ロイヤルブルー */
 }
+
+/* --- スマホ・タブレット横画面対応 --- */
+@media screen and (max-height: 550px) and (orientation: landscape), screen and (max-width: 950px) and (orientation: landscape) {
+    body {
+        padding: 10px 5px;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 20px); /* padding分を引く */
+    }
+
+    header { flex-shrink: 0; }
+    header h1 { font-size: 1.5em; margin: 0; }
+    header p { font-size: 0.9em; margin: 2px 0 5px 0; }
+
+    nav { margin-bottom: 5px; }
+    nav a { padding: 4px 8px; margin: 0 4px; font-size: 0.9em; }
+
+    #mode-selector { margin-bottom: 5px; }
+    .mode-btn { padding: 4px 8px; font-size: 0.8em; }
+
+    main.calculation-layout {
+        gap: 5px;
+        align-items: flex-start; /* 上揃えにしてスペースを節約 */
+        flex-grow: 1;
+        width: 100%;
+    }
+
+    .item-container {
+        width: 180px;
+        height: auto; /* 高さを自動に */
+        min-height: 220px;
+        padding: 5px;
+        border-width: 2px;
+    }
+
+    .digit-group { flex-basis: 55px; }
+    .digit-label { font-size: 2em; }
+    .item-img-wrapper { width: 20px; height: 20px; }
+
+    #calculation-container {
+        padding: 10px;
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .problem { font-size: 2.2em; margin-bottom: 5px; }
+    .answer-area { margin: 0.5rem 0; gap: 0.5rem; }
+    .answer-display { font-size: 2.2em; padding: 5px; }
+    #hint-btn { font-size: 1.5rem; padding: 0.3rem; min-width: 45px; height: 45px; }
+
+    #number-buttons { gap: 5px; margin-bottom: 10px; }
+    .number-btn { font-size: 1.2em; padding: 8px; }
+
+    .buttons { gap: 8px; }
+    button#clear-btn,
+    button#check-btn,
+    button#next-btn {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    #feedback { font-size: 1.5em; height: 25px; margin-top: 5px; }
+}
