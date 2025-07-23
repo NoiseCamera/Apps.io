@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ひらがなをグループ分け
-    const groups = [
+    const hiraganaGroups = [
         ['あ', 'い', 'う', 'え', 'お'],
         ['か', 'き', 'く', 'け', 'こ'],
         ['さ', 'し', 'す', 'せ', 'そ'],
@@ -22,9 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ['な', 'に', 'ぬ', 'ね', 'の'],
         ['は', 'ひ', 'ふ', 'へ', 'ほ'],
         ['ま', 'み', 'む', 'め', 'も'],
-        ['や', 'ゆ', 'よ'],
+        ['や', '　', 'ゆ', '　', 'よ'], // レイアウトを揃えるために空白を追加
         ['ら', 'り', 'る', 'れ', 'ろ'],
-        ['わ', 'を', 'ん'],
+        ['わ', '　', 'を', '　', 'ん'], // レイアウトを揃えるために空白を追加
         ['が', 'ぎ', 'ぐ', 'げ', 'ご'],
         ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
         ['だ', 'ぢ', 'づ', 'で', 'ど'],
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // 各グループのボタンを生成して追加
-    groups.forEach(group => {
+    hiraganaGroups.forEach(group => {
         const groupContainer = document.createElement('div');
         groupContainer.classList.add('hiragana-group'); // グループ用のクラスを追加
 
@@ -41,25 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.textContent = char;
             button.addEventListener('click', () => {
-                // 最初のクリックでBGMを初期化
                 initializeBgm();
-
-                // 他の音声が再生中なら何もしない
-                if (isPlaying) return;
+                if (isPlaying || char === '　') return;
 
                 isPlaying = true;
                 const audio = new Audio(`assets/sounds/hiragana/${char}.mp3`);
-                audio.play();
+                const resetPlayingFlag = () => { isPlaying = false; };
 
-                // 音声の再生が終わったらフラグをリセット
-                audio.onended = () => {
-                    isPlaying = false;
-                };
-                // 音声の再生でエラーが起きた場合もフラグをリセット
-                audio.onerror = () => {
-                    isPlaying = false;
-                    console.error(`音声ファイル assets/sounds/hiragana/${char}.mp3 が見つかりません。`);
-                };
+                audio.play().catch(resetPlayingFlag);
+                audio.onended = resetPlayingFlag;
+                audio.onerror = resetPlayingFlag;
             });
             groupContainer.appendChild(button);
         });

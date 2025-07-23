@@ -87,6 +87,7 @@ nav a:first-child {
     padding: 10px 20px;
     font-size: 1em;
     border-radius: 20px;
+    cursor: pointer;
 }
 
 .mode-btn:hover {
@@ -98,6 +99,17 @@ nav a:first-child {
     color: #fff;
 }
 
+/* 計算アプリのレイアウト */
+.calculation-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* ボタンとコンテナを中央揃え */
+    gap: 20px; /* 各要素間のスペースを少し広げる */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+    padding: 0 20px; /* 画面幅が狭いときのための余白 */
+}
+
+/* アプリ選択画面のコンテナ */
 #app-container {
     display: flex;
     justify-content: center;
@@ -114,41 +126,184 @@ nav a:first-child {
     max-width: 400px;
 }
 
+/* リンゴ表示用のコンテナ */
+.item-container {
+    width: 250px; /* 横幅を広げて桁ごとの表示に対応 */
+    height: 350px;
+    display: flex;
+    justify-content: space-around; /* 桁ごとのグループを均等に配置 */
+    gap: 5px;
+    padding: 10px;
+    border: 3px dashed #a0d8ef;
+    border-radius: 15px;
+    background-color: #f0f8ff;
+}
+
+/* 式の左右のアイテムを視覚的に表示するためのコンテナ */
+.visual-calculation-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* 式の間の演算子（+, -） */
+.operator-symbol {
+    font-size: 4em;
+    font-weight: bold;
+    color: #4CAF50; /* 緑 */
+    align-self: center; /* 上下中央に配置 */
+}
+
+/* 引き算の記号は赤くする */
+.operator-symbol.subtraction {
+    color: #f44336; /* 赤 */
+}
+
+/* 桁ごとのグループ（数字とリンゴをまとめる） */
+.digit-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex-basis: 75px; /* 各グループの基本幅 */
+}
+
+/* 桁の数字ラベル */
+.digit-label {
+    font-size: 2.5em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* ヒントの数字の色を問題の数字の色と合わせる */
+.digit-group.hundreds .digit-label {
+    color: #448AFF; /* あかるい あお */
+}
+
+.digit-group.tens .digit-label {
+    color: #E91E63; /* あかるい あか (ピンク) */
+}
+
+.digit-group.ones .digit-label {
+    color: #FFC107; /* あかるい きいろ */
+}
+
+/* リンゴを並べるコンテナ */
+.digit-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    position: relative; /* アニメーションのために追加 */
+}
+
+.item-img-wrapper {
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+.item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.item-img-wrapper.subtracted .item-img {
+    /* 灰色にして少し透明にするスタイルに変更 */
+    filter: grayscale(100%);
+    opacity: 0.6;
+    /* アニメーションで滑らかに変化させる */
+    transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+/* --- アニメーション関連のスタイル --- */
+.item-img-wrapper.moving {
+    position: absolute; /* 元のレイアウトから切り離して移動させる */
+    z-index: 10;
+    /* 移動距離はJavaScriptでCSSカスタムプロパティとして設定する */
+    /* 例: --move-x: -100px; --move-y: 20px; */
+    animation: move-item-anim 1.5s ease-in-out forwards;
+}
+
+@keyframes move-item-anim {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        /* 少し上に持ち上げてから移動する演出 */
+        transform: translate(calc(var(--move-x, 0) / 2), calc(var(--move-y, 0) / 2 - 40px)) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--move-x, 0), var(--move-y, 0)) scale(0.5);
+        opacity: 0; /* 移動後は見えなくする */
+    }
+}
+
 .problem {
     font-size: 3em;
     font-weight: bold;
     margin-bottom: 20px;
     letter-spacing: 0.1em;
     color: #4682b4; /* スチールブルー */
+    display: flex; /* 横並びにする */
+    justify-content: center; /* 中央揃え */
+    align-items: center; /* 上下中央揃え */
+    gap: 0.2em; /* 要素間の隙間 */
 }
 
 /* 計算式の数字の色分け */
-.problem .digit-hundreds {
+.digit-hundreds {
     color: #448AFF; /* あかるい あお */
 }
 
-.problem .digit-tens {
+.digit-tens {
     color: #E91E63; /* あかるい あか (ピンク) */
 }
 
-.problem .digit-ones {
+.digit-ones {
     color: #FFC107; /* あかるい きいろ */
 }
 
 /* 桁数を揃えるための見えないゼロ */
-.problem .digit-zero {
+.digit-zero {
     /* 色を透明にすることで、場所は確保しつつ見えなくする */
     color: transparent;
 }
 
-#answer-input {
-    width: 80%;
-    padding: 15px;
-    font-size: 2em;
-    text-align: center;
+/* 答えの入力欄とヒントボタンを横並びにするスタイル */
+.answer-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem; /* 答えとヒントボタンの間隔 */
+  margin: 1rem 0;
+}
+
+/* 答え表示欄のスタイル */
+.answer-display {
+    font-size: 3em; /* 問題のフォントサイズと合わせる */
+    font-weight: bold;
+    min-height: 1.5em; /* 高さを確保 */
+    line-height: 1.5em; /* 高さと合わせる */
+    padding: 10px;
     border: 2px solid #ccc;
     border-radius: 10px;
-    margin-bottom: 20px;
+    background-color: #fff;
+    text-align: center; /* 中央揃えに変更 */
+    width: 80%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+/* プレースホルダーのシミュレーション */
+.answer-display.is-placeholder {
+    color: #aaa;
 }
 
 #number-buttons {
@@ -169,16 +324,6 @@ nav a:first-child {
     transition: background-color 0.2s;
 }
 
-/* スピナー（矢印）を非表示にする */
-#answer-input::-webkit-outer-spin-button,
-#answer-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-#answer-input[type=number] {
-    -moz-appearance: textfield;
-}
-
 .buttons {
     display: flex;
     justify-content: center;
@@ -193,7 +338,28 @@ button {
     border-radius: 10px;
     color: white;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+/* ヒントボタンのスタイル調整 */
+#hint-btn {
+  font-size: 1.8rem; /* 電球アイコンのサイズ */
+  padding: 0.5rem;
+  min-width: 60px;
+  height: 60px;
+  line-height: 1;
+  border-radius: 12px;
+  background-color: #2196F3; /* 目立つ青 */
+}
+
+#hint-btn:hover {
+    background-color: #1976D2;
+}
+
+#hint-btn:disabled {
+    background-color: #BDBDBD; /* 灰色 */
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 #clear-btn {

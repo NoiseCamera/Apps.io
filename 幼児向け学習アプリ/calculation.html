@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>すうじのけいさん</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -26,7 +26,8 @@
     </div>
 
 
-    <main id="app-container">
+    <main id="app-container" class="calculation-layout">
+        <div id="left-items" class="item-container"></div>
         <div id="calculation-container">
             <div class="problem">
                 <span id="num1"></span>
@@ -34,7 +35,10 @@
                 <span id="num2"></span>
                 <span>=</span>
             </div>
-            <input type="number" id="answer-input" placeholder="こたえ" inputmode="numeric">
+            <div class="answer-area">
+                <div id="answer-input" class="answer-display" data-placeholder="こたえ"></div>
+                <button id="hint-btn">💡</button>
+            </div>
             <div id="number-buttons">
                 <button class="number-btn">1</button><button class="number-btn">2</button><button class="number-btn">3</button><button class="number-btn">4</button><button class="number-btn">5</button>
                 <button class="number-btn">6</button><button class="number-btn">7</button><button class="number-btn">8</button><button class="number-btn">9</button><button class="number-btn">0</button>
@@ -44,6 +48,7 @@
             </div>
             <div id="feedback"></div>
         </div>
+        <div id="right-items" class="item-container"></div>
     </main>
 
     <script src="script.js"></script>
