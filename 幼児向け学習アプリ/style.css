@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap');
+
 /* 基本的なスタイル */
 body {
-    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: #f0f8ff; /* 明るい空色 */
+    font-family: 'M PLUS Rounded 1c', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #fffde7 0%, #e3f2fd 100%); /* 明るい黄色から水色へのグラデーション */
     color: #333;
     text-align: center;
     margin: 0;
@@ -10,8 +12,10 @@ body {
 }
 
 header h1 {
-    color: #ff6347; /* トマト色 */
+    color: #ff69b4; /* ホットピンク */
     font-size: 2.5em;
+    font-weight: 800;
+    text-shadow: 3px 3px 0 #ffffff, 6px 6px 0 rgba(255, 105, 180, 0.3);
 }
 
 header p {
@@ -23,7 +27,7 @@ header p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 25px; /* 少し間隔を広げる */
     margin-top: 30px;
 }
 
@@ -32,71 +36,136 @@ header p {
     width: 80%;
     max-width: 500px;
     padding: 20px;
-    background-color: #fff;
-    border: 3px solid #87ceeb;
-    border-radius: 20px;
+    border: 4px solid; /* 太さを4pxに */
+    border-radius: 30px; /* 角をより丸く */
     text-decoration: none;
     color: #333;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+/* 各リンクの色分け */
+.app-link[href="calculation.html"] {
+    background-color: #fffde7; /* クリームイエロー */
+    border-color: #fbc02d; /* 濃い黄色 */
+}
+.app-link[href="hiragana.html"] {
+    background-color: #fff0f5; /* ラベンダーブラッシュ */
+    border-color: #f06292; /* 明るいピンク */
+}
+.app-link[href="katakana.html"] {
+    background-color: #e8f5e9; /* 薄い緑 */
+    border-color: #66bb6a; /* 緑 */
+}
+.app-link[href="slide-puzzle.html"] {
+    background-color: #e3f2fd; /* 薄い青 */
+    border-color: #42a5f5; /* 青 */
 }
 
 .app-link:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px) scale(1.03) rotate(1deg); /* 少し浮き上がって傾く */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.app-link h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* アイコンとテキストの間隔 */
+    font-size: 1.8em;
+    margin-bottom: 8px;
 }
 
 /* 各アプリ共通のナビゲーション */
 nav {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    gap: 15px; /* ボタン間の隙間 */
 }
 
 nav a {
     display: inline-block;
-    padding: 10px 20px;
-    margin: 0 10px;
+    padding: 12px 24px;
     text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.2s;
+    font-weight: bold;
+    color: white;
+    border-radius: 15px;
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    top: 0;
+}
+
+nav a, .mode-btn, button {
+    border: none;
+    cursor: pointer;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 700;
+}
+
+nav a {
+    background-color: #ff7f50; /* コーラル */
+    box-shadow: 0 6px #e57248;
 }
 
 nav a:hover {
-    background-color: #e0f7ff;
+    background-color: #ff8a63;
 }
 
-nav a:first-child {
-    background-color: #87ceeb;
-    color: white;
+nav a:active {
+    top: 4px;
+    box-shadow: 0 2px #e57248;
 }
-.nav-link-other {
-    background-color: #f0f8ff; /* 薄い青 */
+
+nav a.nav-link-other {
+    background-color: #64b5f6; /* 明るい青 */
+    box-shadow: 0 6px #4a9fde;
 }
+
+nav a.nav-link-other:hover {
+    background-color: #71bdf7;
+}
+
+nav a.nav-link-other:active {
+    top: 4px;
+    box-shadow: 0 2px #4a9fde;
+}
+
 #mode-selector {
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
 }
 
 .mode-btn {
-    background-color: #fff;
-    color: #4682b4;
-    border: 2px solid #4682b4;
-    padding: 10px 20px;
+    padding: 12px 22px;
     font-size: 1em;
-    border-radius: 20px;
-    cursor: pointer;
-}
-
-.mode-btn:hover {
-    background-color: #e0f7ff;
+    border-radius: 25px;
+    color: #555;
+    background-color: #fafafa;
+    box-shadow: 0 5px #e0e0e0;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
 }
 
 .mode-btn.selected {
-    background-color: #4682b4;
-    color: #fff;
+    background-color: #ffd54f; /* 明るい黄色 */
+    color: #424242;
+    box-shadow: 0 5px #ffc107;
+    top: 2px;
+}
+
+.mode-btn:not(.selected):hover {
+    background-color: #ffffff;
+    top: -2px;
+    box-shadow: 0 7px #e0e0e0;
+}
+
+.mode-btn:active {
+    top: 4px;
+    box-shadow: 0 1px #e0e0e0;
 }
 
 /* 計算アプリのレイアウト */
@@ -118,10 +187,10 @@ nav a:first-child {
 
 #calculation-container {
     background-color: #fff;
-    border: 3px solid #87ceeb; /* スカイブルー */
+    border: 4px solid #a5d6a7; /* 薄い緑 */
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     width: 90%;
     max-width: 400px;
 }
@@ -314,10 +383,10 @@ nav a:first-child {
 }
 
 .number-btn {
-    background-color: #ffeb3b; /* Yellow */
-    color: #333;
+    background-color: #fff176; /* 明るい黄色 */
+    color: #5d4037; /* 茶色 */
     font-size: 1.5em;
-    padding: 15px;
+    padding: 18px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
@@ -330,17 +399,6 @@ nav a:first-child {
     gap: 15px;
 }
 
-button {
-    padding: 15px 25px;
-    font-size: 1.2em;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.2s, opacity 0.2s;
-}
-
 /* ヒントボタンのスタイル調整 */
 #hint-btn {
   font-size: 1.8rem; /* 電球アイコンのサイズ */
@@ -348,57 +406,101 @@ button {
   min-width: 60px;
   height: 60px;
   line-height: 1;
-  border-radius: 12px;
-  background-color: #2196F3; /* 目立つ青 */
+  border-radius: 50%;
+  background-color: #4fc3f7; /* 明るい水色 */
+  box-shadow: 0 6px #03a9f4;
 }
 
-#hint-btn:hover {
-    background-color: #1976D2;
+#hint-btn:active {
+    top: 4px;
+    box-shadow: 0 2px #03a9f4;
 }
 
 #hint-btn:disabled {
-    background-color: #BDBDBD; /* 灰色 */
+    background-color: #e0e0e0;
+    box-shadow: 0 6px #bdbdbd;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-#clear-btn {
-    background-color: #ff9800; /* オレンジ */
+button, .number-btn {
+    padding: 15px 25px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
 }
 
-#clear-btn:hover {
-    background-color: #f57c00;
+button:active, .number-btn:active {
+    top: 4px;
 }
+
+.number-btn {
+    background-color: #fff176; /* 明るい黄色 */
+    box-shadow: 0 6px #fbc02d;
+    color: #424242;
+}
+.number-btn:active { box-shadow: 0 2px #fbc02d; }
+
+#clear-btn {
+    background-color: #ffb74d; /* オレンジ */
+    box-shadow: 0 6px #fb8c00;
+}
+#clear-btn:active { box-shadow: 0 2px #fb8c00; }
 
 #check-btn {
-    background-color: #4CAF50; /* 緑 */
+    background-color: #81c784; /* 緑 */
+    box-shadow: 0 6px #4caf50;
 }
-
-#check-btn:hover {
-    background-color: #45a049;
-}
+#check-btn:active { box-shadow: 0 2px #4caf50; }
 
 #next-btn {
-    background-color: #f44336; /* 赤 */
+    background-color: #e57373; /* 赤 */
+    box-shadow: 0 6px #f44336;
 }
+#next-btn:active { box-shadow: 0 2px #f44336; }
 
-#next-btn:hover {
-    background-color: #da190b;
+button:disabled {
+    background-color: #e0e0e0;
+    box-shadow: 0 6px #bdbdbd;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 #feedback {
     margin-top: 20px;
     font-size: 2em;
     font-weight: bold;
-    height: 40px; /* 高さを確保してレイアウトがずれないようにする */
+    height: 50px; /* 高さを確保してレイアウトがずれないようにする */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
 }
 
 .correct {
-    color: #ff6347; /* トマト色 */
+    color: #e53935; /* 濃い赤 */
+    animation: feedback-anim 0.5s ease-out;
 }
 
 .incorrect {
-    color: #4169e1; /* ロイヤルブルー */
+    color: #1e88e5; /* 濃い青 */
+    animation: feedback-shake 0.5s ease;
+}
+
+@keyframes feedback-anim {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+@keyframes feedback-shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
 }
 
 /* --- スマホ・タブレット横画面対応 --- */

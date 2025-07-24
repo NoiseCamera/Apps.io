@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>どうぶつスライドパズル</title>
+  <link rel="stylesheet" href="style.css"> <!-- 共通スタイルを適用 -->
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="slide-puzzle.css">
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
+  <audio id="win-sound" src="assets/sounds/kirakira.mp3"></audio>
+
+  <header>
+    <h1>どうぶつスライドパズル</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">えらぶがめんへ</a>
+  </nav>
+
+  <!-- ゲームのメインコンテンツ -->
+  <main id="game-area">
+    <div id="puzzle-area">
+      <div id="puzzle-container">
+        <div id="puzzle-grid">
+          <!-- パズルのタイルはJavaScriptで生成されます -->
+        </div>
+      </div>
+      <div id="reference-container">
+        <p>えを えらんでね</p>
+        <img id="current-reference-image" src="assets/images/usagi.png" alt="完成図">
+        <div id="animal-selector-grid"></div>
+      </div>
+    </div>
+    <div id="controls">
+      <p>うごかした かいすう: <span id="move-count">0</span></p>
+      <button id="shuffle-btn">もういちど まぜる</button>
+    </div>
+  </main>
+
+  <!-- 画面全体を覆うオーバーレイ要素 -->
+  <div id="title-screen" class="overlay">
+    <h2>どうぶつスライドパズル</h2>
+    <button id="start-btn">スタート！</button>
+  </div>
+
+  <div id="win-message" class="overlay hidden">
+    <p>クリア！おめでとう！</p>
+    <img id="win-image" src="assets/images/usagi.png" alt="完成した絵">
+    <div class="win-buttons">
+      <button id="play-again-btn">もういちど あそぶ</button>
+      <a href="index.html" id="back-to-menu-btn">えらぶがめんへ</a>
+    </div>
+  </div>
+
+  <script src="slide-puzzle.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

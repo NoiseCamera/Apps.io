@@ -17,18 +17,27 @@
 
 .katakana-group button {
     font-family: inherit; /* bodyのフォントを継承 */
-    font-size: 2.0em; /* ボタン内の文字サイズを調整 */
+    font-size: 2em; /* ボタン内の文字サイズを調整 */
     font-weight: bold;
-    color: #555;
-    background-color: #fff;
-    border: 3px solid #81c784; /* 明るい緑 */
+    color: #424242; /* 濃いグレー */
+    background-color: #a5d6a7; /* 明るい緑 */
+    border: none;
+    box-shadow: 0 6px #81c784; /* 緑色の影 */
     border-radius: 15px;
     cursor: pointer;
-    transition: transform 0.1s, background-color 0.2s;
-    min-width: 50px; /* ボタンの最小幅を固定 */
+    transition: all 0.1s ease-out;
+    min-width: 55px; /* ボタンの最小幅を固定 */
+    padding: 5px 0; /* 上下の余白 */
+    position: relative;
+    top: 0;
 }
 
 .katakana-group button:hover {
-    background-color: #e8f5e9; /* 薄い緑 */
-    transform: scale(1.05);
+    top: -3px;
+    box-shadow: 0 9px #81c784;
+}
+
+.katakana-group button:active {
+    top: 4px;
+    box-shadow: 0 2px #81c784;
 }

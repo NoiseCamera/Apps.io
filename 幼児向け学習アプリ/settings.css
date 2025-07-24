@@ -1,0 +1,149 @@
+/* settings.css */
+#settings-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  background-color: #ba68c8; /* 明るい紫 */
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 5px #9c4d9e;
+  transition: all 0.1s;
+}
+
+#settings-btn:hover {
+  background-color: #c77dd4;
+}
+
+#settings-btn:active {
+  top: 19px; /* 15px + 4px */
+  box-shadow: 0 1px #9c4d9e;
+}
+
+#settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+#settings-modal.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.settings-content {
+  background-color: #f3e5f5; /* 薄い紫 */
+  padding: 30px 40px;
+  border-radius: 20px;
+  border: 4px solid #ce93d8; /* 紫 */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+.settings-content h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #8e24aa; /* 濃い紫 */
+  font-size: 2em;
+}
+
+.volume-control {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.volume-control label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #6a1b9a; /* さらに濃い紫 */
+  font-weight: 700;
+}
+
+/* --- スライダーのスタイル --- */
+.volume-control input[type="range"] {
+  -webkit-appearance: none; /* デフォルトのスタイルを無効化 */
+  appearance: none;
+  width: 100%;
+  height: 15px;
+  background: #e1bee7; /* トラックの背景色 */
+  border-radius: 10px;
+  outline: none;
+  opacity: 0.8;
+  transition: opacity .2s;
+}
+
+.volume-control input[type="range"]:hover {
+  opacity: 1;
+}
+
+/* スライダーのつまみ (Chrome, Safari, Opera, Edge) */
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #9c27b0; /* つまみの色 */
+  cursor: pointer;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* スライダーのつまみ (Firefox) */
+.volume-control input[type="range"]::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #9c27b0;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 閉じるボタン */
+#close-settings-btn {
+    /* style.cssのbuttonスタイルを参考に適用 */
+    padding: 12px 28px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+    background-color: #7e57c2; /* 別の紫 */
+    box-shadow: 0 6px #673ab7;
+}
+
+#close-settings-btn:hover {
+    background-color: #8d6ed1;
+}
+
+#close-settings-btn:active {
+    top: 4px;
+    box-shadow: 0 2px #673ab7;
+}

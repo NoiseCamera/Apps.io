@@ -17,18 +17,27 @@
 
 .hiragana-group button {
     font-family: inherit; /* bodyのフォントを継承 */
-    font-size: 2.0em; /* ボタン内の文字サイズを調整 */
+    font-size: 2em; /* ボタン内の文字サイズを調整 */
     font-weight: bold;
-    color: #555;
-    background-color: #fff;
-    border: 3px solid #ffc107; /* 明るいオレンジ */
+    color: #424242; /* 濃いグレー */
+    background-color: #ffd54f; /* 明るい黄色 */
+    border: none;
+    box-shadow: 0 6px #ffc107; /* 黄色の影 */
     border-radius: 15px;
     cursor: pointer;
-    transition: transform 0.1s, background-color 0.2s;
-    min-width: 50px; /* ボタンの最小幅を固定 */
+    transition: all 0.1s ease-out;
+    min-width: 55px; /* ボタンの最小幅を固定 */
+    padding: 5px 0; /* 上下の余白 */
+    position: relative;
+    top: 0;
 }
 
 .hiragana-group button:hover {
-    background-color: #fff8e1; /* 薄いクリーム色 */
-    transform: scale(1.05);
+    top: -3px;
+    box-shadow: 0 9px #ffc107;
+}
+
+.hiragana-group button:active {
+    top: 4px;
+    box-shadow: 0 2px #ffc107;
 }

@@ -1,0 +1,325 @@
+/* ゲームエリアの基本レイアウト */
+#game-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* パズルと完成図をまとめるエリア */
+#puzzle-area {
+  display: flex;
+  align-items: flex-start; /* 上揃え */
+  gap: 30px;
+}
+
+/* 完成図のコンテナ */
+#reference-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+#reference-container p {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #555;
+  margin: 0;
+}
+
+#reference-container #current-reference-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  border: 3px solid #ffc0cb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+}
+
+/* 動物選択グリッド */
+#animal-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 310px; /* (50px * 5) + (10px * 4) -> 少し広げました */
+}
+
+.animal-select-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.1s ease-out;
+  box-shadow: 0 4px #ccc;
+  position: relative;
+  top: 0;
+}
+
+.animal-select-btn:hover {
+  transform: scale(1.1);
+  border-color: #ff69b4;
+}
+
+.animal-select-btn:active {
+  top: 3px;
+  box-shadow: 0 1px #ccc;
+}
+
+/* パズル盤面のコンテナ */
+#puzzle-container {
+  border: 5px solid #ff69b4;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* パズルグリッド (タイルの親要素) */
+#puzzle-grid {
+  width: 450px;  /* 150px * 3 */
+  height: 450px; /* 150px * 3 */
+  position: relative; /* タイルの絶対位置指定の基準 */
+}
+
+/* パズルタイル */
+.puzzle-tile {
+  width: 150px;
+  height: 150px;
+  position: absolute; /* JavaScriptで位置を制御 */
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-image: url('assets/images/usagi.png');
+  background-size: 450px 450px; /* グリッドサイズ(3) * タイルサイズ(150) */
+  cursor: pointer;
+  /* スライドは速く、最後のピースがはまるのはゆっくりに設定 */
+  transition: left 0.3s ease-in-out, top 0.3s ease-in-out,
+    opacity 0.8s ease-out, transform 0.8s ease-out;
+  user-select: none; /* テキスト選択を無効化 */
+  opacity: 1; /* フェードイン/アウトの基準 */
+  transform: scale(1); /* 拡大・縮小の基準 */
+}
+
+/* 空きマスのタイル */
+.puzzle-tile.empty {
+  background-image: none;
+  background-color: transparent;
+  cursor: default;
+  border: none;
+  pointer-events: none; /* クリックできなくする */
+  opacity: 0; /* 透明にして見えなくする */
+  transform: scale(0.8); /* 少し小さくしておくことで、はまる時に拡大する演出 */
+}
+
+/* 操作ボタンエリア */
+#controls {
+  text-align: center;
+}
+
+#controls p {
+  font-size: 1.2em;
+  color: #555;
+  margin: 0 0 10px 0;
+}
+
+#shuffle-btn, #title-screen button {
+  padding: 12px 28px;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+  top: 0;
+}
+
+#shuffle-btn:active, #title-screen button:active {
+  top: 4px;
+}
+
+/* タイトル画面とクリア画面の共通スタイル */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s, transform 0.5s ease-in-out;
+  transform: scale(1);
+}
+
+/* タイトル画面 */
+#title-screen {
+  background-color: rgba(240, 248, 255, 0.98); /* 明るい空色、少し透明 */
+  z-index: 101;
+}
+
+#title-screen h2 {
+  font-size: 3em;
+  color: #ff69b4;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+#title-screen button {
+  padding: 15px 40px;
+  font-size: 1.8em;
+  background-color: #ff6347; /* トマト色 */
+  box-shadow: 0 6px #e5593f;
+}
+
+#shuffle-btn {
+  background-color: #ff69b4; /* ホットピンク */
+  box-shadow: 0 6px #e55f9f;
+}
+
+/* クリア画面 */
+#win-message {
+  /* 明るい光が広がるような背景に変更 */
+  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 60%, rgba(255,255,255,0) 100%);
+  z-index: 100;
+}
+
+#win-message p {
+  font-size: 3.5em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  /* 可愛らしいパステル調の虹色グラデーション */
+  background: linear-gradient(
+    45deg,
+    #ff69b4, /* ホットピンク */
+    #ffb6c1, /* ライトピンク */
+    #87cefa, /* ライトスカイブルー */
+    #98fb98, /* ペールグリーン */
+    #ffdab9  /* ピーチパフ */
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* グラデーションを動かすアニメーション */
+  animation: rainbow-text-animation 8s ease infinite, win-text-pop 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes rainbow-text-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes win-text-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#win-message img {
+  max-width: 80%;
+  max-height: 60%;
+  margin-top: 20px;
+  margin-bottom: 10px; /* ボタンとの間隔 */
+  border-radius: 10px;
+  border: 5px solid white;
+  animation: win-image-appear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards; /* 0.5秒遅れて開始、バウンドするイージング */
+}
+
+@keyframes win-image-appear {
+  from {
+    transform: translateY(50px) scale(0.8);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(-10px) scale(1.05);
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(5px) scale(0.98);
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 非表示にするためのクラス */
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none; /* 非表示のときはクリックできないようにする */
+  transform: scale(1.1); /* 隠れるときに少し大きくなる */
+}
+
+/* ゲームクリア時にゲームエリアを非表示にするためのクラス */
+#game-area.hidden-win {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* JSで生成する紙吹雪のスタイル */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #f00; /* JSで上書き */
+  opacity: 0;
+  animation: fall 5s linear forwards;
+  z-index: 1002; /* オーバーレイより手前 */
+  pointer-events: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(var(--drift, 0px)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* クリア画面のボタン */
+.win-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+.win-buttons button,
+.win-buttons a {
+  padding: 12px 28px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 15px;
+  color: white;
+  text-decoration: none;
+  background-color: #4caf50; /* 緑 */
+  box-shadow: 0 6px #388e3c;
+}
+
+#back-to-menu-btn {
+  background-color: #2196f3; /* 青 */
+  box-shadow: 0 6px #1976d2;
+}
+
+.win-buttons button:active,
+.win-buttons a:active {
+  top: 4px;
+  box-shadow: 0 2px #388e3c;
+}
+
+#back-to-menu-btn:active {
+  box-shadow: 0 2px #1976d2;
+}
