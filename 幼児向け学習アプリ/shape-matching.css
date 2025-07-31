@@ -1,0 +1,131 @@
+/* shape-matching.css */
+
+/* --- Main Layout --- */
+#app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 25px;    
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* 影は残します */
+}
+
+/* --- Question Area --- */
+#question-area {
+    width: 100%;
+    text-align: center;
+}
+
+#question-area p {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ad1457; /* 濃いピンク */
+    margin: 0 0 15px 0;
+}
+
+#question-shape-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 180px;
+    background-color: #fce4ec; /* 薄いピンク */
+    border-radius: 20px;
+    border: 4px solid #ec407a; /* ピンクの枠線をここに適用 */
+    padding: 10px;
+}
+
+/* --- Options Area --- */
+#options-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.option-shape {
+    width: 140px;
+    height: 180px; /* 高さを名前分増やす */
+    background-color: #fff;
+    border: 4px solid #bdbdbd; /* グレー */
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column; /* 縦並びにする */
+    justify-content: space-evenly; /* 中身を均等に配置 */
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.option-shape:hover:not(.disabled) {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+    border-color: #f06292; /* 明るいピンク */
+}
+
+/* 選択後のスタイル */
+.option-shape.selected.correct {
+    border-color: #81c784; /* 緑 */
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(129, 199, 132, 0.4);
+}
+
+.option-shape.selected.incorrect {
+    border-color: #e57373; /* 赤 */
+    animation: feedback-shake 0.5s ease;
+}
+
+.option-shape.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* --- Feedback Area --- */
+#feedback-area {
+    min-height: 100px; /* 高さを確保してレイアウト崩れを防ぐ */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+#feedback-text {
+    font-size: 2.5em;
+    font-weight: 800;
+    margin: 0;
+    height: 1.5em; /* アニメーションのために高さを固定 */
+    line-height: 1.5em;
+}
+
+/* --- Shape Definitions --- */
+/* 図形はSVGで描画するため、コンテナのスタイルのみ定義 */
+.option-shape .shape-svg {
+    width: 80%;
+    height: 90px; /* SVGの高さを固定 */
+    flex-shrink: 0;
+}
+
+.shape-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.shape-name {
+    margin: 5px 0 0 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #424242; /* 少し濃いグレー */
+}
+
+.hidden {
+    visibility: hidden;
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>しんごうを わたろう</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="traffic-signal.css">
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm4.mp3" loop></audio>
+  <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio> <!-- 正解音 -->
+  <audio id="incorrect-sound" src="assets/sounds/car-horn.mp3"></audio> <!-- 不正解音（クラクション） -->
+  <audio id="siren-sound" src="assets/sounds/siren.mp3" loop></audio> <!-- サイレン音 -->
+  <audio id="walk-sound" src="assets/sounds/walk.mp3"></audio> <!-- 歩く音 -->
+
+  <header>
+    <h1>しんごうを わたろう</h1>
+  </header>
+
+  <main>
+    <div id="traffic-app-container">
+      <div id="scene">
+        <div class="crosswalk"></div>
+        <div id="pedestrian"></div>
+        <div id="traffic-light-car">
+          <div class="light green"></div>
+          <div class="light yellow"></div>
+          <div class="light red"></div>
+        </div>
+        <div id="traffic-light-pedestrian">
+          <div class="light red"></div>
+          <div class="light green"></div>
+        </div>
+        <div id="car"></div>
+        <div id="car-blue"></div>
+      </div>
+      <div id="feedback"></div>
+    </div>
+    <div id="question-area">
+      <p id="question-text">ひとの しんごうが あおになったら「わたる」をおしてね</p>
+    </div>
+    <div id="controls">
+      <button id="cross-btn" class="control-btn">わたる</button>
+      <button id="wait-btn" class="control-btn hidden">まつ</button>
+    </div>
+
+    <!-- 遊び方説明モーダル -->
+    <div id="tutorial-modal">
+      <div class="tutorial-content">
+        <h2>あそびかた</h2>
+        <p>「ひとの しんごう」が<span class="text-blue">あお</span>になったら「わたる」ボタンをおしてね。</p>
+        <p>しんごうが<span class="text-red">あか</span>のときや、<span class="text-red">てんめつ</span>しているときは わたらないでね。</p>
+        <p>ときどき<span class="text-emergency">きんきゅうしゃりょう</span>がくるよ！<br>サイレンが きこえたら、しんごうが あおでも「まつ」ボタンをおして、さきに とおしてあげよう。</p>
+        <button id="start-game-btn" class="control-btn">わかった！</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="traffic-signal.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

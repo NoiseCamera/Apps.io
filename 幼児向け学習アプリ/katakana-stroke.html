@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>カタカナ かきじゅん</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="katakana-stroke.css">
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm2.mp3" loop></audio>
+
+  <header>
+    <h1>カタカナ かきじゅん</h1>
+  </header>
+
+  <main>
+    <div id="stroke-app-container">
+      <div id="character-selector">
+        <p>じを えらんでね</p>
+        <div id="character-grid"></div>
+      </div>
+      <div id="canvas-container">
+        <div id="model-character-display">ア</div>
+        <canvas id="stroke-canvas" width="300" height="300"></canvas>
+        <div id="mode-selector">
+          <button id="watch-mode-btn" class="mode-btn selected">おてほん</button>
+          <button id="step-mode-btn" class="mode-btn">ひとふでずつ</button>
+          <button id="practice-mode-btn" class="mode-btn">れんしゅう</button>
+        </div>
+        <div id="controls">
+          <button id="replay-btn">もういちど</button>
+          <button id="toggle-numbers-btn" class="control-btn">ばんごう ON</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="katakana-stroke.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

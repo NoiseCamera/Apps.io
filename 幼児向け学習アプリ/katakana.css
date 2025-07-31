@@ -3,21 +3,21 @@
 
 #katakana-container {
     /* グループ(div)が自然に縦に並ぶように、gridやflexの設定を削除します */
-    max-width: 480px; /* 「ヤユヨ」などが広がりすぎないように最大幅を調整 */
+    max-width: 600px; /* ボタンが大きくなった分、最大幅を調整 */
     margin: 20px auto;
     padding: 0 10px; /* 画面が狭いときのための余白 */
 }
 /* カタカナの各グループ */
 .katakana-group {
     display: flex;
-    justify-content: flex-start; /* グループを左揃え */
-    gap: 10px;
-    margin-bottom: 10px; /* グループ間の余白 */
+    justify-content: center; /* グループを中央揃え */
+    gap: 12px;
+    margin-bottom: 12px; /* グループ間の余白 */
 }
 
 .katakana-group button {
     font-family: inherit; /* bodyのフォントを継承 */
-    font-size: 2em; /* ボタン内の文字サイズを調整 */
+    font-size: 3em; /* ボタン内の文字サイズを調整 */
     font-weight: bold;
     color: #424242; /* 濃いグレー */
     background-color: #a5d6a7; /* 明るい緑 */
@@ -26,8 +26,8 @@
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.1s ease-out;
-    min-width: 55px; /* ボタンの最小幅を固定 */
-    padding: 5px 0; /* 上下の余白 */
+    min-width: 80px; /* ボタンの最小幅を固定 */
+    padding: 15px 0; /* 上下の余白 */
     position: relative;
     top: 0;
 }

@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const answerInput = document.getElementById('answer-input');
     const checkBtn = document.getElementById('check-btn');
     const clearBtn = document.getElementById('clear-btn'); // けすボタン
+    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
     const modeButtons = document.querySelectorAll('.mode-btn');
     const nextBtn = document.getElementById('next-btn');
     const feedbackElem = document.getElementById('feedback');
     const interactiveElements = document.querySelectorAll('button, input'); // 操作可能な要素を全て
     const leftItemsContainer = document.getElementById('left-items');
     const rightItemsContainer = document.getElementById('right-items');
-    const operatorSymbolElem = document.querySelector('.operator-symbol');
     const hintBtn = document.getElementById('hint-btn');
 
     // 音声ファイルを読み込んでおく
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAnswerString = ''; // 現在の答えを文字列で保持
     let audioInitialized = false; // 音声再生の準備ができたか
     let currentMode = 'mixed'; // 'mixed', 'addition', 'subtraction'
+    let currentDifficulty = 'mixed'; // 'mixed', '1', '2', '3'
 
     // ユーザーの最初の操作で音声再生の準備をする関数
     function initializeAudio() {
@@ -46,6 +47,27 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('音声の準備ができました。');
     }
 
+    /**
+     * 指定された難易度に基づいてランダムな数値を生成する
+     * @param {string} difficulty - '1', '2', '3', or 'mixed'
+     * @returns {number} 生成された数値
+     */
+    function generateRandomNumber(difficulty) {
+        let digits;
+        if (difficulty === 'mixed') {
+            digits = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+        } else {
+            digits = parseInt(difficulty, 10);
+        }
+
+        if (digits === 1) {
+            return Math.floor(Math.random() * 9) + 1; // 1-9
+        } else {
+            const min = Math.pow(10, digits - 1);
+            const max = Math.pow(10, digits) - 1;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+    }
     /**
      * 繰り上がり・繰り下がりがないかチェックする関数
      * @param {number} n1 - 1つ目の数値
@@ -195,32 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
             isAddition = Math.random() < 0.5;
         }
 
-        function generateRandomNumber(maxDigits = 3) {
-            // 1〜maxDigits桁の数値を生成
-            const digits = Math.floor(Math.random() * maxDigits) + 1;
-            const maxValue = Math.pow(10, digits) - 1;
-            return Math.floor(Math.random() * maxValue) + 1;
-        }
-
         do {
-            num1 = generateRandomNumber();
-            num2 = generateRandomNumber();
+            num1 = generateRandomNumber(currentDifficulty);
+            num2 = generateRandomNumber(currentDifficulty);
 
-            if (isAddition) {
-                const num1Str = num1.toString();
-                const num2Str = num2.toString();
-                if (num1Str.length < num2Str.length) {
-                    [num1, num2] = [num2, num1];
-                }
-            } else {
-                const num1Str = num1.toString();
-                const num2Str = num2.toString();
-
-                if (num1Str.length < num2Str.length) {
-                    num2 = generateRandomNumber(num1Str.length);
-                } else if (num1Str.length === num2Str.length && num1 < num2) {
-                    [num1, num2] = [num2, num1];
-                }
+            // 引き算で num1 < num2 になるのを防ぐため、単純に入れ替える
+            if (!isAddition && num1 < num2) {
+                [num1, num2] = [num2, num1];
             }
         } while (hasCarryOrBorrow(num1, num2, isAddition));
 
@@ -242,14 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayVisualItems(leftItemsContainer, currentProblem.num1, maxDigits);
         displayVisualItems(rightItemsContainer, currentProblem.num2, maxDigits);
-
-        // 演算子の記号と色を更新
-        operatorSymbolElem.textContent = currentProblem.operator;
-        if (currentProblem.operator === '-') {
-            operatorSymbolElem.classList.add('subtraction');
-        } else {
-            operatorSymbolElem.classList.remove('subtraction');
-        }
 
         // ヒントボタンを有効化
         if (hintBtn) {
@@ -546,6 +541,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // けすボタン
     clearBtn.addEventListener('click', resetAnswerInput);
+
+    // 難易度選択ボタン
+    difficultyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            difficultyButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            currentDifficulty = button.id.replace('difficulty-', '');
+            generateProblem();
+        });
+    });
 
     // モード選択ボタン
     modeButtons.forEach(button => {

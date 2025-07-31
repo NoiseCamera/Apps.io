@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const GRID_SIZE = 3;
   const TILE_COUNT = GRID_SIZE * GRID_SIZE;
   const EMPTY_VALUE = TILE_COUNT - 1; // The last tile is the empty one.
-  const TILE_SIZE = 150; // Corresponds to CSS .puzzle-tile width/height
+  const TILE_SIZE = 180; // Corresponds to CSS .puzzle-tile width/height
 
   // --- Game State ---
   let tiles = []; // Array representing the logical state of the puzzle grid.

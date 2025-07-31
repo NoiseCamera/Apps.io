@@ -1,0 +1,398 @@
+/* traffic-signal.css */
+
+body {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+header {
+    position: relative; /* z-index を効かせるため */
+}
+
+/* --- Scene Elements --- */
+#traffic-app-container {
+    position: relative;
+    width: 95%;
+    max-width: 800px;
+    margin: 10px auto;
+    aspect-ratio: 16 / 9; /* 横長の画面比率 */
+    overflow: hidden;
+    border: 3px solid #555;
+    border-radius: 15px;
+    background-color: #e0f7fa; /* 青空のような背景色 */
+}
+
+#scene {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* CSSで手前に歩道を描画し、男の子が立つ場所を確保 */
+#scene::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15%; /* 男の子が立つエリアを覆う高さ */
+    background-color: #a9a9a9; /* 歩道の色 (ダークグレイ) */
+    z-index: 1; /* 横断歩道画像より手前、キャラクターより奥 */
+}
+
+.crosswalk {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 用意された横断歩道の画像に差し替え */
+    background-image: url('assets/images/oudan.png');
+    /* 画像を要素いっぱいに引き伸ばして表示 */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    z-index: 0; /* 他の要素より後ろに配置 */
+}
+
+/* --- Characters --- */
+#pedestrian {
+    position: absolute;
+    bottom: 5%; /* 画面手前・中央 */
+    left: 50%;
+    width: 100px; /* 大きく表示 */
+    height: 200px;
+    background-image: url('assets/images/boy-walk.png'); /* 初期画像を歩く姿に */
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: translateX(-50%) scale(1);
+    transition: transform 4s linear, bottom 4s linear;
+    z-index: 10;
+}
+
+#pedestrian.walking {
+    /* 奥に進むにつれて縮小するアニメーション */
+    transform: translateX(-38%) scale(0.95); /* 最終的なサイズを少し大きく */
+    bottom: 38%; /* 最終的な位置を停止線に合わせる */
+}
+
+#pedestrian.finished {
+    /* 渡り切った後の状態 */
+    background-image: url('assets/images/boy-stop.png');
+    /* 車が手前を通過するように、z-indexを低くする */
+    z-index: 2;
+}
+@keyframes drive-left-to-right {
+    from {
+        transform: translateX(-350px) scale(0.8) scaleX(-1); /* 奥のレーン用に縮小 */
+    }
+    to {
+        transform: translateX(calc(800px + 100%)) scale(0.8) scaleX(-1); /* 奥のレーン用に縮小 */
+    }
+}
+
+@keyframes drive-right-to-left {
+    from {
+        transform: translateX(calc(800px + 100%)); /* 画面右外からスタート */
+    }
+    to {
+        transform: translateX(-350px); /* 画面左外へ移動 */
+    }
+}
+
+#car, #car-blue {
+    position: absolute;
+    bottom: 10%;
+    left: 0; /* アニメーションの基準点を左に統一 */
+    width: 250px; /* 大きく表示 */
+    height: 140px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 5;
+    /* JSで動的に車を生成するため、HTMLに元からある車は非表示にする */
+    visibility: hidden;
+}
+
+#car {
+    background-image: url('assets/images/car_red.png');
+    transform: scaleX(-1); /* 車の向きを反転 */
+}
+
+#car-blue {
+    background-image: url('assets/images/car_blue.png');
+}
+
+/* JSから動的に生成される車のためのクラス */
+.car-instance {
+    position: absolute;
+    /* bottom, z-index はJSで車ごとに設定 */
+    left: 0;
+    width: 250px;
+    height: 140px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none; /* クリックイベントを拾わないようにする */
+    animation-timing-function: linear;
+}
+
+/* 走行アニメーション */
+.driving-red { animation-name: drive-left-to-right; }
+.driving-blue { animation-name: drive-right-to-left; }
+
+/* --- Traffic Lights --- */
+
+/* 自動車用信号機 (横向き) */
+#traffic-light-car {
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    display: flex; /* flexboxで横並びに */
+    flex-direction: row;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 10px;
+    border: 3px solid #111;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    z-index: 20;
+}
+
+/* 信号機のラベル共通スタイル */
+#traffic-light-car::after,
+#traffic-light-pedestrian::after {
+    content: '';
+    position: absolute;
+    top: -28px; /* 信号機の上部に配置 */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap; /* テキストが折り返さないように */
+}
+
+#traffic-light-car::after { content: 'くるまの しんごう'; }
+#traffic-light-pedestrian::after { content: 'ひとの しんごう'; }
+
+/* 歩行者用信号機 (四角) */
+#traffic-light-pedestrian {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 80px;  /* 四角い形 */
+    height: 160px;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 10px;
+    border: 3px solid #111;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    z-index: 20;
+}
+
+.light {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 5px;
+    background-color: #4d4d4d; /* 消灯時の色 */
+    border: 2px solid #111;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#traffic-light-pedestrian .light {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px; /* 少し角丸の四角いライト */
+}
+/* 点灯時の色 (よりリアルな色合いに) */
+/* inset box-shadowで内側に淡い光を追加し、立体感を演出 */
+.light.red.on { background-color: #d90000; box-shadow: 0 0 20px #d90000, inset 0 0 5px rgba(255,255,255,0.3); }
+.light.yellow.on { background-color: #f2a100; box-shadow: 0 0 20px #f2a100, inset 0 0 5px rgba(255,255,255,0.3); }
+.light.green.on { background-color: #00a56d; box-shadow: 0 0 20px #00a56d, inset 0 0 5px rgba(255,255,255,0.3); }
+
+/* 歩行者用信号の青点滅アニメーション */
+.light.green.blinking {
+    animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: #00a56d;
+        box-shadow: 0 0 20px #00a56d, inset 0 0 5px rgba(255,255,255,0.3);
+    }
+    50% {
+        background-color: #4d4d4d;
+        box-shadow: none;
+    }
+}
+/* --- UI Elements --- */
+#question-area {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#question-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    min-height: 2rem;
+}
+
+#controls {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.control-btn {
+    padding: 15px 40px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    background-color: #81c784;
+    box-shadow: 0 6px #4caf50;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+}
+
+/* 「まつ」ボタンのスタイル */
+#wait-btn {
+    background-color: #42a5f5; /* 青色 */
+    box-shadow: 0 6px #1e88e5;
+}
+
+.control-btn:active {
+    top: 4px;
+}
+#cross-btn:active {
+    box-shadow: 0 2px #4caf50;
+}
+#wait-btn:active {
+    box-shadow: 0 2px #1e88e5;
+}
+
+.control-btn:disabled {
+    background-color: #e0e0e0;
+    box-shadow: 0 6px #bdbdbd;
+    cursor: not-allowed;
+}
+
+#feedback {
+    /* 画面中央に大きく表示するためのスタイル */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10em; /* 大幅に大きく */
+    font-weight: 800; /* より太く */
+    z-index: 100; /* 他のどの要素よりも手前に表示 */
+    pointer-events: none; /* 下の要素をクリックできるように */
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 5px rgba(255, 255, 255, 0.7); /* 白い縁取りで視認性アップ */
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.correct {
+    color: #e53935; /* 濃い赤 */
+    animation: feedback-anim 0.5s ease-out;
+}
+
+.incorrect {
+    color: #1e88e5; /* 濃い青 */
+    animation: feedback-shake 0.5s ease;
+}
+
+@keyframes feedback-anim {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+@keyframes feedback-shake {
+    0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+    20%, 60% { transform: translate(-50%, -50%) translateX(-10px); }
+    40%, 80% { transform: translate(-50%, -50%) translateX(10px); }
+}
+
+/* --- 緊急車両用の画面フラッシュエフェクト --- */
+#traffic-app-container.emergency-active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 0, 0, 0.3);
+    animation: screen-flash 0.5s infinite;
+    z-index: 25; /* 信号機(20)より手前、フィードバック(100)より奥 */
+    pointer-events: none; /* 下の要素をクリックできるように */
+}
+
+@keyframes screen-flash {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Tutorial Modal --- */
+#tutorial-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.tutorial-content {
+    background-color: #fff;
+    padding: 25px 35px;
+    border-radius: 20px;
+    text-align: left;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.tutorial-content h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #004d40;
+}
+
+.tutorial-content p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.tutorial-content .text-blue { color: #00a56d; font-weight: 800; }
+.tutorial-content .text-red { color: #d90000; font-weight: 800; }
+.tutorial-content .text-emergency { color: #e53935; font-weight: 800; }
+
+#start-game-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    background-color: #ff9800; /* オレンジ色 */
+    box-shadow: 0 6px #f57c00;
+}
+
+#start-game-btn:active {
+    box-shadow: 0 2px #f57c00;
+}

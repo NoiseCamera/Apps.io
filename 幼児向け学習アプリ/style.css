@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap');
-
 /* 基本的なスタイル */
 body {
-    font-family: 'M PLUS Rounded 1c', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    font-family: 'Kosugi Maru', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
     background: linear-gradient(135deg, #fffde7 0%, #e3f2fd 100%); /* 明るい黄色から水色へのグラデーション */
     color: #333;
     text-align: center;
@@ -24,24 +22,47 @@ header p {
 
 /* アプリ選択画面のスタイル */
 #app-selector {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px; /* 少し間隔を広げる */
-    margin-top: 30px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.category-group {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-size: 2.2rem;
+    color: #004d40; /* 濃いティール */
+    border-bottom: 4px solid #4db6ac; /* 明るいティール */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.app-grid {
+    display: grid;
+    /* 画面幅に応じて列数を自動調整します */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
 }
 
 .app-link {
-    display: block;
-    width: 80%;
-    max-width: 500px;
-    padding: 20px;
-    border: 4px solid; /* 太さを4pxに */
-    border-radius: 30px; /* 角をより丸く */
+    /* display: block; から flex に変更して中身を中央揃え */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    min-height: 180px; /* 高さを揃える */
+
+    /* 既存のスタイルを微調整 */
+    padding: 25px 20px;
+    border-width: 4px;
+    border-style: solid;
+    border-radius: 15px; /* 少し角を戻す */
     text-decoration: none;
     color: #333;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 /* 各リンクの色分け */
@@ -61,21 +82,72 @@ header p {
     background-color: #e3f2fd; /* 薄い青 */
     border-color: #42a5f5; /* 青 */
 }
+.app-link[href="jigsaw-puzzle.html"] {
+    background-color: #f3e5f5; /* 薄い紫 */
+    border-color: #ab47bc; /* 紫 */
+}
+.app-link[href="hiragana-stroke.html"] {
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
+}
+.app-link[href="katakana-stroke.html"] {
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
+}
+.app-link[href="clock.html"] {
+    background-color: #fff3e0; /* 薄いオレンジ */
+    border-color: #ff9800; /* オレンジ */
+}
+.app-link[href="traffic-signal.html"] {
+    background-color: #e0f7fa; /* 薄いシアン */
+    border-color: #00bcd4; /* シアン */
+}
 
 .app-link:hover {
-    transform: translateY(-8px) scale(1.03) rotate(1deg); /* 少し浮き上がって傾く */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
 }
 
-.app-link h2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px; /* アイコンとテキストの間隔 */
-    font-size: 1.8em;
-    margin-bottom: 8px;
+/* h2からh3に変更したため、セレクタを更新 */
+.app-link h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem; /* 少し小さくして2行でも収まりやすくする */
+    line-height: 1.3; /* 2行になったときの行間を調整 */
 }
 
+/* h3の文字色を各リンクのテーマカラーに合わせる */
+.app-link[href="calculation.html"] h3 {
+    color: #fbc02d;
+}
+.app-link[href="hiragana.html"] h3 {
+    color: #f06292;
+}
+.app-link[href="katakana.html"] h3 {
+    color: #66bb6a;
+}
+.app-link[href="slide-puzzle.html"] h3 {
+    color: #42a5f5;
+}
+.app-link[href="jigsaw-puzzle.html"] h3 {
+    color: #ab47bc;
+}
+.app-link[href="clock.html"] h3 {
+    color: #ff9800;
+}
+.app-link[href="traffic-signal.html"] h3 {
+    color: #00bcd4;
+}
+.app-link[href="hiragana-stroke.html"] h3,
+.app-link[href="katakana-stroke.html"] h3 {
+    color: #26a69a;
+}
+
+.app-link p {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.5;
+}
 /* 各アプリ共通のナビゲーション */
 nav {
     display: flex;
@@ -84,7 +156,7 @@ nav {
     gap: 15px; /* ボタン間の隙間 */
 }
 
-nav a {
+nav a, .nav-link-back {
     display: inline-block;
     padding: 12px 24px;
     text-decoration: none;
@@ -96,23 +168,23 @@ nav a {
     top: 0;
 }
 
-nav a, .mode-btn, button {
+nav a, .nav-link-back, .mode-btn, .difficulty-btn, button {
     border: none;
     cursor: pointer;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-family: 'Kosugi Maru', sans-serif;
     font-weight: 700;
 }
 
-nav a {
+nav a, .nav-link-back {
     background-color: #ff7f50; /* コーラル */
     box-shadow: 0 6px #e57248;
 }
 
-nav a:hover {
+nav a:hover, .nav-link-back:hover {
     background-color: #ff8a63;
 }
 
-nav a:active {
+nav a:active, .nav-link-back:active {
     top: 4px;
     box-shadow: 0 2px #e57248;
 }
@@ -131,8 +203,20 @@ nav a.nav-link-other:active {
     box-shadow: 0 2px #4a9fde;
 }
 
-#mode-selector {
+/* 計算ゲームのオプションコンテナ */
+#game-options-container {
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 15px;
+    border-radius: 20px;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 中の要素を中央揃えにする */
+    gap: 15px;
+}
+
+#mode-selector {
+    margin-bottom: 0; /* コンテナ側で管理 */
     display: flex;
     justify-content: center;
     gap: 15px;
@@ -168,6 +252,40 @@ nav a.nav-link-other:active {
     box-shadow: 0 1px #e0e0e0;
 }
 
+/* 難易度選択ボタン */
+#difficulty-selector {
+    margin-bottom: 0; /* コンテナ側で管理 */
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+}
+
+.difficulty-btn {
+    padding: 12px 22px;
+    font-size: 1em;
+    border-radius: 25px;
+    color: #555;
+    background-color: #fafafa;
+    box-shadow: 0 5px #e0e0e0;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+}
+
+.difficulty-btn.selected {
+    background-color: #a5d6a7; /* 薄い緑 */
+    color: #424242;
+    box-shadow: 0 5px #81c784;
+    top: 2px;
+}
+
+.difficulty-btn:not(.selected):hover {
+    background-color: #ffffff;
+    top: -2px;
+    box-shadow: 0 7px #e0e0e0;
+}
+
 /* 計算アプリのレイアウト */
 .calculation-layout {
     display: flex;
@@ -179,11 +297,7 @@ nav a.nav-link-other:active {
 }
 
 /* アプリ選択画面のコンテナ */
-#app-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+#app-container {}
 
 #calculation-container {
     background-color: #fff;
@@ -194,7 +308,6 @@ nav a.nav-link-other:active {
     width: 90%;
     max-width: 400px;
 }
-
 /* リンゴ表示用のコンテナ */
 .item-container {
     width: 250px; /* 横幅を広げて桁ごとの表示に対応 */
@@ -206,28 +319,6 @@ nav a.nav-link-other:active {
     border: 3px dashed #a0d8ef;
     border-radius: 15px;
     background-color: #f0f8ff;
-}
-
-/* 式の左右のアイテムを視覚的に表示するためのコンテナ */
-.visual-calculation-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-/* 式の間の演算子（+, -） */
-.operator-symbol {
-    font-size: 4em;
-    font-weight: bold;
-    color: #4CAF50; /* 緑 */
-    align-self: center; /* 上下中央に配置 */
-}
-
-/* 引き算の記号は赤くする */
-.operator-symbol.subtraction {
-    color: #f44336; /* 赤 */
 }
 
 /* 桁ごとのグループ（数字とリンゴをまとめる） */
@@ -344,7 +435,6 @@ nav a.nav-link-other:active {
     /* 色を透明にすることで、場所は確保しつつ見えなくする */
     color: transparent;
 }
-
 /* 答えの入力欄とヒントボタンを横並びにするスタイル */
 .answer-area {
   display: flex;
@@ -502,7 +592,6 @@ button:disabled {
     20%, 60% { transform: translateX(-10px); }
     40%, 80% { transform: translateX(10px); }
 }
-
 /* --- スマホ・タブレット横画面対応 --- */
 @media screen and (max-height: 550px) and (orientation: landscape), screen and (max-width: 950px) and (orientation: landscape) {
     body {
@@ -516,15 +605,21 @@ button:disabled {
     header h1 { font-size: 1.5em; margin: 0; }
     header p { font-size: 0.9em; margin: 2px 0 5px 0; }
 
-    nav { margin-bottom: 5px; }
+    nav { margin-bottom: 10px; }
     nav a { padding: 4px 8px; margin: 0 4px; font-size: 0.9em; }
 
-    #mode-selector { margin-bottom: 5px; }
+    #game-options-container {
+        padding: 10px;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+    #difficulty-selector, #mode-selector { gap: 5px; }
+    .difficulty-btn { padding: 4px 8px; font-size: 0.8em; }
     .mode-btn { padding: 4px 8px; font-size: 0.8em; }
-
+ 
     main.calculation-layout {
         gap: 5px;
-        align-items: flex-start; /* 上揃えにしてスペースを節約 */
+        align-items: flex-start;
         flex-grow: 1;
         width: 100%;
     }
@@ -543,8 +638,9 @@ button:disabled {
 
     #calculation-container {
         padding: 10px;
-        max-width: 300px;
+        max-width: 280px;
         width: 100%;
+        flex-shrink: 0;
     }
 
     .problem { font-size: 2.2em; margin-bottom: 5px; }
@@ -564,4 +660,299 @@ button:disabled {
     }
 
     #feedback { font-size: 1.5em; height: 25px; margin-top: 5px; }
+}
+
+/* --- 時計アプリの新しいレイアウト --- */
+
+.clock-game-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-around; /* 中央から広がるように配置 */
+  gap: 30px; /* 要素間の隙間を調整 */
+  width: 100%;
+  max-width: 900px; /* アプリ全体の最大幅 */
+  margin: 20px auto;
+}
+
+.clock-display-area {
+  /* 時計エリアがより多くのスペースを占めるようにして中央に寄せる */
+  flex: 1.5;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clock-wrapper {
+  position: relative;
+  width: 100%;
+  /* 正方形を維持する */
+  aspect-ratio: 1 / 1;
+  overflow: hidden; /* アニメーションがはみ出さないようにする */
+}
+
+#clock-canvas {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); /* 時計に影をつけて立体感を出す */
+}
+
+.clock-controls-area {
+  /* 操作エリアのスペースを相対的に小さくする */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+.read-mode #controls, .set-mode #controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ボタンを2列に */
+  gap: 10px;
+}
+
+.main-action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center; /* ボタンを垂直方向にも中央揃えにする */
+  margin-top: 10px;
+}
+
+/* 答え合わせで不正解だったボタンのスタイル */
+#controls .choice-btn.wrong-answer {
+  opacity: 0.6;
+  filter: grayscale(50%);
+}
+
+/* 「とけいをあわせる」モードのボタン（グリッドレイアウトに変更） */
+.time-setter-grid {
+  display: grid;
+  grid-template-columns: auto auto auto; /* [-] [label] [+] の3列 */
+  gap: 10px 15px; /* 行と列の間の隙間 */
+  align-items: center;
+  justify-items: center; /* 各セル内のアイテムを中央揃え */
+  margin-bottom: 15px;
+  background-color: #f0f8ff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.time-adjust-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 1.5em;
+  border-radius: 50%;
+  background-color: #64b5f6; /* 青 */
+  color: white;
+  border: none;
+  box-shadow: 0 4px #42a5f5;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+  top: 0;
+  /* 以下を追加して文字を中央に配置 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1; /* フォントによる縦のズレを補正 */
+}
+
+.time-setter-grid label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+}
+
+.time-adjust-btn:active {
+    top: 2px;
+    box-shadow: 0 2px #42a5f5;
+}
+
+#check-answer-btn, #next-question-btn {
+    padding: 0; /* パディングをリセットし、高さとflexで中央揃え */
+    font-size: 1.2rem;
+    width: 180px; /* ボタンの幅を固定して大きさを揃える */
+    height: 60px; /* 高さを固定して揃える */
+    text-align: center; /* 文字を中央に配置 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    line-height: 1; /* テキストのベースラインを揃え、垂直方向のズレをなくす */
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+    transition: all 0.1s;
+}
+
+#check-answer-btn {
+    background-color: #e57373; /* 赤 */
+    box-shadow: 0 6px #f44336;
+}
+
+#check-answer-btn:active, #next-question-btn:active {
+    top: 4px;
+}
+
+#check-answer-btn:active {
+    box-shadow: 0 2px #f44336;
+}
+
+/* 「つぎのもんだい」ボタンのスタイル */
+#next-question-btn {
+    background-color: #64b5f6; /* 青 */
+    box-shadow: 0 6px #42a5f5;
+}
+
+#next-question-btn:active {
+    box-shadow: 0 2px #42a5f5;
+}
+
+/* 「よむ れんしゅう」モードの「つぎのもんだい」ボタンに余白を追加 */
+.read-mode #controls > #next-question-btn {
+    margin-top: 15px;
+}
+
+/* 画面幅が狭い場合（スマホ縦向きなど）は縦並びに戻す */
+@media (max-width: 768px) {
+  .clock-game-layout {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .clock-display-area,
+  .clock-controls-area {
+    max-width: 380px;
+    width: 100%;
+  }
+}
+
+/* --- 時計アプリの選択肢ボタンのスタイル --- */
+/* 4つのボタンにそれぞれ違う色を割り当てる */
+#controls .choice-btn:nth-child(1) {
+  background-color: #81c784; /* 緑 */
+  box-shadow: 0 5px #4caf50;
+}
+#controls .choice-btn:nth-child(2) {
+  background-color: #ffb74d; /* オレンジ */
+  box-shadow: 0 5px #fb8c00;
+}
+#controls .choice-btn:nth-child(3) {
+  background-color: #64b5f6; /* 青 */
+  box-shadow: 0 5px #42a5f5;
+}
+#controls .choice-btn:nth-child(4) {
+  background-color: #e57373; /* 赤 */
+  box-shadow: 0 5px #f44336;
+}
+
+/* ボタンにマウスを乗せたときのスタイル */
+.choice-btn:hover:not(:disabled) {
+  top: -2px;
+  box-shadow: 0 7px #555;
+}
+
+/* クリックしたときのスタイル */
+.choice-btn:active:not(:disabled) {
+  top: 2px;
+  box-shadow: 0 2px #555;
+}
+
+/* 答え合わせ後の正解/不正解ボタンのスタイル */
+#controls .choice-btn.correct-answer {
+  background-color: #ffd54f; /* 黄色でハイライト */
+  color: #424242;
+  text-shadow: none;
+  box-shadow: 0 5px #ffc107;
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+/* --- トグルスイッチのコンテナ --- */
+#toggle-switches-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* スイッチ間の隙間を調整 */
+    margin-bottom: 20px; /* レイアウト用のマージン */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+}
+
+/* --- 「ほんもの とけい」モード切り替えスイッチのスタイル --- */
+#advanced-mode-toggle-container, #minute-display-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.1em;
+  color: #555;
+  font-weight: bold;
+  /* 以下を追加して、各スイッチを枠で囲み分かりやすくする */
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: 2px solid #ffca28; /* Amber */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #4caf50; /* Green */
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }

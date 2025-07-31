@@ -58,7 +58,7 @@
   width: 90%;
   max-width: 400px;
   text-align: center;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-family: 'Kosugi Maru', sans-serif;
 }
 
 .settings-content h2 {
@@ -122,9 +122,16 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* 閉じるボタン */
-#close-settings-btn {
-    /* style.cssのbuttonスタイルを参考に適用 */
+.settings-buttons {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* 閉じるボタンとメニューへ戻るボタンの共通スタイル */
+#close-settings-btn, #back-to-menu-link {
+    display: inline-block;
     padding: 12px 28px;
     font-size: 1.1em;
     font-weight: bold;
@@ -135,15 +142,33 @@
     transition: all 0.1s;
     position: relative;
     top: 0;
+    text-decoration: none; /* aタグのために指定 */
+}
+
+#close-settings-btn:active, #back-to-menu-link:active {
+    top: 4px;
+}
+
+/* 閉じるボタン */
+#close-settings-btn {
     background-color: #7e57c2; /* 別の紫 */
     box-shadow: 0 6px #673ab7;
 }
-
 #close-settings-btn:hover {
     background-color: #8d6ed1;
 }
-
 #close-settings-btn:active {
-    top: 4px;
     box-shadow: 0 2px #673ab7;
+}
+
+/* メニューへ戻るボタンの個別スタイル */
+#back-to-menu-link {
+    background-color: #ff7f50; /* コーラル */
+    box-shadow: 0 6px #e57248;
+}
+#back-to-menu-link:hover {
+    background-color: #ff8a63;
+}
+#back-to-menu-link:active {
+    box-shadow: 0 2px #e57248;
 }

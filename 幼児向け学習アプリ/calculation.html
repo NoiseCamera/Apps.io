@@ -14,18 +14,19 @@
         <p>もんだいを といてみよう！</p>
     </header>
 
-    <nav>
-        <a href="index.html">えらぶがめんへ</a>
-        <a href="hiragana.html" class="nav-link-other">ひらがな</a>
-        <a href="katakana.html" class="nav-link-other">カタカナ</a>
-    </nav>
-
-    <div id="mode-selector">
-        <button class="mode-btn selected" id="mode-mixed">まぜこぜ</button>
-        <button class="mode-btn" id="mode-addition">たしざん</button>
-        <button class="mode-btn" id="mode-subtraction">ひきざん</button>
+    <div id="game-options-container">
+        <div id="mode-selector">
+            <button class="mode-btn selected" id="mode-mixed">まぜこぜ</button>
+            <button class="mode-btn" id="mode-addition">たしざん</button>
+            <button class="mode-btn" id="mode-subtraction">ひきざん</button>
+        </div>
+        <div id="difficulty-selector">
+            <button class="difficulty-btn selected" id="difficulty-mixed">いろんな けた</button>
+            <button class="difficulty-btn" id="difficulty-1">1けた</button>
+            <button class="difficulty-btn" id="difficulty-2">2けた</button>
+            <button class="difficulty-btn" id="difficulty-3">3けた</button>
+        </div>
     </div>
-
 
     <main id="app-container" class="calculation-layout">
         <div id="left-items" class="item-container"></div>

@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <label for="se-volume">こうかおん (SE)</label>
           <input type="range" id="se-volume" min="0" max="1" step="0.1">
         </div>
-        <button id="close-settings-btn">とじる</button>
+        <div class="settings-buttons">
+          <a href="index.html" id="back-to-menu-link">えらぶがめんへ</a>
+          <button id="close-settings-btn">とじる</button>
+        </div>
       </div>
     </div>
   `;

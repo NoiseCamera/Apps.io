@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>とけいを おぼえよう</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="clock.css">
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm4.mp3" loop></audio>
+  <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio>
+  <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3"></audio>
+
+  <header>
+    <h1>とけいを おぼえよう</h1>
+  </header>
+
+  <main id="clock-app-container">
+    <div id="mode-selector">
+      <button class="mode-btn selected" data-mode="read">よむ れんしゅう</button>
+      <button class="mode-btn" data-mode="set">とけいを あわせる</button>
+    </div>
+
+    <div id="toggle-switches-container">
+      <!-- 「ほんもの とけい」モード切り替えスイッチ -->
+      <div id="advanced-mode-toggle-container">
+        <span>かんたん</span>
+        <label class="switch"><input type="checkbox" id="advanced-mode-toggle"><span class="slider round"></span></label>
+        <span>ほんもの</span>
+      </div>
+      <!-- 分の表示切り替えスイッチ -->
+      <div id="minute-display-toggle-container">
+        <span>ふんのすうじ</span>
+        <label class="switch"><input type="checkbox" id="minute-display-toggle"><span class="slider round"></span></label>
+      </div>
+    </div>
+
+    <!-- 新しいレイアウト用のコンテナ -->
+    <div id="game-container" class="clock-game-layout">
+        <!-- 左エリア：時計表示 -->
+        <div class="clock-display-area">
+            <div class="clock-wrapper">
+                <canvas id="clock-canvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <!-- 右エリア：問題文と操作ボタン -->
+        <div class="clock-controls-area">
+            <h2 id="question-text">この とけいは なんじかな？</h2>
+            <div id="controls">
+                <!-- 回答ボタンはここにJavaScriptで生成されます -->
+            </div>
+            <div id="feedback"></div>
+        </div>
+    </div>
+  </main>
+
+  <script src="clock.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

@@ -30,8 +30,8 @@
 }
 
 #reference-container #current-reference-image {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 8px;
   border: 3px solid #ffc0cb;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -81,21 +81,21 @@
 
 /* パズルグリッド (タイルの親要素) */
 #puzzle-grid {
-  width: 450px;  /* 150px * 3 */
-  height: 450px; /* 150px * 3 */
+  width: 540px;  /* 180px * 3 */
+  height: 540px; /* 180px * 3 */
   position: relative; /* タイルの絶対位置指定の基準 */
 }
 
 /* パズルタイル */
 .puzzle-tile {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   position: absolute; /* JavaScriptで位置を制御 */
   box-sizing: border-box;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-image: url('assets/images/usagi.png');
-  background-size: 450px 450px; /* グリッドサイズ(3) * タイルサイズ(150) */
+  background-size: 540px 540px; /* グリッドサイズ(3) * タイルサイズ(180) */
   cursor: pointer;
   /* スライドは速く、最後のピースがはまるのはゆっくりに設定 */
   transition: left 0.3s ease-in-out, top 0.3s ease-in-out,

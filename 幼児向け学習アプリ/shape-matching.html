@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>かたちあわせ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="shape-matching.css">
+</head>
+<body>
+    <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
+    <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3"></audio>
+
+    <header>
+        <h1>かたちあわせ</h1>
+    </header>
+
+    <main id="app-container">
+        <div id="question-area">
+            <p>この かたちは なあに？</p>
+            <div id="question-shape-container">
+                <!-- 問題の図形がここに表示される -->
+            </div>
+        </div>
+        <div id="options-container">
+            <!-- 選択肢がここに表示される -->
+        </div>
+        <div id="feedback-area">
+            <p id="feedback-text"></p>
+        </div>
+    </main>
+
+    <script src="shape-matching.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
