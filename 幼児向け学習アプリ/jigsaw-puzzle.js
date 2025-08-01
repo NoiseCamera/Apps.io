@@ -442,6 +442,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function onTouchMove(e) {
+    if (!selectedPiece) {
+      return; // ピースを掴んでいないときは、通常のスクロールを許可
+    }
+    // ピースを掴んでいるときは、ページのスクロールを無効にする
+    e.preventDefault();
+
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       const mouseEvent = new MouseEvent("mousemove", {
