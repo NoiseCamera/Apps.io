@@ -102,6 +102,10 @@ header p {
     background-color: #e0f7fa; /* 薄いシアン */
     border-color: #00bcd4; /* シアン */
 }
+.app-link[href="movies.html"] {
+    background-color: #ffebee; /* 薄い赤 */
+    border-color: #e53935; /* 赤 */
+}
 
 .app-link:hover {
     transform: translateY(-5px);
@@ -140,6 +144,9 @@ header p {
 .app-link[href="hiragana-stroke.html"] h3,
 .app-link[href="katakana-stroke.html"] h3 {
     color: #26a69a;
+}
+.app-link[href="movies.html"] h3 {
+    color: #e53935;
 }
 
 .app-link p {

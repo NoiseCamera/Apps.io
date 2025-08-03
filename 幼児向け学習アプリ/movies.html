@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>どうがをみよう</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="movies.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>どうがを みよう！</h1>
+    </header>
+
+    <main>
+        <div id="app-container">
+            <div id="movie-player-container">
+                <video id="video-player" controls playsinline></video>
+                <p id="movie-title"></p>
+            </div>
+
+            <div id="movie-selector">
+                <!-- JavaScriptによってボタンがここに生成されます -->
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 音量設定用モーダルとボタン (settings.jsが生成) -->
+    <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
+    <script src="settings.js"></script>
+    <script src="movies.js"></script>
+</body>
+</html>
