@@ -48,31 +48,66 @@ document.addEventListener('DOMContentLoaded', () => {
      * @returns {Promise<string>} サムネイルのData URLを解決するPromise
      */
     function generateThumbnail(videoSrc) {
-        return new Promise((resolve, reject) => {
+         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
+            let resolved = false; // 複数回resolve/rejectが呼ばれるのを防ぐフラグ
 
+            // スマホでの動作を安定させるための属性
+            video.playsinline = true;
+            video.muted = true;
+            video.preload = 'metadata'; // メタデータのプリロードを推奨
             video.src = videoSrc;
-            video.muted = true; // 自動再生ポリシー対策
 
-            // 動画のメタデータが読み込まれたら
-            video.addEventListener('loadeddata', () => {
+            const cleanup = () => {
+                video.removeEventListener('loadeddata', onDataLoaded);
+                video.removeEventListener('seeked', onSeeked);
+                video.removeEventListener('error', onError);
+                clearTimeout(timeoutId);
+            };
+
+            const doResolve = (dataUrl) => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                resolve(dataUrl);
+            };
+
+            const doReject = (reason) => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                reject(reason);
+            };
+
+            const onSeeked = () => {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                doResolve(canvas.toDataURL('image/jpeg'));
+            };
+
+            const onDataLoaded = () => {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 video.currentTime = 1.0; // 1秒時点に移動
-            });
+            };
 
-            // 指定時間に移動が完了したら
-            video.addEventListener('seeked', () => {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg')); // 画像データに変換
-            });
-
-            video.addEventListener('error', (e) => {
+            const onError = (e) => {
                 console.error('サムネイル生成のための動画読み込みエラー:', videoSrc, e);
-                reject('サムネイル生成エラー');
-            });
+                doReject('サムネイル生成エラー');
+            };
+
+            // タイムアウト処理 (5秒で失敗とみなす)
+            const timeoutId = setTimeout(() => {
+                doReject('サムネイル生成がタイムアウトしました');
+            }, 5000);
+
+            video.addEventListener('loadeddata', onDataLoaded);
+            video.addEventListener('seeked', onSeeked);
+            video.addEventListener('error', onError);
+
+            // iOS Safariなどでは、load()を呼ばないとイベントが発火しないことがある
+            video.load();
         });
     }
 
@@ -99,9 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
         videoPlayer.src = movieData.src;
         videoPlayer.load();
         if (autoPlay) {
-            videoPlayer.play().catch(error => {
-                console.error('動画の再生に失敗しました:', error);
-            });
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error('動画の自動再生に失敗しました:', error);
+                });
+            }
         }
         movieTitle.textContent = movieData.title;
 
