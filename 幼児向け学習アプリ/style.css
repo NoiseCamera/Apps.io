@@ -106,6 +106,10 @@ header p {
     background-color: #ffebee; /* 薄い赤 */
     border-color: #e53935; /* 赤 */
 }
+.app-link[href="drawing-board.html"] {
+    background-color: #e1f5fe; /* Light Cyan */
+    border-color: #29b6f6; /* Light Blue */
+}
 
 .app-link:hover {
     transform: translateY(-5px);
@@ -148,6 +152,9 @@ header p {
 .app-link[href="movies.html"] h3 {
     color: #e53935;
 }
+.app-link[href="drawing-board.html"] h3 {
+    color: #039be5; /* Blue */
+}
 
 .app-link p {
     margin: 0;
@@ -161,53 +168,6 @@ nav {
     justify-content: center;
     margin-bottom: 25px;
     gap: 15px; /* ボタン間の隙間 */
-}
-
-nav a, .nav-link-back {
-    display: inline-block;
-    padding: 12px 24px;
-    text-decoration: none;
-    font-weight: bold;
-    color: white;
-    border-radius: 15px;
-    transition: transform 0.1s, box-shadow 0.1s;
-    position: relative;
-    top: 0;
-}
-
-nav a, .nav-link-back, .mode-btn, .difficulty-btn, button {
-    border: none;
-    cursor: pointer;
-    font-family: 'Kosugi Maru', sans-serif;
-    font-weight: 700;
-}
-
-nav a, .nav-link-back {
-    background-color: #ff7f50; /* コーラル */
-    box-shadow: 0 6px #e57248;
-}
-
-nav a:hover, .nav-link-back:hover {
-    background-color: #ff8a63;
-}
-
-nav a:active, .nav-link-back:active {
-    top: 4px;
-    box-shadow: 0 2px #e57248;
-}
-
-nav a.nav-link-other {
-    background-color: #64b5f6; /* 明るい青 */
-    box-shadow: 0 6px #4a9fde;
-}
-
-nav a.nav-link-other:hover {
-    background-color: #71bdf7;
-}
-
-nav a.nav-link-other:active {
-    top: 4px;
-    box-shadow: 0 2px #4a9fde;
 }
 
 /* 計算ゲームのオプションコンテナ */
@@ -229,36 +189,6 @@ nav a.nav-link-other:active {
     gap: 15px;
 }
 
-.mode-btn {
-    padding: 12px 22px;
-    font-size: 1em;
-    border-radius: 25px;
-    color: #555;
-    background-color: #fafafa;
-    box-shadow: 0 5px #e0e0e0;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-}
-
-.mode-btn.selected {
-    background-color: #ffd54f; /* 明るい黄色 */
-    color: #424242;
-    box-shadow: 0 5px #ffc107;
-    top: 2px;
-}
-
-.mode-btn:not(.selected):hover {
-    background-color: #ffffff;
-    top: -2px;
-    box-shadow: 0 7px #e0e0e0;
-}
-
-.mode-btn:active {
-    top: 4px;
-    box-shadow: 0 1px #e0e0e0;
-}
-
 /* 難易度選択ボタン */
 #difficulty-selector {
     margin-bottom: 0; /* コンテナ側で管理 */
@@ -266,31 +196,6 @@ nav a.nav-link-other:active {
     justify-content: center;
     gap: 15px;
     flex-wrap: wrap; /* 画面が狭い時に折り返す */
-}
-
-.difficulty-btn {
-    padding: 12px 22px;
-    font-size: 1em;
-    border-radius: 25px;
-    color: #555;
-    background-color: #fafafa;
-    box-shadow: 0 5px #e0e0e0;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-}
-
-.difficulty-btn.selected {
-    background-color: #a5d6a7; /* 薄い緑 */
-    color: #424242;
-    box-shadow: 0 5px #81c784;
-    top: 2px;
-}
-
-.difficulty-btn:not(.selected):hover {
-    background-color: #ffffff;
-    top: -2px;
-    box-shadow: 0 7px #e0e0e0;
 }
 
 /* 計算アプリのレイアウト */
@@ -451,27 +356,6 @@ nav a.nav-link-other:active {
   margin: 1rem 0;
 }
 
-/* 答え表示欄のスタイル */
-.answer-display {
-    font-size: 3em; /* 問題のフォントサイズと合わせる */
-    font-weight: bold;
-    min-height: 1.5em; /* 高さを確保 */
-    line-height: 1.5em; /* 高さと合わせる */
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    background-color: #fff;
-    text-align: center; /* 中央揃えに変更 */
-    width: 80%;
-    max-width: 300px;
-    box-sizing: border-box;
-}
-
-/* プレースホルダーのシミュレーション */
-.answer-display.is-placeholder {
-    color: #aaa;
-}
-
 #number-buttons {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -479,94 +363,10 @@ nav a.nav-link-other:active {
     margin-bottom: 20px;
 }
 
-.number-btn {
-    background-color: #fff176; /* 明るい黄色 */
-    color: #5d4037; /* 茶色 */
-    font-size: 1.5em;
-    padding: 18px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
 .buttons {
     display: flex;
     justify-content: center;
     gap: 15px;
-}
-
-/* ヒントボタンのスタイル調整 */
-#hint-btn {
-  font-size: 1.8rem; /* 電球アイコンのサイズ */
-  padding: 0.5rem;
-  min-width: 60px;
-  height: 60px;
-  line-height: 1;
-  border-radius: 50%;
-  background-color: #4fc3f7; /* 明るい水色 */
-  box-shadow: 0 6px #03a9f4;
-}
-
-#hint-btn:active {
-    top: 4px;
-    box-shadow: 0 2px #03a9f4;
-}
-
-#hint-btn:disabled {
-    background-color: #e0e0e0;
-    box-shadow: 0 6px #bdbdbd;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-button, .number-btn {
-    padding: 15px 25px;
-    font-size: 1.2em;
-    font-weight: bold;
-    border: none;
-    border-radius: 15px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-}
-
-button:active, .number-btn:active {
-    top: 4px;
-}
-
-.number-btn {
-    background-color: #fff176; /* 明るい黄色 */
-    box-shadow: 0 6px #fbc02d;
-    color: #424242;
-}
-.number-btn:active { box-shadow: 0 2px #fbc02d; }
-
-#clear-btn {
-    background-color: #ffb74d; /* オレンジ */
-    box-shadow: 0 6px #fb8c00;
-}
-#clear-btn:active { box-shadow: 0 2px #fb8c00; }
-
-#check-btn {
-    background-color: #81c784; /* 緑 */
-    box-shadow: 0 6px #4caf50;
-}
-#check-btn:active { box-shadow: 0 2px #4caf50; }
-
-#next-btn {
-    background-color: #e57373; /* 赤 */
-    box-shadow: 0 6px #f44336;
-}
-#next-btn:active { box-shadow: 0 2px #f44336; }
-
-button:disabled {
-    background-color: #e0e0e0;
-    box-shadow: 0 6px #bdbdbd;
-    cursor: not-allowed;
-    opacity: 0.7;
 }
 
 #feedback {
@@ -753,68 +553,10 @@ button:disabled {
   border-radius: 10px;
 }
 
-.time-adjust-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 1.5em;
-  border-radius: 50%;
-  background-color: #64b5f6; /* 青 */
-  color: white;
-  border: none;
-  box-shadow: 0 4px #42a5f5;
-  cursor: pointer;
-  transition: all 0.1s;
-  position: relative;
-  top: 0;
-  /* 以下を追加して文字を中央に配置 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  line-height: 1; /* フォントによる縦のズレを補正 */
-}
-
 .time-setter-grid label {
     font-size: 1.2em;
     font-weight: bold;
     color: #555;
-}
-
-.time-adjust-btn:active {
-    top: 2px;
-    box-shadow: 0 2px #42a5f5;
-}
-
-#check-answer-btn, #next-question-btn {
-    padding: 0; /* パディングをリセットし、高さとflexで中央揃え */
-    font-size: 1.2rem;
-    width: 180px; /* ボタンの幅を固定して大きさを揃える */
-    height: 60px; /* 高さを固定して揃える */
-    text-align: center; /* 文字を中央に配置 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    line-height: 1; /* テキストのベースラインを揃え、垂直方向のズレをなくす */
-    border-radius: 15px;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    top: 0;
-    transition: all 0.1s;
-}
-
-#check-answer-btn {
-    background-color: #e57373; /* 赤 */
-    box-shadow: 0 6px #f44336;
-}
-
-#check-answer-btn:active, #next-question-btn:active {
-    top: 4px;
-}
-
-#check-answer-btn:active {
-    box-shadow: 0 2px #f44336;
 }
 
 /* 「つぎのもんだい」ボタンのスタイル */
@@ -843,37 +585,6 @@ button:disabled {
     max-width: 380px;
     width: 100%;
   }
-}
-
-/* --- 時計アプリの選択肢ボタンのスタイル --- */
-/* 4つのボタンにそれぞれ違う色を割り当てる */
-#controls .choice-btn:nth-child(1) {
-  background-color: #81c784; /* 緑 */
-  box-shadow: 0 5px #4caf50;
-}
-#controls .choice-btn:nth-child(2) {
-  background-color: #ffb74d; /* オレンジ */
-  box-shadow: 0 5px #fb8c00;
-}
-#controls .choice-btn:nth-child(3) {
-  background-color: #64b5f6; /* 青 */
-  box-shadow: 0 5px #42a5f5;
-}
-#controls .choice-btn:nth-child(4) {
-  background-color: #e57373; /* 赤 */
-  box-shadow: 0 5px #f44336;
-}
-
-/* ボタンにマウスを乗せたときのスタイル */
-.choice-btn:hover:not(:disabled) {
-  top: -2px;
-  box-shadow: 0 7px #555;
-}
-
-/* クリックしたときのスタイル */
-.choice-btn:active:not(:disabled) {
-  top: 2px;
-  box-shadow: 0 2px #555;
 }
 
 /* 答え合わせ後の正解/不正解ボタンのスタイル */

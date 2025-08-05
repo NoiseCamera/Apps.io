@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>おえかき</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="drawing-board.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header id="main-header">
+        <h1>おえかき</h1>
+    </header>
+
+    <main>
+        <div id="drawing-board-layout">
+            <div id="left-toolbar" class="toolbar">
+                <button id="pen-tool" class="tool-btn" data-tool="pen">
+                    <img src="assets/images/icon_pen.svg" alt="ペン"> <span>ペン</span>
+                </button>
+                <button id="eraser-tool" class="tool-btn" data-tool="eraser">
+                    <img src="assets/images/icon_eraser.svg" alt="けしゴム"> <span>けしゴム</span>
+                </button>
+                <button id="fill-tool" class="tool-btn" data-tool="fill">
+                    <img src="assets/images/icon_fill.svg" alt="ぬりつぶし"> <span>ぬりつぶし</span>
+                </button>
+                <button id="stamp-tool" class="tool-btn" data-tool="stamp">
+                    <img src="assets/images/icon_stamp.svg" alt="スタンプ"> <span>スタンプ</span>
+                </button>
+                <hr>
+                <button id="undo-btn" class="action-btn">
+                    <img src="assets/images/icon_undo.svg" alt="もどる"> <span>もどる</span>
+                </button>
+                <button id="redo-btn" class="action-btn">
+                    <img src="assets/images/icon_redo.svg" alt="すすむ"> <span>すすむ</span>
+                </button>
+                <hr>
+                <button id="clear-btn" class="action-btn">ぜんぶけす</button>
+                <button id="save-btn" class="action-btn">ほぞんする</button>
+            </div>
+            <div id="canvas-wrapper">
+                <canvas id="drawing-canvas"></canvas>
+            </div>
+            <div id="right-toolbar" class="toolbar">
+                <div class="tool-group vertical">
+                    <label for="pen-width">ふとさ: <span id="pen-width-display">5</span></label>
+                    <input type="range" id="pen-width" min="2" max="50" value="5">
+                </div>
+                <div id="stamp-controls" class="tool-group vertical hidden">
+                    <label for="stamp-size">おおきさ: <span id="stamp-size-display">50</span></label>
+                    <input type="range" id="stamp-size" min="20" max="150" value="50">
+                    <div id="stamp-selector"></div>
+                </div>
+                <div id="color-palette"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="settings.js"></script>
+    <script src="drawing-board.js"></script>
+</body>
+</html>

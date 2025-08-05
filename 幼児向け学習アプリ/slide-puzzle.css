@@ -127,23 +127,6 @@
   margin: 0 0 10px 0;
 }
 
-#shuffle-btn, #title-screen button {
-  padding: 12px 28px;
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #fff;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: all 0.1s;
-  position: relative;
-  top: 0;
-}
-
-#shuffle-btn:active, #title-screen button:active {
-  top: 4px;
-}
-
 /* タイトル画面とクリア画面の共通スタイル */
 .overlay {
   position: fixed;
@@ -171,18 +154,6 @@
   color: #ff69b4;
   margin-bottom: 40px;
   text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
-}
-
-#title-screen button {
-  padding: 15px 40px;
-  font-size: 1.8em;
-  background-color: #ff6347; /* トマト色 */
-  box-shadow: 0 6px #e5593f;
-}
-
-#shuffle-btn {
-  background-color: #ff69b4; /* ホットピンク */
-  box-shadow: 0 6px #e55f9f;
 }
 
 /* クリア画面 */
@@ -213,6 +184,26 @@
   animation: rainbow-text-animation 8s ease infinite, win-text-pop 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+/* クリア結果表示エリア */
+#win-stats {
+  margin: 5px 0 15px 0;
+  padding: 10px 25px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  display: inline-block; /* 中身に合わせて幅を調整 */
+}
+
+/* クリア結果のテキストスタイル */
+#win-stats p {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #4a4a4a;
+  margin: 8px 0;
+  background: none; /* 親要素のグラデーションを解除 */
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  animation: none; /* 親要素のアニメーションを解除 */
+}
 @keyframes rainbow-text-animation {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -297,29 +288,10 @@
   gap: 20px;
 }
 
-.win-buttons button,
-.win-buttons a {
-  padding: 12px 28px;
-  font-size: 1.1em;
-  font-weight: bold;
-  border-radius: 15px;
-  color: white;
-  text-decoration: none;
-  background-color: #4caf50; /* 緑 */
-  box-shadow: 0 6px #388e3c;
-}
-
-#back-to-menu-btn {
-  background-color: #2196f3; /* 青 */
-  box-shadow: 0 6px #1976d2;
-}
-
-.win-buttons button:active,
-.win-buttons a:active {
-  top: 4px;
-  box-shadow: 0 2px #388e3c;
-}
-
-#back-to-menu-btn:active {
-  box-shadow: 0 2px #1976d2;
+/* 難易度選択ボタン */
+#difficulty-selector {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: center;
 }

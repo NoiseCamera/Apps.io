@@ -6,6 +6,7 @@
     <title>どうがをみよう</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
     <link rel="stylesheet" href="movies.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +20,10 @@
     <main>
         <div id="app-container">
             <div id="movie-player-container">
-                <video id="video-player" controls playsinline preload="metadata"></video>
+                <div id="video-wrapper">
+                    <video id="video-player" playsinline preload="metadata"></video>
+                    <div id="play-overlay"><button id="play-btn" aria-label="再生"></button></div>
+                </div>
                 <p id="movie-title"></p>
             </div>
 

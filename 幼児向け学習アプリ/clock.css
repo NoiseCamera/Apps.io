@@ -53,65 +53,6 @@
     max-width: 400px;
 }
 
-.time-setter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    font-size: 1.5rem;
-}
-
-.time-setter label {
-    font-weight: bold;
-}
-
-.time-setter button {
-    font-size: 1.5rem;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: none;
-    background-color: #81c784;
-    color: white;
-    box-shadow: 0 4px #4caf50;
-    cursor: pointer;
-    position: relative;
-    top: 0;
-    transition: all 0.1s;
-}
-
-.time-setter button:active {
-    top: 2px;
-    box-shadow: 0 2px #4caf50;
-}
-
-.time-setter span {
-    font-size: 2rem;
-    font-weight: bold;
-    width: 60px;
-    text-align: center;
-}
-
-#check-answer-btn {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    margin-top: 10px;
-    background-color: #e57373;
-    box-shadow: 0 6px #f44336;
-    color: white;
-    border-radius: 15px;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    top: 0;
-    transition: all 0.1s;
-}
-
-#check-answer-btn:active {
-    top: 4px;
-    box-shadow: 0 2px #f44336;
-}
-
 #feedback {
     font-size: 2em;
     font-weight: bold;

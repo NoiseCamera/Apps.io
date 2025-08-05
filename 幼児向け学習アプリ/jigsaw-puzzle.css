@@ -92,40 +92,6 @@
     gap: 15px;
 }
 
-.difficulty-btn {
-    padding: 12px 22px;
-    font-size: 1em;
-    border-radius: 25px;
-    color: #555;
-    background-color: #fafafa;
-    box-shadow: 0 5px #e0e0e0;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-    border: none;
-    cursor: pointer;
-    font-family: 'Kosugi Maru', sans-serif;
-    font-weight: 700;
-}
-
-.difficulty-btn.selected {
-    background-color: #ce93d8; /* 紫 */
-    color: #424242;
-    box-shadow: 0 5px #ab47bc;
-    top: 2px;
-}
-
-.difficulty-btn:not(.selected):hover {
-    background-color: #ffffff;
-    top: -2px;
-    box-shadow: 0 7px #e0e0e0;
-}
-
-.difficulty-btn:active {
-    top: 4px;
-    box-shadow: 0 1px #e0e0e0;
-}
-
 /* クリア画面のスタイルは slide-puzzle.css と共通の部分が多いが、ボタンの色などを調整 */
 .overlay {
   position: fixed;
@@ -186,39 +152,4 @@
   margin-top: 20px;
   display: flex;
   gap: 20px;
-}
-
-.win-buttons button,
-.win-buttons a {
-  padding: 12px 28px;
-  font-size: 1.1em;
-  font-weight: bold;
-  border-radius: 15px;
-  color: white;
-  text-decoration: none;
-  background-color: #4caf50;
-  box-shadow: 0 6px #388e3c;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  top: 0;
-  transition: all 0.1s;
-}
-
-#back-to-menu-btn {
-  background-color: #2196f3;
-  box-shadow: 0 6px #1976d2;
-}
-
-.win-buttons button:active,
-.win-buttons a:active {
-  top: 4px;
-}
-
-#play-again-btn:active {
-  box-shadow: 0 2px #388e3c;
-}
-
-#back-to-menu-btn:active {
-  box-shadow: 0 2px #1976d2;
 }

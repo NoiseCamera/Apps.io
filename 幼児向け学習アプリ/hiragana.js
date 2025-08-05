@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const hiraganaContainer = document.getElementById('hiragana-container');
-    const bgm = document.getElementById('bgm'); // BGM要素を取得
     let bgmInitialized = false; // BGMの初期化が完了したか
     let isPlaying = false; // 音声が再生中かどうかのフラグ
 
@@ -8,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * ユーザーの最初の操作でBGMを再生する関数
      */
     function initializeBgm() {
-        if (bgmInitialized || !bgm) return;
+        if (bgmInitialized) return;
+        const bgm = document.getElementById('bgm');
+        if (!bgm) return;
         bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
         bgmInitialized = true;
     }
@@ -40,21 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
         group.forEach(char => {
             const button = document.createElement('button');
             button.textContent = char;
-            button.addEventListener('click', () => {
-                initializeBgm();
+            button.addEventListener('click', async () => {
                 if (isPlaying || char === '　') return;
 
                 isPlaying = true;
-                const audio = new Audio(`assets/sounds/hiragana/${char}.mp3`);
-                const resetPlayingFlag = () => { isPlaying = false; };
-
-                audio.play().catch(resetPlayingFlag);
-                audio.onended = resetPlayingFlag;
-                audio.onerror = resetPlayingFlag;
+                await playSE(`assets/sounds/hiragana/${char}.mp3`);
+                isPlaying = false;
             });
             groupContainer.appendChild(button);
         });
 
         hiraganaContainer.appendChild(groupContainer);
     });
+
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
 });

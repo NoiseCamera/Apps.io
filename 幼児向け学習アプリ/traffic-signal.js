@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const trafficAppContainer = document.getElementById('traffic-app-container');
 
     // --- Sounds ---
-    const bgm = document.getElementById('bgm');
     const correctSound = document.getElementById('correct-sound');
     const incorrectSound = document.getElementById('incorrect-sound'); // 元の不正解音はクラクションに置き換える
     const walkSound = document.getElementById('walk-sound');
@@ -121,7 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeBgm() {
-        if (bgmInitialized || !bgm) return;
+        if (bgmInitialized) return;
+        const bgm = document.getElementById('bgm');
+        if (!bgm) return;
         bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
         bgmInitialized = true;
     }
@@ -167,9 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 車の通過音を再生 (車の信号が青の時のみ)
         if (carPassSound && carLightGreen.classList.contains('on')) {
-            // 音が途切れないように、Audio要素を複製して再生する
-            const soundClone = carPassSound.cloneNode();
-            soundClone.play().catch(e => console.error("通過音の再生に失敗", e));
+            // 連続再生に対応するため、グローバルなplaySE関数を使用
+            playSE(carPassSound.src);
         }
 
         scene.appendChild(car);
@@ -217,6 +217,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSiren = currentEmergencyVehicleData.sound;
             if (currentSiren) {
                 currentSiren.currentTime = 0;
+                // Safariでの動作を安定させるため、再生直前に音量を再設定
+                const seVolume = localStorage.getItem('seVolume') || 0.7;
+                currentSiren.volume = parseFloat(seVolume);
                 currentSiren.play().catch(e => console.error("サイレンの再生に失敗", e));
             }
         }
@@ -364,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * 「わたる」ボタンが押されたときの処理
      */
     function handleCross() {
-        initializeBgm();
         if (isCrossing) return; // 横断中はボタンを無効化
 
         // 緊急車両イベント中の不正解処理
@@ -372,10 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.textContent = '×';
             feedback.className = 'incorrect';
             questionText.textContent = 'あぶない！きんきゅうしゃが とおるまで まってね！';
-            if (carHornSound) {
-                carHornSound.currentTime = 0;
-                carHornSound.play();
-            }
+            playSE(carHornSound.src);
             // フィードバックは resolveEmergencySequence でリセットされる
             return;
         }
@@ -383,10 +382,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (canCross) {
             // --- 正解 ---
             isCrossing = true;
-            crossBtn.disabled = true;
-            correctSound.play();
+            crossBtn.disabled = true; // ボタンを無効化
+            playSE(correctSound.src); // グローバル関数で再生
             if (walkSound) {
                 walkSound.loop = true;
+                // Safariでの動作を安定させるため、再生直前に音量を再設定
+                const seVolume = localStorage.getItem('seVolume') || 0.7;
+                walkSound.volume = parseFloat(seVolume);
                 walkSound.play();
             }
 
@@ -406,10 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.textContent = '×'; // 「×」を大きく表示
             feedback.className = 'incorrect';
             questionText.textContent = 'あぶない！いまは わたれないよ！'; // メッセージはこちらに表示
-            if (carHornSound) {
-                carHornSound.currentTime = 0;
-                carHornSound.play();
-            }
+            playSE(carHornSound.src);
             setTimeout(() => {
                 feedback.textContent = '';
                 feedback.className = '';
@@ -427,7 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.textContent = '〇';
             feedback.className = 'correct';
             questionText.textContent = 'えらい！ちゃんと まてたね！';
-            correctSound.play();
+            playSE(correctSound.src); // グローバル関数で再生
+            addPoints(2); // 緊急車両を待てたら2ポイント
 
             // ボタンを無効化
             crossBtn.disabled = true;
@@ -450,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!pedestrianAtStart) { // 奥に到着した場合
             pedestrian.classList.add('finished');
+            addPoints(1); // 正しく渡れたら1ポイント
             questionText.textContent = 'じょうずに わたれたね！';
         } else { // 手前に戻ってきた場合
             pedestrian.classList.remove('finished');
@@ -476,7 +477,9 @@ document.addEventListener('DOMContentLoaded', () => {
     startGameBtn.addEventListener('click', () => {
         // CSSの詳細度の問題で classList.add('hidden') が効かないため、直接スタイルを操作する
         tutorialModal.style.display = 'none';
-        initializeBgm();
         startNextRound(); // ゲーム開始
     });
+
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
 });

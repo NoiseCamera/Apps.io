@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoPlayer = document.getElementById('video-player');
     const movieTitle = document.getElementById('movie-title');
     const movieSelector = document.getElementById('movie-selector');
-    const bgm = document.getElementById('bgm');
+    const playOverlay = document.getElementById('play-overlay');
 
     // --- State ---
     let bgmInitialized = false;
@@ -30,6 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'ippai-tabeyou',
             title: 'いっぱいたべようソング',
             src: 'assets/movies/いっぱいたべようソング.mp4'
+        },
+        {
+            id: 'okatazuke',
+            title: 'おかたづけソング',
+            src: 'assets/movies/おかたづけソング.mp4'
+        },
+        {
+            id: 'otetsudai',
+            title: 'おてつだいソング',
+            src: 'assets/movies/おてつだいソング.mp4'
         }
     ];
 
@@ -37,7 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * ユーザーの最初の操作でBGMを再生する関数
      */
     function initializeBgm() {
-        if (bgmInitialized || !bgm) return;
+        if (bgmInitialized) return;
+        const bgm = document.getElementById('bgm');
+        if (!bgm) return;
         bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
         bgmInitialized = true;
     }
@@ -117,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {boolean} [autoPlay=true] - trueの場合、自動的に再生を開始する
      */
     function selectMovieByIndex(index, autoPlay = true) {
-        // インデックスが範囲外なら何もしない
         if (index < 0 || index >= MOVIES.length) {
             console.error('無効な動画インデックスです:', index);
             return;
@@ -126,10 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMovieIndex = index;
         const movieData = MOVIES[currentMovieIndex];
 
-        // BGMが再生中なら停止する
+        const bgm = document.getElementById('bgm');
         if (bgm && !bgm.paused) {
             bgm.pause();
         }
+
+        // プレーヤーの状態をリセット
+        videoPlayer.controls = false;
+        playOverlay.classList.remove('hidden');
 
         videoPlayer.src = movieData.src;
         videoPlayer.load();
@@ -143,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         movieTitle.textContent = movieData.title;
 
-        // 選択されたボタンのスタイルを更新
         document.querySelectorAll('.movie-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.movieId === movieData.id);
         });
@@ -160,14 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('movie-btn');
             button.dataset.movieId = movie.id;
 
-            // サムネイル生成中はプレースホルダーを表示
             button.innerHTML = `
                 <div class="thumbnail-placeholder"></div>
                 <p>${movie.title}</p>`;
             movieSelector.appendChild(button);
 
             try {
-                // サムネイルを非同期で生成
                 const thumbnailSrc = await generateThumbnail(movie.src);
                 button.innerHTML = `
                     <img src="${thumbnailSrc}" alt="${movie.title}">
@@ -175,11 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             } catch (error) {
                 console.error(`サムネイル生成失敗: ${movie.src}`, error);
-                // エラーの場合はプレースホルダーのままにする
             }
 
             button.addEventListener('click', () => {
-                initializeBgm();
                 selectMovieByIndex(index);
             });
         }
@@ -189,20 +199,40 @@ document.addEventListener('DOMContentLoaded', () => {
      * 初期化処理
      */
     async function initialize() {
-        // ボタンとサムネイルの生成を待つ
         await createMovieButtons();
 
-        // 最初の動画をデフォルトで設定（再生はしない）
         if (MOVIES.length > 0) {
             selectMovieByIndex(0, false); // 最初の動画をロードするが再生はしない
         }
 
-        // 動画が終了したら次の動画を再生する
-        videoPlayer.addEventListener('ended', () => {
-            // 次の動画のインデックスを計算（リストの最後に達したら最初に戻る）
-            const nextIndex = (currentMovieIndex + 1) % MOVIES.length;
-            selectMovieByIndex(nextIndex);
+        // --- 再生コントロールのイベントリスナー ---
+
+        // カスタム再生ボタンが押されたら再生
+        playOverlay.addEventListener('click', () => {
+            videoPlayer.play();
         });
+
+        // 動画の再生が始まったら、カスタムボタンを隠して標準コントロールを表示
+        videoPlayer.addEventListener('play', () => {
+            playOverlay.classList.add('hidden');
+            videoPlayer.controls = true;
+        });
+
+        // 動画が一時停止したら（ユーザー操作）、カスタムボタンを再表示
+        videoPlayer.addEventListener('pause', () => {
+            if (!videoPlayer.ended) {
+                playOverlay.classList.remove('hidden');
+            }
+        });
+
+        // 動画が終了したら次の動画を自動再生
+        videoPlayer.addEventListener('ended', () => {
+            const nextIndex = (currentMovieIndex + 1) % MOVIES.length;
+            selectMovieByIndex(nextIndex, true); // 次は自動再生する
+        });
+
+        document.body.addEventListener('click', initializeBgm, { once: true });
+        document.body.addEventListener('touchstart', initializeBgm, { once: true });
     }
 
     initialize();

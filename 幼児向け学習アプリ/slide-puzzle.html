@@ -6,6 +6,7 @@
   <title>どうぶつスライドパズル</title>
   <link rel="stylesheet" href="style.css"> <!-- 共通スタイルを適用 -->
   <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="buttons.css">
   <link rel="stylesheet" href="slide-puzzle.css">
 </head>
 <body>
@@ -28,10 +29,16 @@
         <p>えを えらんでね</p>
         <img id="current-reference-image" src="assets/images/usagi.png" alt="完成図">
         <div id="animal-selector-grid"></div>
+        <div id="difficulty-selector">
+            <button class="difficulty-btn selected" data-size="3">かんたん (3x3)</button>
+            <button class="difficulty-btn" data-size="4">ふつう (4x4)</button>
+            <button class="difficulty-btn" data-size="5">むずかしい (5x5)</button>
+        </div>
       </div>
     </div>
     <div id="controls">
       <p>うごかした かいすう: <span id="move-count">0</span></p>
+      <p>じかん: <span id="time-count">00:00</span></p>
       <button id="shuffle-btn">もういちど まぜる</button>
     </div>
   </main>
@@ -44,10 +51,14 @@
 
   <div id="win-message" class="overlay hidden">
     <p>クリア！おめでとう！</p>
+    <div id="win-stats">
+      <p>かかったじかん: <span id="win-time">00:00</span></p>
+      <p>うごかしたかいすう: <span id="win-moves">0</span></p>
+    </div>
     <img id="win-image" src="assets/images/usagi.png" alt="完成した絵">
     <div class="win-buttons">
       <button id="play-again-btn">もういちど あそぶ</button>
-      <a href="index.html" id="back-to-menu-btn">えらぶがめんへ</a>
+      <a href="index.html" id="back-to-menu-btn" class="button-style">えらぶがめんへ</a>
     </div>
   </div>
 

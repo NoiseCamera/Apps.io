@@ -247,44 +247,6 @@ header {
     margin-top: 10px;
 }
 
-.control-btn {
-    padding: 15px 40px;
-    font-size: 1.8rem;
-    font-weight: 700;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    background-color: #81c784;
-    box-shadow: 0 6px #4caf50;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-}
-
-/* 「まつ」ボタンのスタイル */
-#wait-btn {
-    background-color: #42a5f5; /* 青色 */
-    box-shadow: 0 6px #1e88e5;
-}
-
-.control-btn:active {
-    top: 4px;
-}
-#cross-btn:active {
-    box-shadow: 0 2px #4caf50;
-}
-#wait-btn:active {
-    box-shadow: 0 2px #1e88e5;
-}
-
-.control-btn:disabled {
-    background-color: #e0e0e0;
-    box-shadow: 0 6px #bdbdbd;
-    cursor: not-allowed;
-}
-
 #feedback {
     /* 画面中央に大きく表示するためのスタイル */
     position: absolute;
@@ -385,14 +347,16 @@ header {
 .tutorial-content .text-red { color: #d90000; font-weight: 800; }
 .tutorial-content .text-emergency { color: #e53935; font-weight: 800; }
 
-#start-game-btn {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
-    background-color: #ff9800; /* オレンジ色 */
-    box-shadow: 0 6px #f57c00;
+/* --- ボタンのサイズ調整 --- */
+#controls button {
+    padding: 15px 40px;
+    font-size: 1.8rem;
 }
 
-#start-game-btn:active {
-    box-shadow: 0 2px #f57c00;
+#start-game-btn {
+    display: block;
+    margin: 20px auto 0;
+    width: 80%;
+    max-width: 300px;
+    font-size: 1.5rem;
 }

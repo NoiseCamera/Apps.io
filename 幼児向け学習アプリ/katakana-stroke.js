@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const practiceModeBtn = document.getElementById('practice-mode-btn');
   const stepModeBtn = document.getElementById('step-mode-btn');
   const toggleNumbersBtn = document.getElementById('toggle-numbers-btn');
-  const bgm = document.getElementById('bgm');
 
   // --- State ---
   let bgmInitialized = false;
@@ -496,7 +495,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initializeBgm() {
-    if (bgmInitialized || !bgm) return;
+    if (bgmInitialized) return;
+    const bgm = document.getElementById('bgm');
+    if (!bgm) return;
     bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
     bgmInitialized = true;
   }
@@ -875,20 +876,14 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('empty');
           btn.disabled = true;
         } else {
-          btn.addEventListener('click', () => {
-            initializeBgm();
+          btn.addEventListener('click', async () => {
 
             // 他の音声が再生中でなければ、文字の音声を再生
             if (isAudioPlaying) return;
             isAudioPlaying = true;
             const hiraganaChar = katakanaToHiragana(char);
-            const audio = new Audio(`assets/sounds/hiragana/${hiraganaChar}.mp3`);
-            const seVolume = localStorage.getItem('seVolume') || 0.5;
-            audio.volume = parseFloat(seVolume);
-            const resetFlag = () => { isAudioPlaying = false; };
-            audio.play().catch(resetFlag);
-            audio.onended = resetFlag;
-            audio.onerror = resetFlag;
+            await playSE(`assets/sounds/hiragana/${hiraganaChar}.mp3`);
+            isAudioPlaying = false;
 
             selectCharacter(char);
           });
@@ -990,6 +985,9 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('touchend', stopDrawing);
     // Initial animation
     selectCharacter('ア');
+
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
   }
 
   initialize();

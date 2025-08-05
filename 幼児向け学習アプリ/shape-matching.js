@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackText = document.getElementById('feedback-text');
     const correctSound = document.getElementById('correct-sound');
     const incorrectSound = document.getElementById('incorrect-sound');
-    const bgm = document.getElementById('bgm');
 
     // --- Shape Definitions ---
     // SVGで様々な図形を定義します
@@ -23,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentCorrectShape = null;
     let isAnswered = false;
+    let bgmInitialized = false;
 
     // --- Functions ---
 
@@ -98,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedOption.classList.add('selected', 'correct');
             feedbackText.textContent = 'せいかい！';
             feedbackText.style.color = '#e53935'; // 赤色
-            playFeedbackSound(correctSound);
+            playSE(correctSound.src);
+            addPoints(1); // 正解で1ポイント追加
             animateFeedback(feedbackText);
 
             // 5. 1.5秒後に自動で次の問題へ進む
@@ -108,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedOption.classList.add('selected', 'incorrect', 'disabled'); // 間違えた選択肢は操作不可に
             feedbackText.textContent = 'ちがうかな？';
             feedbackText.style.color = '#1e88e5'; // 青色
-            playFeedbackSound(incorrectSound);
+            playSE(incorrectSound.src);
 
             // アニメーションが終わったら、スタイルをリセットしてdisabled状態だけ残す
             selectedOption.addEventListener('animationend', () => {
@@ -123,15 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 2000);
         }
-    }
-
-    /**
-     * フィードバックの音を再生する
-     * @param {HTMLAudioElement} soundElement 再生するオーディオ要素
-     */
-    function playFeedbackSound(soundElement) {
-        soundElement.currentTime = 0;
-        soundElement.play();
     }
 
     /**
@@ -153,18 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * BGMの再生を試みる
      */
-    function playBGM() {
+    function initializeBgm() {
+        if (bgmInitialized) return;
+        const bgm = document.getElementById('bgm');
         if (bgm) {
-            bgm.play().catch(error => {
-                // ユーザーがページを操作するまで再生できない場合がある
-                console.log("BGMの自動再生がブロックされました:", error);
-                // 最初のクリックで再生を開始するためのリスナーを追加
-                document.body.addEventListener('click', () => bgm.play(), { once: true });
-            });
+            bgm.play().catch(error => console.log("BGMの自動再生がブロックされました:", error));
         }
+        bgmInitialized = true;
     }
 
     // --- Initialization ---
     generateQuestion();
-    playBGM();
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
 });

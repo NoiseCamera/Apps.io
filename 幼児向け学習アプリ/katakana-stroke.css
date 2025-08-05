@@ -113,80 +113,8 @@ body {
   cursor: crosshair;
 }
 
-#mode-selector {
-  display: flex;
-  gap: 15px;
-  margin-top: 10px; /* canvasとの間に少し余白 */
-}
-
-.mode-btn {
-  padding: 10px 20px;
-  font-size: 1em;
-  font-family: 'Kosugi Maru', sans-serif; /* フォント統一 */
-  font-weight: bold;
-  border-radius: 20px;
-  color: #555;
-  background-color: #fafafa;
-  box-shadow: 0 5px #e0e0e0;
-  transition: all 0.1s;
-  position: relative;
-  top: 0;
-  border: none;
-  cursor: pointer;
-}
-
-.mode-btn.selected {
-  background-color: #a7ffeb; /* 明るいミント色 */
-  color: #004d40;
-  box-shadow: 0 5px #26a69a;
-  top: 2px;
-}
-
-.mode-btn:not(.selected):hover {
-  background-color: #ffffff;
-  top: -2px;
-  box-shadow: 0 7px #e0e0e0;
-}
-
-.mode-btn:active {
-  top: 4px;
-  box-shadow: 0 1px #e0e0e0;
-}
-
 #controls {
   display: flex;
   gap: 15px;
   margin-top: 10px;
-}
-
-#replay-btn,
-.control-btn {
-  padding: 12px 28px;
-  font-size: 1.1em;
-  font-family: 'Kosugi Maru', sans-serif; /* フォント統一 */
-  font-weight: bold;
-  border-radius: 15px;
-  color: white;
-  background-color: #26a69a;
-  box-shadow: 0 6px #00897b;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  top: 0;
-  transition: all 0.1s;
-}
-
-#replay-btn:active,
-.control-btn:active {
-  top: 4px;
-  box-shadow: 0 2px #00897b;
-}
-
-.control-btn.off {
-  background-color: #9e9e9e; /* オフの時はグレー */
-  box-shadow: 0 6px #757575;
-}
-
-.control-btn.off:active {
-  box-shadow: 0 2px #757575;
 }

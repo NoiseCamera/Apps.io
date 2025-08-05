@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.modeButtons = document.querySelectorAll('.mode-btn');
             this.correctSound = document.getElementById('correct-sound');
             this.incorrectSound = document.getElementById('incorrect-sound');
-            this.bgm = document.getElementById('bgm');
             this.advancedModeToggle = document.getElementById('advanced-mode-toggle');
             this.minuteDisplayToggle = document.getElementById('minute-display-toggle');
 
@@ -40,27 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Initialization ---
         init() {
             this.modeButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    this.initializeBgm();
-                    this.handleModeChange(e);
-                });
+                btn.addEventListener('click', this.handleModeChange);
             });
             this.advancedModeToggle.addEventListener('change', (e) => {
-                this.initializeBgm();
                 this.state.isAdvancedMode = e.target.checked;
                 this.draw(); // モードを切り替えたら時計を再描画
             });
             this.minuteDisplayToggle.addEventListener('change', (e) => {
-                this.initializeBgm();
                 this.state.showMinuteNumbers = e.target.checked;
                 this.draw(); // モードを切り替えたら時計を再描画
             });
             this.switchMode('read');
+            document.body.addEventListener('click', this.initializeBgm.bind(this), { once: true });
+            document.body.addEventListener('touchstart', this.initializeBgm.bind(this), { once: true });
         }
 
         initializeBgm() {
-            if (this.state.bgmInitialized || !this.bgm) return;
-            this.bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+            if (this.state.bgmInitialized) return;
+            const bgm = document.getElementById('bgm');
+            if (!bgm) return;
+            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
             this.state.bgmInitialized = true;
         }
 
@@ -206,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Answer Checking ---
         checkReadAnswer(e) {
             if (this.state.isAnswered) return;
-            this.initializeBgm();
  
             const clickedBtn = e.target;
             const selectedHour = parseInt(clickedBtn.dataset.hour, 10);
@@ -221,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.disabled = true;
                 });
                 clickedBtn.classList.add('correct-answer');
+                addPoints(1); // 正解で1ポイント追加
                 this.showFeedback('せいかい！すごい！', 'correct', this.setupReadMode.bind(this));
             } else {
                 clickedBtn.disabled = true; // 間違えたボタンのみ無効化
@@ -230,8 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         checkSetAnswer() {
-            this.initializeBgm();
             if (this.state.hour === this.state.targetHour && this.state.minute === this.state.targetMinute) {
+                addPoints(1); // 正解で1ポイント追加
                 this.showFeedback('せいかい！すごい！', 'correct', this.setupSetMode.bind(this));
             } else {
                 this.showFeedback('おしい！もういちど', 'incorrect'); // 次の問題には進まない
@@ -242,10 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.feedbackDiv.textContent = message;
             this.feedbackDiv.className = type;
             if (type === 'correct') {
-                this.correctSound.play();
+                playSE(this.correctSound.src);
                 this.playCorrectAnimation(); // 正解アニメーションを再生
             } else {
-                this.incorrectSound.play();
+                playSE(this.incorrectSound.src);
                 // 不正解のフィードバックも2秒後に消す
                 setTimeout(() => {
                     // メッセージがまだ表示されている場合（他のメッセージに上書きされていない場合）のみクリアする

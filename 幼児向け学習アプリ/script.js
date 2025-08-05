@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const numberButtons = document.querySelectorAll('.number-btn');
     const incorrectSound = new Audio('assets/sounds/incorrect.mp3'); // 不正解の音
     const attentionSound = new Audio('assets/sounds/attention.mp3'); // 数字が空の時の音
-    const bgm = new Audio('assets/sounds/bgm.mp3'); // BGM
 
     // 現在の問題の状態をまとめて管理するオブジェクト
     let currentProblem = {};
@@ -37,11 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
         correctSound.load();
         incorrectSound.load();
         attentionSound.load();
-        bgm.load();
-        bgm.loop = true; // BGMをループ再生する
-        // BGMを少し小さめの音量で再生する（0.0〜1.0）
-        bgm.volume = 0.2;
-        bgm.play().catch(e => console.error("BGMの自動再生がブロックされました。", e));
+        // BGM要素を取得して再生を試みる
+        const bgm = document.getElementById('bgm');
+        if (bgm) {
+            bgm.play().catch(e => console.error("BGMの自動再生がブロックされました。", e));
+        }
 
         audioInitialized = true;
         console.log('音声の準備ができました。');
@@ -415,58 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 音声ファイルを再生し、再生完了を待つPromiseを返す (タイムアウト付き)
-     * @param {HTMLAudioElement} audio - 再生するAudioオブジェクト
-     * @param {number} timeout - タイムアウト時間 (ミリ秒)
-     * @returns {Promise<void>}
-     */
-    function playAudio(audio, timeout = 2000) {
-        return new Promise((resolve) => {
-            let timeoutId = null;
-
-            const cleanup = () => {
-                if (timeoutId) clearTimeout(timeoutId);
-                audio.onended = null;
-                audio.onerror = null;
-            };
-
-            timeoutId = setTimeout(() => {
-                console.warn(`音声再生がタイムアウトしました: ${audio.src}`);
-                cleanup();
-                resolve(); // タイムアウトしても次に進む
-            }, timeout);
-
-            audio.onended = () => {
-                cleanup();
-                resolve();
-            };
-
-            audio.onerror = () => {
-                console.error(`音声ファイルの読み込み/再生エラー: ${audio.src}`);
-                cleanup();
-                resolve(); // エラーでも次に進む
-            };
-
-            audio.currentTime = 0;
-            audio.play().catch(() => {
-                console.error(`play()の呼び出しに失敗しました: ${audio.src}`);
-                cleanup();
-                resolve(); // play()の失敗でも次に進む
-            });
-        });
-    }
-
-    /**
      * 音声ファイルのリストを順番に再生する (async/await版)
      * @param {string[]} soundQueue - 再生する音声ファイルのパスの配列
      */
     async function playSoundsSequentially(soundQueue) {
-        if (!soundQueue || soundQueue.length === 0) {
-            return;
-        }
+        if (!soundQueue || soundQueue.length === 0) return;
         for (const soundPath of soundQueue) {
-            const audio = new Audio(soundPath);
-            await playAudio(audio);
+            // settings.jsで定義されたグローバルなplaySE関数を使用
+            await playSE(soundPath);
         }
     }
 
@@ -480,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userAnswerStr === '') {
             feedbackElem.textContent = 'すうじをいれてね';
             feedbackElem.className = 'incorrect';
-            await playAudio(attentionSound);
+            await playSE(attentionSound.src);
             return;
         }
 
@@ -494,7 +449,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userAnswer === currentProblem.answer) {
                 feedbackElem.textContent = 'せいかい！すごい！';
                 feedbackElem.className = 'correct';
-                await playAudio(correctSound);
+                await playSE(correctSound.src);
+                addPoints(1); // 正解で1ポイント追加
 
                 // 正解を1秒間表示してから、次の問題へ
                 await sleep(1000);
@@ -503,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 feedbackElem.textContent = 'おしい！もういちど';
                 feedbackElem.className = 'incorrect';
-                await playAudio(incorrectSound);
+                await playSE(incorrectSound.src);
             }
         } catch (error) {
             console.error("checkAnswer内で予期せぬエラーが発生しました:", error);
@@ -520,8 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             initializeAudio();
             const number = button.textContent;
-            const numberSound = new Audio(`assets/sounds/kazu/${number}.mp3`);
-            numberSound.play().catch(e => console.error(`音声ファイル assets/sounds/kazu/${number}.mp3 の再生に失敗しました。`, e));
+            playSE(`assets/sounds/kazu/${number}.mp3`);
 
             // 3桁より多くは入力させない
             if (currentAnswerString.length >= 3) {
@@ -573,4 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 最初に問題を表示
     generateProblem();
+
+    // ユーザーの最初の操作でBGMを含む音声を初期化する
+    document.body.addEventListener('click', initializeAudio, { once: true });
+    document.body.addEventListener('touchstart', initializeAudio, { once: true });
 });

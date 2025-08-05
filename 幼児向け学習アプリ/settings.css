@@ -1,31 +1,36 @@
 /* settings.css */
-#settings-btn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  width: 50px;
-  height: 50px;
-  background-color: #ba68c8; /* 明るい紫 */
-  border: none;
-  border-radius: 50%;
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 5px #9c4d9e;
-  transition: all 0.1s;
+
+/* --- ポイントカウンターのスタイル --- */
+#points-counter {
+    position: fixed;
+    top: 15px;
+    right: 80px; /* 設定ボタンの隣に配置 */
+    background-color: #ffc107; /* 明るい黄色 */
+    color: #5d4037; /* 茶色 */
+    padding: 8px 16px 8px 38px; /* 左側に星のアイコン用のスペースを確保 */
+    border-radius: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    font-family: 'Kosugi Maru', sans-serif;
+    z-index: 999;
+    box-shadow: 0 4px #e6a000;
+    transition: transform 0.2s ease-out;
 }
 
-#settings-btn:hover {
-  background-color: #c77dd4;
+#points-counter::before {
+    content: '★'; /* 星のアイコン */
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f57f17; /* オレンジ色 */
+    font-size: 24px;
 }
 
-#settings-btn:active {
-  top: 19px; /* 15px + 4px */
-  box-shadow: 0 1px #9c4d9e;
+/* ポイントが追加されたときのアニメーション */
+#points-counter.points-added {
+    transform: scale(1.2);
+    transition: transform 0.1s ease-in-out;
 }
 
 #settings-modal {
@@ -66,6 +71,15 @@
   margin-bottom: 25px;
   color: #8e24aa; /* 濃い紫 */
   font-size: 2em;
+}
+.points-display-modal {
+    background-color: #fffde7; /* 薄い黄色 */
+    border: 2px solid #ffca28; /* 黄色 */
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    color: #c79100;
 }
 
 .volume-control {
@@ -127,48 +141,4 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-}
-
-/* 閉じるボタンとメニューへ戻るボタンの共通スタイル */
-#close-settings-btn, #back-to-menu-link {
-    display: inline-block;
-    padding: 12px 28px;
-    font-size: 1.1em;
-    font-weight: bold;
-    border: none;
-    border-radius: 15px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-    text-decoration: none; /* aタグのために指定 */
-}
-
-#close-settings-btn:active, #back-to-menu-link:active {
-    top: 4px;
-}
-
-/* 閉じるボタン */
-#close-settings-btn {
-    background-color: #7e57c2; /* 別の紫 */
-    box-shadow: 0 6px #673ab7;
-}
-#close-settings-btn:hover {
-    background-color: #8d6ed1;
-}
-#close-settings-btn:active {
-    box-shadow: 0 2px #673ab7;
-}
-
-/* メニューへ戻るボタンの個別スタイル */
-#back-to-menu-link {
-    background-color: #ff7f50; /* コーラル */
-    box-shadow: 0 6px #e57248;
-}
-#back-to-menu-link:hover {
-    background-color: #ff8a63;
-}
-#back-to-menu-link:active {
-    box-shadow: 0 2px #e57248;
 }
