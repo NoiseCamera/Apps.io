@@ -1,5 +1,5 @@
 // coloring.js
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be fully loaded before executing the script
     // --- DOM Elements ---
     const canvas = document.getElementById('coloring-canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-btn');
     const undoBtn = document.getElementById('undo-btn');
     const redoBtn = document.getElementById('redo-btn');
-
+    
     // --- State ---
     let currentColor = '#FF0000'; // 初期色は赤
     let lineArtImage = new Image();
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let historyStack = [];
     let redoStack = [];
     const MAX_HISTORY_SIZE = 20; // ぬりえはメモリ消費が大きいので少し減らす
-    let recentlyUsedColors = [];
+    let recentlyUsedColors = []; // Array to hold recently used colors
     const MAX_RECENT_COLORS = 4; // 最近使った色を4色まで記録 (2x2グリッド)
 
     // --- Pinch Zoom & Drag State ---
@@ -30,11 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let lastPinchDistance = 0;
     let lastDragPosition = null;
-    let dragJustFinished = false; // ドラッグ/ピンチ操作直後かのフラグ
 
-    // このゲームで使う効果音のリスト
+    // --- Tap State ---
+    let touchStartTime = 0;
+    let touchStartPosition = null;
+    const TAP_THRESHOLD_MS = 200; // 200ms
+    const DRAG_THRESHOLD_PX = 5; // 5px以上動いたらドラッグとみなす
+
+    // --- Sound Effects ---
     const SOUND_EFFECTS = [
-        'assets/sounds/fill.mp3', // ぬりつぶし音
+        'assets/sounds/fill.mp3',  // ぬりつぶし音
         'assets/sounds/clear.mp3'  // やりなおし音
     ];
 
@@ -60,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '#FCF3CF', '#F9E79F', '#BDC3C7', '#95A5A6'
     ];
 
-    // --- Initialization ---
+    // --- Initialization Function ---
     function initialize() {
         // 1. URLからどのぬりえを読み込むか決定する
         const urlParams = new URLSearchParams(window.location.search);
@@ -72,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 3. 画像が見つからなかった場合の処理
-        if (!currentImageInfo) {
+        if (!currentImageInfo) { // Handle the case where the image is not found
             console.error('指定されたぬりえが見つかりません。');
             canvasWrapper.innerHTML = `<p>ぬりえが えらばれていません。<br><a href="coloring-select.html">えらぶがめんに もどる</a></p>`;
             // ツールバーを非表示にする
@@ -81,14 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // 初期化処理を中断
         }
 
-        loadRecentColors();
-        createRecentColorsPalette();
-        createColorPalette();
-        addEventListeners();
-        loadLineArt();
-        updateUI();
-        updateUndoRedoButtons();
+        // 拡大・縮小の基準点を左上（0, 0）に設定して、座標計算のずれを防ぐ
+        canvas.style.transformOrigin = '0 0';
 
+        loadRecentColors();
+        createRecentColorsPalette(); // Populate recent color palette
+        createColorPalette();        // Populate the color palette
+        addEventListeners();           // Attach event listeners to DOM elements
+        loadLineArt();               // Load the line art image
+        updateUI();                  // Update the UI based on initial state
+        updateUndoRedoButtons();     // Update the undo/redo button states
+    
         // ユーザーの最初の操作でBGMを再生
         document.body.addEventListener('click', initializeBgm, { once: true });
         document.body.addEventListener('touchstart', initializeBgm, { once: true });
@@ -96,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * ユーザーの最初の操作でBGMを再生する
-     */
+     */    
     function initializeBgm() {
         if (bgmInitialized) return;
         const bgm = document.getElementById('bgm');
@@ -112,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bgmInitialized = true;
     }
 
-    // --- Canvas and Image Loading ---
+    // --- Canvas and Image Loading Functions ---
     function loadLineArt() {
         lineArtImage.onload = () => {
             resizeCanvas();
@@ -125,8 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         lineArtImage.src = currentImageInfo.src;
     }
-
-    function resizeCanvas() {
+    
+  function resizeCanvas() {
         const wrapperRect = canvasWrapper.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
 
@@ -155,12 +163,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function resetCanvas() {
+  function resetCanvas() {
         // キャンバスをクリア
+        const dpr = window.devicePixelRatio || 1;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // 線画を描画（スケール後のサイズで描画）
-        ctx.drawImage(lineArtImage, 0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        ctx.drawImage(lineArtImage, 0, 0, canvas.width / dpr, canvas.height / dpr);
         
+        // --- 線の色を変更する処理 ---
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        const newColor = { r: 85, g: 85, b: 85 }; // 濃い灰色 (#555555)
+        const colorThreshold = 100; // この明るさ以下のピクセルを線とみなす
+        const alphaThreshold = 200; // この不透明度以上のピクセルを対象とする
+
+        for (let i = 0; i < data.length; i += 4) {
+            // ピクセルが黒（またはそれに近い色）で、かつ透明でない場合
+            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+            if (avg < colorThreshold && data[i + 3] > alphaThreshold) {
+                data[i] = newColor.r;     // Red
+                data[i + 1] = newColor.g; // Green
+                data[i + 2] = newColor.b; // Blue
+                // Alpha (data[i + 3]) は変更しない
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        // --- ここまで ---
+
         // 拡大・縮小・移動の状態をリセット
         scale = 1;
         offsetX = 0;
@@ -168,8 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTransform();
     }
 
-    // --- UI Creation ---
-    function createColorPalette() {
+  // --- UI Creation Functions ---
+  function createColorPalette() {
         COLORS.forEach(color => {
             const button = document.createElement('button');
             button.classList.add('color-btn');
@@ -185,14 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
+   /**
      * 色を選択し、UIと「最近使った色」を更新する
      * @param {string} color - 選択された色のHEXコード
      */
     function selectColor(color) {
         currentColor = color;
         addRecentColor(color); // 色を選択した時点で「最近使った色」を更新
-        updateUI();
+        updateUI();              // Update the UI to reflect the current color
     }
 
     /**
@@ -212,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('coloringRecentColors', JSON.stringify(recentlyUsedColors));
     }
 
-    /**
+   /**
      * 最近使った色を追加・更新する
      * @param {string} color - 追加する色のHEXコード
      */
@@ -235,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         createRecentColorsPalette(); // UIを更新
     }
 
-    /**
+   /**
      * 最近使った色のパレットをUIに生成する
      */
     function createRecentColorsPalette() {
@@ -255,13 +284,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Event Listeners ---
+  // --- Event Listener Functions ---
     function addEventListeners() {
         canvas.addEventListener('click', handleCanvasClick);
         clearBtn.addEventListener('click', () => {
             if (confirm('ぜんぶ やりなおしますか？')) {
                 if (typeof playSE === 'function') playSE('assets/sounds/clear.mp3');
-                resetCanvas();
+                resetCanvas(); // Clear the canvas
                 saveState(); // クリアした状態を履歴に保存
             }
         });
@@ -276,22 +305,49 @@ document.addEventListener('DOMContentLoaded', () => {
         canvasWrapper.addEventListener('touchend', handleTouchEnd);
     }
 
-    function handleCanvasClick(e) {
-        // ドラッグやピンチ操作の直後は、誤操作を防ぐために塗りつぶしを実行しない
-        if (dragJustFinished) {
-            dragJustFinished = false;
-            return;
+  function getPosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+
+        if (event.touches) {
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        } else {
+            clientX = event.clientX;
+            clientY = event.clientY;
+        }
+        const x = (clientX - rect.left) / scale - offsetX / scale;
+        const y = (clientY - rect.top) / scale - offsetY / scale;
+        return { x, y };
+    }
+
+  function handleCanvasClick(e) {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        let clientX, clientY;
+
+        // touchendイベントではchangedTouchesを、それ以外ではtouchesや直接の座標を参照
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        } else if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
         }
 
-        const rect = canvas.getBoundingClientRect();
-        // クリック座標を、現在の拡大率と移動量を考慮したキャンバス上の座標に変換
-        const x = (e.clientX - rect.left - offsetX) / scale;
-        const y = (e.clientY - rect.top - offsetY) / scale;
-
-        const dpr = window.devicePixelRatio || 1;
+      // getBoundingClientRectにはtransformによる移動量(offsetX, offsetY)が既に含まれているため、
+      // クリック位置と矩形の左上の差をスケールで割るだけで正しい座標が計算できる
+      const x = (clientX - rect.left) / scale;
+      const y = (clientY - rect.top) / scale;
+    
         floodFill(Math.floor(x * dpr), Math.floor(y * dpr), hexToRgba(currentColor));
     }
+    
     // --- Touch Handlers for Pinch Zoom & Drag ---
+
     function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
@@ -307,62 +363,107 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTouchStart(e) {
         e.preventDefault();
-        if (e.touches.length >= 2) {
+        if (e.touches.length >= 2) { // 2本指以上はピンチ操作
             isPinching = true;
             isDragging = false; // ピンチ中はドラッグ無効
             lastPinchDistance = getDistance(e.touches);
         } else if (e.touches.length === 1) {
-            isDragging = true;
-            isPinching = false; // ドラッグ中はピンチ無効
-            lastDragPosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            // 1本指はタップかドラッグの可能性
+            isDragging = false; // この時点ではまだドラッグではない
+            isPinching = false;
+            touchStartTime = Date.now();
+            const touch = e.touches[0];
+            touchStartPosition = { x: touch.clientX, y: touch.clientY };
+            lastDragPosition = { x: touch.clientX, y: touch.clientY };
         }
     }
 
     function handleTouchMove(e) {
         e.preventDefault();
-        if (isPinching && e.touches.length >= 2) {
+        if (isPinching && e.touches.length >= 2) { // ピンチ操作
             const newDist = getDistance(e.touches);
-            const scaleFactor = newDist / lastPinchDistance;
-            const newScale = Math.max(1, Math.min(scale * scaleFactor, 5)); // 1倍から5倍まで
 
             // 拡大の中心点を基準にオフセットを調整
             const center = getCenter(e.touches);
             const rect = canvasWrapper.getBoundingClientRect();
             const pointX = center.x - rect.left;
             const pointY = center.y - rect.top;
+            const scaleFactor = newDist / lastPinchDistance;
 
-            offsetX = pointX - (pointX - offsetX) * (newScale / scale);
-            offsetY = pointY - (pointY - offsetY) * (newScale / scale);
-
-            scale = newScale;
+            scaleWithOffset(scaleFactor, pointX, pointY); // オフセットとスケールを更新
             lastPinchDistance = newDist;
             updateTransform();
-        } else if (isDragging && e.touches.length === 1) {
-            const newPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            offsetX += newPos.x - lastDragPosition.x;
-            offsetY += newPos.y - lastDragPosition.y;
-            lastDragPosition = newPos;
-            updateTransform();
+        } else if (e.touches.length === 1 && touchStartPosition) { // 1本指の移動
+            const touch = e.touches[0];
+            const newPos = { x: touch.clientX, y: touch.clientY };
+            const dx = newPos.x - touchStartPosition.x;
+            const dy = newPos.y - touchStartPosition.y;
+
+            // 一定距離以上動いたらドラッグ開始とみなす
+            if (!isDragging && (dx * dx + dy * dy) > (DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX)) {
+                isDragging = true;
+            }
+
+            if (isDragging) {
+                drag(newPos); // ドラッグによるオフセットを更新
+                lastDragPosition = newPos;
+                updateTransform();
+            }
         }
     }
 
     function handleTouchEnd(e) {
+        e.preventDefault();
+        const touchEndTime = Date.now();
+
+        // ピンチ操作の終了
         if (isPinching && e.touches.length < 2) {
             isPinching = false;
-            dragJustFinished = true;
+            lastDragPosition = null;
+            touchStartPosition = null;
         }
-        if (isDragging && e.touches.length < 1) {
+
+        // 1本指の操作終了（タップ or ドラッグ終了）
+        if (!isPinching && touchStartPosition) {
+            const touchDuration = touchEndTime - touchStartTime;
+            // isDraggingフラグと時間でタップを判定
+            if (!isDragging && touchDuration < TAP_THRESHOLD_MS) {
+                // これはタップ
+                handleCanvasClick(e);
+            }
+            // ドラッグ終了の処理はここで行う（isDraggingフラグをリセット）
             isDragging = false;
-            dragJustFinished = true;
+            lastDragPosition = null;
+            touchStartPosition = null;
+        }
+
+        // すべての指が離れたら状態をリセット
+        if (e.touches.length === 0) {
+            isPinching = false;
+            isDragging = false;
+            lastDragPosition = null;
+            touchStartPosition = null;
         }
     }
 
+    function scaleWithOffset(scaleFactor, pointX, pointY) {
+         const newScale = Math.max(1, Math.min(scale * scaleFactor, 5)); // 1倍から5倍まで
+         offsetX = pointX - (pointX - offsetX) * (newScale / scale);
+         offsetY = pointY - (pointY - offsetY) * (newScale / scale);
+         scale = newScale;
+    }
+
+    function drag(newPos) {
+        offsetX += newPos.x - lastDragPosition.x;
+        offsetY += newPos.y - lastDragPosition.y;
+    }
+    
     function updateTransform() {
-        canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+       canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
     }
 
     // --- Actions ---
-    function saveCanvas() {
+function saveCanvas() {
         const link = document.createElement('a');
         // ファイル名にぬりえの名前を含める
         const fileName = currentImageInfo ? `ぬりえ_${currentImageInfo.name}.png` : 'ぬりえ.png';
@@ -371,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
     }
 
-    function updateUI() {
+function updateUI() {
         // すべてのカラーボタン（通常パレット＋最近使った色パレット）の選択状態を更新
         document.querySelectorAll('#left-toolbar .color-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.color === currentColor);
@@ -379,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- History (Undo/Redo) ---
-    function saveState() {
+function saveState() {
         redoStack = [];
         historyStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
         if (historyStack.length > MAX_HISTORY_SIZE) {
@@ -388,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUndoRedoButtons();
     }
 
-    function undo() {
+function undo() {
         if (historyStack.length > 1) {
             redoStack.push(historyStack.pop());
             const lastState = historyStack[historyStack.length - 1];
@@ -397,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function redo() {
+function redo() {
         if (redoStack.length > 0) {
             const nextState = redoStack.pop();
             ctx.putImageData(nextState, 0, 0);
@@ -406,13 +507,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateUndoRedoButtons() {
+function updateUndoRedoButtons() {
         undoBtn.disabled = historyStack.length <= 1;
         redoBtn.disabled = redoStack.length === 0;
     }
 
     // --- Utility Functions ---
-    function hexToRgba(hex) {
+function hexToRgba(hex) {
         let r = 0, g = 0, b = 0;
         if (hex.length === 4) {
             r = parseInt(hex[1] + hex[1], 16);
@@ -427,13 +528,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Flood Fill Algorithm (Further Improved) ---
+
     /**
      * 境界線を越えずに領域を塗りつぶすアルゴリズム。アンチエイリアスされた線の際まで綺麗に塗れます。
      * @param {number} startX - 塗りつぶし開始点のX座標
      * @param {number} startY - 塗りつぶし開始点のY座標
      * @param {object} fillColor - 塗りつぶす色 {r, g, b, a}
      */
-    function floodFill(startX, startY, fillColor) {
+function floodFill(startX, startY, fillColor) {
         // --- 塗りつぶし条件を改善 ---
         // 以前はクリックした場所の色と「似ている色」を塗りつぶしていましたが、
         // これだと線の周りのアンチエイリアス（ぼかし）部分が塗り残しになることがありました。
@@ -451,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. 境界線判定
         // 境界線の色（黒や濃い灰色）を定義します。
         // RGBの合計値がこの値以下なら線とみなします。アンチエイリアスを考慮して少し甘めに設定。
-        const boundaryThreshold = 250; // この値より明るい色を塗りつぶす対象とします
+        const boundaryThreshold = 300; // 線の色を灰色にしたため、境界値も調整 (85+85+85=255)
 
         // クリックした場所が境界線なら何もしない
         if (data[startPos] + data[startPos + 1] + data[startPos + 2] < boundaryThreshold) {
@@ -501,4 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Run ---
     initialize();
+
+
 });
