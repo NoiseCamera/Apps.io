@@ -1,6 +1,6 @@
 // settings.js
 
-const DEBUG_INFINITE_STARS = true; // デバッグ用に星を無限にする場合は true に設定
+const DEBUG_INFINITE_STARS = false; // デバッグ用に星を無限にする場合は true に設定
 
 // --- ポイント管理機能 ---
 // このセクションの関数は、他のJSファイルからグローバルに呼び出せるように、
