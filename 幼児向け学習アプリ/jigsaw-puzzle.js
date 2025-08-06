@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const snapSound = document.getElementById('snap-sound');
   const winSound = document.getElementById('win-sound');
 
+  // このゲームで使う効果音のリスト
+  const SOUND_EFFECTS = [
+    'assets/sounds/snap.mp3', // snapSound.src
+    'assets/sounds/win.mp3'   // winSound.src
+  ];
+
   // --- Game Configuration ---
   const ANIMALS = [
     'usagi', 'アシカ', 'イヌ', 'イルカ', 'ウマ', 'キリン', 'クジラ', 'クマ',
@@ -618,8 +624,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeBgm() {
     if (bgmInitialized) return;
     const bgm = document.getElementById('bgm');
-    if (!bgm) return;
-    bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    if (bgm) {
+      bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    }
+    if (typeof preloadAudioSources === 'function') {
+      preloadAudioSources(SOUND_EFFECTS);
+    }
     bgmInitialized = true;
   }
 

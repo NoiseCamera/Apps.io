@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const winSound = document.getElementById('win-sound');
   const playAgainBtn = document.getElementById('play-again-btn');
 
+  // このゲームで使う効果音のリスト
+  const SOUND_EFFECTS = [
+    'assets/sounds/win.mp3'
+  ];
+
   // --- Game Configuration ---
   const ANIMALS = [
     'usagi', 'アシカ', 'イヌ', 'イルカ', 'ウマ', 'キリン', 'クジラ', 'クマ',
@@ -331,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 効果音を再生
       stopTimer();
-      playSE(winSound.src);
+      playSE('assets/sounds/win.mp3');
 
       // The puzzle is solved!
       // 1. Find the last piece (the one that was empty).
@@ -405,9 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeBgm() {
     if (bgmInitialized) return;
     const bgm = document.getElementById('bgm');
-    if (!bgm) return;
-    // 音量設定はsettings.jsに一任する
-    bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    if (bgm) {
+      bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    }
+    if (typeof preloadAudioSources === 'function') {
+      preloadAudioSources(SOUND_EFFECTS);
+    }
     bgmInitialized = true;
   }
 

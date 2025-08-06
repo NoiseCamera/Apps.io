@@ -72,6 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
         RED_PAUSE: 2000   // 全赤の時間 (2秒)
     };
 
+    // このゲームで使う効果音のリスト
+    const SOUND_EFFECTS = [
+        correctSound.src,
+        walkSound.src,
+        carPassSound.src,
+        carHornSound.src,
+        policeCarSound.src,
+        fireTruckSound.src,
+        ambulanceSound.src
+    ];
+
     // --- Functions ---
 
     /**
@@ -119,11 +130,25 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSignalState();
     }
 
+    /**
+     * BGMの再生と、このゲームで使う音声要素の音量コントロール接続を行う
+     */
     function initializeBgm() {
         if (bgmInitialized) return;
         const bgm = document.getElementById('bgm');
         if (!bgm) return;
         bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        
+        // 音声のプリロードと、<audio>要素の音量コントロール接続
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
+        if (typeof connectAudioElementToGainNode === 'function') {
+            // ループ再生する<audio>要素をSEのGainNodeに接続する
+            [policeCarSound, fireTruckSound, ambulanceSound, walkSound].forEach(audioEl => {
+                connectAudioElementToGainNode(audioEl, 'se');
+            });
+        }
         bgmInitialized = true;
     }
 
@@ -217,9 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSiren = currentEmergencyVehicleData.sound;
             if (currentSiren) {
                 currentSiren.currentTime = 0;
-                // Safariでの動作を安定させるため、再生直前に音量を再設定
-                const seVolume = localStorage.getItem('seVolume') || 0.7;
-                currentSiren.volume = parseFloat(seVolume);
                 currentSiren.play().catch(e => console.error("サイレンの再生に失敗", e));
             }
         }
@@ -386,9 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
             playSE(correctSound.src); // グローバル関数で再生
             if (walkSound) {
                 walkSound.loop = true;
-                // Safariでの動作を安定させるため、再生直前に音量を再設定
-                const seVolume = localStorage.getItem('seVolume') || 0.7;
-                walkSound.volume = parseFloat(seVolume);
                 walkSound.play();
             }
 

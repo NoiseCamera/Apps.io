@@ -400,6 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ['パ', 'ピ', 'プ', 'ペ', 'ポ']
   ];
 
+  // プリロードする音声ファイルのリストを生成 (音声ファイルはひらがな名)
+  const SOUND_EFFECTS = KATAKANA_GYO.flat()
+    .filter(char => char !== '　')
+    .map(char => `assets/sounds/hiragana/${katakanaToHiragana(char)}.mp3`);
+
+
   // 特定の文字・画数の番号表示位置を上書きするためのデータ
   const STROKE_NUMBER_POS_OVERRIDES = {
     'ア': {
@@ -497,8 +503,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeBgm() {
     if (bgmInitialized) return;
     const bgm = document.getElementById('bgm');
-    if (!bgm) return;
-    bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    if (bgm) {
+      bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    }
+    if (typeof preloadAudioSources === 'function') {
+      preloadAudioSources(SOUND_EFFECTS);
+    }
     bgmInitialized = true;
   }
 

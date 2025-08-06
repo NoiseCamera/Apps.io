@@ -1,6 +1,6 @@
 // settings.js
 
-const DEBUG_INFINITE_STARS = false; // デバッグ用に星を無限にする場合は true に設定
+const DEBUG_INFINITE_STARS = true; // デバッグ用に星を無限にする場合は true に設定
 
 // --- ポイント管理機能 ---
 // このセクションの関数は、他のJSファイルからグローバルに呼び出せるように、
@@ -75,6 +75,57 @@ let bgmSourceNode; // BGMのソースノード (一度しか作成できない�
 const audioBuffers = new Map(); // デコード済み音声データをキャッシュする場所
 
 /**
+ * 指定された単一の音声ソースをデコードしてキャッシュする内部関数
+ * @param {string} src - 音声ファイルのパス
+ * @returns {Promise<AudioBuffer|null>}
+ */
+async function decodeAndCache(src) {
+    // AudioContextが未初期化、srcがない、または既にキャッシュ済みの場合は何もしない
+    if (!audioContext || !src || audioBuffers.has(src)) {
+        return audioBuffers.get(src) || null;
+    }
+    try {
+        const response = await fetch(src);
+        const arrayBuffer = await response.arrayBuffer();
+        // decodeAudioDataはメインスレッドをブロックしない非同期処理
+        const buffer = await audioContext.decodeAudioData(arrayBuffer);
+        audioBuffers.set(src, buffer); // デコード結果をキャッシュ
+        return buffer;
+    } catch (e) {
+        console.error(`音声データのデコードエラー: ${src}`, e);
+        return null;
+    }
+}
+
+/**
+ * 指定された<audio>要素を、対応するGainNode（BGM用またはSE用）に接続します。
+ * これにより、Web Audio API経由での一元的な音量管理が可能になります。
+ * この関数は、initializeWebAudioが呼ばれた後に使用してください。
+ * @param {HTMLAudioElement} audioElement - 接続する<audio>要素
+ * @param {string} type - 'bgm' または 'se'
+ */
+function connectAudioElementToGainNode(audioElement, type) {
+    if (!audioContext || !audioElement) {
+        // console.warn('AudioContext未初期化、または要素が見つからないため接続をスキップします。');
+        return;
+    }
+
+    try {
+        const sourceNode = audioContext.createMediaElementSource(audioElement);
+        if (type === 'se' && seGainNode) {
+            sourceNode.connect(seGainNode);
+        } else {
+            console.warn(`不明なタイプまたはGainNodeが未初期化です: ${type}`);
+        }
+    } catch (e) {
+        // すでに接続済みのMediaElementを再度接続しようとするとエラーになるため、それを無視する
+        if (e.name !== 'InvalidStateError') {
+            console.error(`オーディオ要素の接続に失敗しました: ${audioElement.id}`, e);
+        }
+    }
+}
+
+/**
  * ユーザーの最初の操作でWeb Audio APIを初期化する関数
  */
 function initializeWebAudio() {
@@ -111,6 +162,20 @@ function initializeWebAudio() {
 }
 
 /**
+ * 指定された複数の音声ソースを事前に読み込み、デコードしてキャッシュします。
+ * ゲーム開始時など、ユーザーの操作後に呼び出すことで、再生時の遅延をなくします。
+ * @param {string[]} sources - プリロードする音声ファイルのパスの配列
+ */
+async function preloadAudioSources(sources) {
+    if (!audioContext) {
+        console.warn('AudioContextが未初期化のため、音声のプリロードをスキップします。');
+        return;
+    }
+    // Promise.allを使用して、すべてのデコード処理を並行して実行
+    await Promise.all(sources.map(src => decodeAndCache(src)));
+}
+
+/**
  * 効果音（SE）を再生するためのグローバル関数。
  * Web Audio APIを使用して、安定性とパフォーマンスを向上させます。
  * @param {string} src - 再生する音声ファイルのパス
@@ -135,25 +200,15 @@ async function playSE(src) {
             await audioContext.resume();
         }
 
-        let buffer;
-        // 1. キャッシュを確認
-        if (audioBuffers.has(src)) {
-            buffer = audioBuffers.get(src);
-        } else {
-            // 2. キャッシュになければ、音声ファイルを読み込んでデコードする
-            try {
-                const response = await fetch(src);
-                const arrayBuffer = await response.arrayBuffer();
-                buffer = await audioContext.decodeAudioData(arrayBuffer);
-                audioBuffers.set(src, buffer); // 3. デコード結果をキャッシュに保存
-            } catch (e) {
-                console.error(`音声データのデコードエラー: ${src}`, e);
-                resolve(); // エラーでも次に進む
-                return;
-            }
+        // プリロードされたバッファを取得。なければフォールバックとしてその場でデコード。
+        const buffer = await decodeAndCache(src);
+
+        if (!buffer) {
+            resolve(); // バッファがなければ再生できない
+            return;
         }
 
-        // 4. 音声ソースを作成して再生
+        // 音声ソースを作成して再生
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
         // 作成したGainNode（音量調整役）に接続
@@ -175,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bgmAudio.id = 'bgm';
     bgmAudio.src = 'assets/sounds/bgm5.mp3'; // BGMのソースをここで指定
     bgmAudio.loop = true;
+    bgmAudio.preload = 'auto'; // BGMファイルを事前に読み込むようブラウザにヒントを与える
     document.body.appendChild(bgmAudio);
   }
 

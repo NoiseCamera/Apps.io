@@ -240,33 +240,43 @@
     }
 }
 
-/* 設定ボタンのスタイル (buttons.cssから一部抜粋して適用) */
-/* drawing-board.htmlではbuttons.cssを読み込まないため、ここで個別に設定 */
-#settings-btn {
-    /* 共通スタイルから */
+/* 太さ選択ボタンのコンテナ */
+.width-controls-container {
     display: flex;
-    border: none;
-    border-radius: 50px;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 5px 0 #00000026;
-    -webkit-tap-highlight-color: transparent;
-    
-    /* 個別スタイル */
-    background-color: #9c27b0; /* Purple */
-    width: 55px;
-    height: 55px;
-    font-size: 28px;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    padding: 0;
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 1000;
+    gap: 8px;
 }
 
-/* ホバー/アクティブ時の動きも再現 */
-#settings-btn:hover:not(:disabled) { top: 13px; box-shadow: 0 7px 0 #00000026; }
-#settings-btn:active:not(:disabled) { top: 18px; box-shadow: 0 2px 0 #00000026; }
+/* 太さ選択ボタン */
+.width-btn {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.width-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
+}
+
+.width-btn.selected {
+    border-color: #007bff;
+    background-color: #e7f1ff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* ボタン内の太さを示す円 */
+.width-indicator {
+    display: block;
+    background-color: #333;
+    border-radius: 50%;
+}

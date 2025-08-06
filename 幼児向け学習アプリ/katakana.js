@@ -4,17 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false; // 音声が再生中かどうかのフラグ
 
     /**
-     * ユーザーの最初の操作でBGMを再生する関数
-     */
-    function initializeBgm() {
-        if (bgmInitialized) return;
-        const bgm = document.getElementById('bgm');
-        if (!bgm) return;
-        bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
-        bgmInitialized = true;
-    }
-
-    /**
      * カタカナをひらがなに変換する関数
      * @param {string} katakanaChar - 変換するカタカナ1文字
      * @returns {string} 変換されたひらがな
@@ -46,6 +35,26 @@ document.addEventListener('DOMContentLoaded', () => {
         ['バ', 'ビ', 'ブ', 'ベ', 'ボ'],
         ['パ', 'ピ', 'プ', 'ペ', 'ポ']
     ];
+
+    // プリロードする音声ファイルのリストを生成 (音声ファイルはひらがな名)
+    const SOUND_EFFECTS = katakanaGroups.flat()
+        .filter(char => char !== '　')
+        .map(char => `assets/sounds/hiragana/${katakanaToHiragana(char)}.mp3`);
+
+    /**
+     * ユーザーの最初の操作でBGMを再生し、効果音をプリロードする関数
+     */
+    function initializeBgm() {
+        if (bgmInitialized) return;
+        const bgm = document.getElementById('bgm');
+        if (bgm) {
+            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        }
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
+        bgmInitialized = true;
+    }
 
     // 各グループのボタンを生成して追加
     katakanaGroups.forEach(group => {

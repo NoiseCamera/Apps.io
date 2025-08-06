@@ -15,12 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const leftItemsContainer = document.getElementById('left-items');
     const rightItemsContainer = document.getElementById('right-items');
     const hintBtn = document.getElementById('hint-btn');
-
-    // 音声ファイルを読み込んでおく
-    const correctSound = new Audio('assets/sounds/seikai.mp3');
     const numberButtons = document.querySelectorAll('.number-btn');
-    const incorrectSound = new Audio('assets/sounds/incorrect.mp3'); // 不正解の音
-    const attentionSound = new Audio('assets/sounds/attention.mp3'); // 数字が空の時の音
+
+    // このゲームで使う効果音のリスト
+    const SOUND_EFFECTS = [
+        'assets/sounds/seikai.mp3',
+        'assets/sounds/incorrect.mp3',
+        'assets/sounds/attention.mp3',
+        // 数字の音もプリロード
+        'assets/sounds/kazu/0.mp3', 'assets/sounds/kazu/1.mp3', 'assets/sounds/kazu/2.mp3',
+        'assets/sounds/kazu/3.mp3', 'assets/sounds/kazu/4.mp3', 'assets/sounds/kazu/5.mp3', 'assets/sounds/kazu/6.mp3',
+        'assets/sounds/kazu/7.mp3', 'assets/sounds/kazu/8.mp3', 'assets/sounds/kazu/9.mp3', 'assets/sounds/kazu/10.mp3',
+        // 100以上の位の音も追加
+        'assets/sounds/kazu/100.mp3', 'assets/sounds/kazu/300.mp3', 'assets/sounds/kazu/600.mp3', 'assets/sounds/kazu/800.mp3'
+    ];
 
     // 現在の問題の状態をまとめて管理するオブジェクト
     let currentProblem = {};
@@ -32,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ユーザーの最初の操作で音声再生の準備をする関数
     function initializeAudio() {
         if (audioInitialized) return;
-        // .load()を呼び出すことで、ブラウザに音声を使う意図を伝える
-        correctSound.load();
-        incorrectSound.load();
-        attentionSound.load();
         // BGM要素を取得して再生を試みる
         const bgm = document.getElementById('bgm');
         if (bgm) {
             bgm.play().catch(e => console.error("BGMの自動再生がブロックされました。", e));
+        }
+
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
         }
 
         audioInitialized = true;
@@ -435,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userAnswerStr === '') {
             feedbackElem.textContent = 'すうじをいれてね';
             feedbackElem.className = 'incorrect';
-            await playSE(attentionSound.src);
+            await playSE('assets/sounds/attention.mp3');
             return;
         }
 
@@ -449,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userAnswer === currentProblem.answer) {
                 feedbackElem.textContent = 'せいかい！すごい！';
                 feedbackElem.className = 'correct';
-                await playSE(correctSound.src);
+                await playSE('assets/sounds/seikai.mp3');
                 addPoints(1); // 正解で1ポイント追加
 
                 // 正解を1秒間表示してから、次の問題へ
@@ -459,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 feedbackElem.textContent = 'おしい！もういちど';
                 feedbackElem.className = 'incorrect';
-                await playSE(incorrectSound.src);
+                await playSE('assets/sounds/incorrect.mp3');
             }
         } catch (error) {
             console.error("checkAnswer内で予期せぬエラーが発生しました:", error);

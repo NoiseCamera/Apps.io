@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let bgmInitialized = false;
     let currentMovieIndex = 0; // 現在再生中の動画のインデックスを追跡
 
+    // このゲームで使う効果音のリスト (現在はなし)
+    const SOUND_EFFECTS = [];
+
+
     // --- Movie Data ---
     const MOVIES = [
         {
@@ -49,8 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeBgm() {
         if (bgmInitialized) return;
         const bgm = document.getElementById('bgm');
-        if (!bgm) return;
-        bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        if (bgm) {
+            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        }
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
         bgmInitialized = true;
     }
 

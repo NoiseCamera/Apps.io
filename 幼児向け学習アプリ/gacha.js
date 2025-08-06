@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const GACHA_COST = 3;
+    let bgmInitialized = false; // BGMが初期化されたかどうかのフラグ
+
+    // このゲームで使う効果音のリスト
+    const SOUND_EFFECTS = [
+        'assets/sounds/gacha-shake.mp3',
+        'assets/sounds/gacha-open.mp3',
+        'assets/sounds/gacha-fanfare.mp3'
+    ];
 
     // ごほうびのリスト (IDは動物の画像ファイル名、nameは表示用)
     const REWARDS = [
@@ -40,6 +48,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'リス', name: 'リス' },
         { id: 'レッサーパンダ', name: 'レッサーパンダ' }
     ];
+
+    /**
+     * ユーザーの最初の操作でBGMを再生する
+     */
+    function initializeBgm() {
+        if (bgmInitialized) return;
+        // settings.jsによって<audio>要素が生成される
+        const bgm = document.getElementById('bgm');
+        if (bgm) {
+            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        }
+        // 効果音もこのタイミングでプリロードする
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
+        bgmInitialized = true;
+    }
 
     /**
      * ユーザーのコレクションデータをlocalStorageから取得する
@@ -107,4 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gachaImage.src = 'assets/images/treasure_chest_closed.png'; // 宝箱を閉じた状態に戻す
         gachaButton.disabled = false; // ボタンを再度有効化
     });
+
+    // ユーザーの最初の操作でBGMを再生
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
 });

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const eraserToolBtn = document.getElementById('eraser-tool');
     const fillToolBtn = document.getElementById('fill-tool');
     const penWidthSlider = document.getElementById('pen-width');
-    const penWidthDisplay = document.getElementById('pen-width-display');
     const colorPalette = document.getElementById('color-palette');
     const clearBtn = document.getElementById('clear-btn');
     const saveBtn = document.getElementById('save-btn');
@@ -16,14 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const stampToolBtn = document.getElementById('stamp-tool');
     const stampControls = document.getElementById('stamp-controls');
     const stampSizeSlider = document.getElementById('stamp-size');
-    const stampSizeDisplay = document.getElementById('stamp-size-display');
     const stampSelector = document.getElementById('stamp-selector');
 
     // --- State ---
     let isDrawing = false;
     let currentTool = 'pen';
     let currentColor = '#000000';
-    let currentWidth = 5;
+    let currentWidth = 8; // デフォルトの太さをボタンの値に変更
     let lastX = 0;
     let lastY = 0;
     let currentStamp = 'circle'; // デフォルトのスタンプを図形に変更
@@ -31,7 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let historyStack = [];
     let redoStack = [];
     const MAX_HISTORY_SIZE = 30; // 履歴の最大保存数（メモリ使用量対策）
+    let stampSizeControlsContainer = null; // スタンプサイズボタンのコンテナを保持する変数
+    let widthControlsContainer = null; // 太さボタンのコンテナを保持する変数
     let bgmInitialized = false; // BGMが初期化されたかどうかのフラグ
+
+    // このゲームで使う効果音のリスト (お絵描きアプリには固有の効果音は現在なし)。
+    // BGM用のaudio要素はsettings.jsでページに追加されます。
+    const SOUND_EFFECTS = [];
+
+    // --- 新しい定数 ---
+    const PEN_SIZES = [3, 8, 15, 30]; // 4種類の太さ
+    const STAMP_SIZES = [30, 50, 80, 120]; // 4種類のスタンプサイズ
 
     // --- Colors ---
     const COLORS = [
@@ -76,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         createColorPalette();
         createStampSelector();
+        replaceWidthSliderWithButtons(); // ★スライダーをボタンに置き換える関数を呼ぶ
+        replaceStampSizeSliderWithButtons(); // ★スタンプサイズスライダーもボタンに置き換える
         addEventListeners();
         updateToolUI();
         updateUndoRedoButtons();
@@ -97,8 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const bgm = document.getElementById('bgm');
         if (bgm) {
             bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
-            bgmInitialized = true;
+        } else {
+            console.warn('BGM要素(#bgm)が見つかりませんでした。HTMLファイルでsettings.jsが正しく読み込まれているか確認してください。');
         }
+        // 効果音もこのタイミングでプリロードする
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
+        bgmInitialized = true;
     }
 
     // --- Canvas Sizing ---
@@ -119,10 +135,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleResize() {
-        if (confirm('がめんの おおきさを かえると、かいた えが きえちゃうけど いい？')) {
-            resizeCanvas();
-            clearCanvas(false); // 確認なしでクリア
-        }
+        // 1. 現在のキャンバスの内容を一時的なインメモリキャンバスにコピー
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // 2. メインのキャンバスのサイズを変更
+        resizeCanvas();
+
+        // 3. 一時キャンバスからメインキャンバスに内容を戻す
+        // resizeCanvasでdprスケールがかかっているので、描画サイズはCSSピクセル単位で指定
+        const dpr = window.devicePixelRatio || 1;
+        ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width / dpr, tempCanvas.height / dpr);
+
+        // 4. 新しい状態を履歴に保存
+        saveState();
     }
 
     // --- UI Creation ---
@@ -143,6 +172,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * 線の太さ調整スライダーを、4つの選択ボタンに置き換えます。
+     */
+    function replaceWidthSliderWithButtons() {
+        widthControlsContainer = penWidthSlider.parentElement;
+        if (!widthControlsContainer) return;
+
+        // スライダーとテキスト表示を削除
+        widthControlsContainer.innerHTML = '';
+        // 新しいコンテナクラスを追加してスタイリングしやすくする
+        widthControlsContainer.classList.add('width-controls-container');
+
+        PEN_SIZES.forEach(size => {
+            const button = document.createElement('button');
+            button.classList.add('width-btn');
+            button.dataset.width = size;
+            // ボタンの中に、太さを表す円を描画
+            const indicatorSize = Math.max(5, size / 1.5);
+            button.innerHTML = `<span class="width-indicator" style="width: ${indicatorSize}px; height: ${indicatorSize}px;"></span>`;
+            button.title = `ふとさ: ${size}`;
+
+            button.addEventListener('click', () => {
+                currentWidth = size;
+                updateToolUI();
+            });
+            widthControlsContainer.appendChild(button);
+        });
+    }
+
+    /**
+     * スタンプの大きさ調整スライダーを、4つの選択ボタンに置き換えます。
+     */
+    function replaceStampSizeSliderWithButtons() {
+        // HTMLで追加したdiv#stamp-size-containerを取得
+        stampSizeControlsContainer = stampSizeSlider.parentElement;
+        if (!stampSizeControlsContainer) return;
+
+        // スライダーとテキスト表示を削除
+        stampSizeControlsContainer.innerHTML = '';
+        // 新しいコンテナクラスを追加してスタイリングしやすくする
+        stampSizeControlsContainer.classList.add('stamp-size-controls-container');
+
+        STAMP_SIZES.forEach(size => {
+            const button = document.createElement('button');
+            button.classList.add('width-btn'); // ペンの太さボタンと同じスタイルを流用
+            button.dataset.stampSize = size;
+            const indicatorSize = Math.max(5, size / 5); // サイズ感を調整
+            button.innerHTML = `<span class="width-indicator" style="width: ${indicatorSize}px; height: ${indicatorSize}px;"></span>`;
+            button.title = `おおきさ: ${size}`;
+
+            button.addEventListener('click', () => {
+                stampSize = size;
+                updateToolUI();
+            });
+            stampSizeControlsContainer.appendChild(button);
+        });
+    }
     function createStampSelector() {
         STAMPS.forEach(stamp => {
             const button = document.createElement('button');
@@ -177,16 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
         eraserToolBtn.addEventListener('click', () => switchTool('eraser'));
         fillToolBtn.addEventListener('click', () => switchTool('fill'));
         stampToolBtn.addEventListener('click', () => switchTool('stamp'));
-
-        penWidthSlider.addEventListener('input', (e) => {
-            currentWidth = e.target.value;
-            penWidthDisplay.textContent = currentWidth;
-        });
-
-        stampSizeSlider.addEventListener('input', (e) => {
-            stampSize = e.target.value;
-            stampSizeDisplay.textContent = stampSize;
-        });
 
         clearBtn.addEventListener('click', () => clearCanvas(true));
         saveBtn.addEventListener('click', saveCanvas);
@@ -343,13 +419,25 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.toggle('selected', btn.dataset.color === currentColor);
         });
 
+        // ★太さボタンの選択状態を更新
+        document.querySelectorAll('.width-btn[data-width]').forEach(btn => {
+            btn.classList.toggle('selected', parseInt(btn.dataset.width, 10) === currentWidth);
+        });
+
+        // ★スタンプサイズボタンの選択状態を更新
+        document.querySelectorAll('.width-btn[data-stamp-size]').forEach(btn => {
+            btn.classList.toggle('selected', parseInt(btn.dataset.stampSize, 10) === stampSize);
+        });
+
         // ツールごとのコントロールパネルの表示/非表示
         const showPenWidth = currentTool === 'pen' || currentTool === 'eraser';
-        // スタンプツールでもカラーパレットを表示
         const showColorPalette = currentTool === 'pen' || currentTool === 'fill' || currentTool === 'stamp';
         const isStampToolActive = currentTool === 'stamp';
 
-        penWidthSlider.parentElement.classList.toggle('hidden', !showPenWidth);
+        // ★スライダーの親要素（今はボタンのコンテナ）の表示を切り替える
+        if (widthControlsContainer) {
+            widthControlsContainer.classList.toggle('hidden', !showPenWidth);
+        }
         colorPalette.classList.toggle('hidden', !showColorPalette);
         stampControls.classList.toggle('hidden', !isStampToolActive);
 

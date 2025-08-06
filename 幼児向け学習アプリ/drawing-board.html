@@ -44,13 +44,15 @@
                 <canvas id="drawing-canvas"></canvas>
             </div>
             <div id="right-toolbar" class="toolbar">
-                <div class="tool-group vertical">
+                <div class="tool-group">
                     <label for="pen-width">ふとさ: <span id="pen-width-display">5</span></label>
                     <input type="range" id="pen-width" min="2" max="50" value="5">
                 </div>
                 <div id="stamp-controls" class="tool-group vertical hidden">
-                    <label for="stamp-size">おおきさ: <span id="stamp-size-display">50</span></label>
-                    <input type="range" id="stamp-size" min="20" max="150" value="50">
+                    <div id="stamp-size-container" class="tool-group">
+                        <label for="stamp-size">おおきさ: <span id="stamp-size-display">50</span></label>
+                        <input type="range" id="stamp-size" min="20" max="150" value="50">
+                    </div>
                     <div id="stamp-selector"></div>
                 </div>
                 <div id="color-palette"></div>

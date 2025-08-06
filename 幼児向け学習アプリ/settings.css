@@ -142,3 +142,31 @@
   justify-content: center;
   gap: 20px;
 }
+
+/* --- 設定ボタンのスタイル --- */
+/* どのページでも同じ位置に表示されるように、ここで定義 */
+#settings-btn {
+    display: flex;
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 5px 0 #00000026;
+    -webkit-tap-highlight-color: transparent;
+    background-color: #9c27b0; /* Purple */
+    width: 55px;
+    height: 55px;
+    font-size: 28px;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+}
+
+/* ホバー/アクティブ時の動き */
+#settings-btn:hover:not(:disabled) { top: 13px; box-shadow: 0 7px 0 #00000026; }
+#settings-btn:active:not(:disabled) { top: 18px; box-shadow: 0 2px 0 #00000026; }

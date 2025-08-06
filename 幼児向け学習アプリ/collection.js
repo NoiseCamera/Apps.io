@@ -9,6 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalItemImage = document.getElementById('modal-item-image');
     const modalItemName = document.getElementById('modal-item-name');
     const closeModalBtn = document.getElementById('close-detail-modal-btn');
+    let bgmInitialized = false; // BGMが初期化されたかどうかのフラグ
+
+    // このゲームで使う効果音のリスト
+    const SOUND_EFFECTS = [
+        'assets/sounds/kachi.mp3',
+        'assets/sounds/kirakira.mp3'
+    ];
 
     // ページ下部のボタンを「ガチャ画面に行く」に変更し、クリックイベントを設定
     const footerNavButton = document.getElementById('footer-nav-button');
@@ -42,6 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'リス', name: 'リス' },
         { id: 'レッサーパンダ', name: 'レッサーパンダ' }
     ];
+
+    /**
+     * ユーザーの最初の操作でBGMを再生する
+     */
+    function initializeBgm() {
+        if (bgmInitialized) return;
+        // settings.jsによって<audio>要素が生成される
+        const bgm = document.getElementById('bgm');
+        if (bgm) {
+            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+        }
+        // 効果音もこのタイミングでプリロードする
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
+        }
+        bgmInitialized = true;
+    }
 
     const userCollection = JSON.parse(localStorage.getItem('userCollection') || '[]');
 
@@ -120,4 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ユーザーの最初の操作でBGMを再生
+    document.body.addEventListener('click', initializeBgm, { once: true });
+    document.body.addEventListener('touchstart', initializeBgm, { once: true });
 });

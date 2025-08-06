@@ -1,0 +1,44 @@
+/* coloring-select.css */
+
+#nurie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.nurie-link {
+    display: block;
+    border: 4px solid #aed581;
+    border-radius: 15px;
+    background-color: #f1f8e9;
+    padding: 15px;
+    text-decoration: none;
+    color: #333;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.nurie-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+.nurie-thumbnail {
+    width: 100%;
+    height: 150px;
+    object-fit: contain; /* 画像がはみ出さないように */
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+}
+
+.nurie-link p {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #558b2f;
+}

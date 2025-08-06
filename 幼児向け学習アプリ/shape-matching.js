@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionShapeContainer = document.getElementById('question-shape-container');
     const optionsContainer = document.getElementById('options-container');
     const feedbackText = document.getElementById('feedback-text');
-    const correctSound = document.getElementById('correct-sound');
-    const incorrectSound = document.getElementById('incorrect-sound');
 
     // --- Shape Definitions ---
     // SVGで様々な図形を定義します
@@ -18,6 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'diamond', name: 'ひしがた', color: '#26a69a', svg: '<polygon points="50,5 95,50 50,95 5,50" fill="currentColor"/>' },
         { id: 'oval', name: 'だえん', color: '#ff7043', svg: '<ellipse cx="50" cy="50" rx="45" ry="30" fill="currentColor"/>' },
         { id: 'cross', name: 'じゅうじ', color: '#78909c', svg: '<polygon points="35,5 65,5 65,35 95,35 95,65 65,65 65,95 35,95 35,65 5,65 5,35 35,35" fill="currentColor"/>' }
+    ];
+
+    // このゲームで使う効果音のリスト
+    const SOUND_EFFECTS = [
+        'assets/sounds/seikai.mp3',
+        'assets/sounds/incorrect.mp3'
     ];
 
     let currentCorrectShape = null;
@@ -98,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedOption.classList.add('selected', 'correct');
             feedbackText.textContent = 'せいかい！';
             feedbackText.style.color = '#e53935'; // 赤色
-            playSE(correctSound.src);
+            playSE('assets/sounds/seikai.mp3');
             addPoints(1); // 正解で1ポイント追加
             animateFeedback(feedbackText);
 
@@ -109,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedOption.classList.add('selected', 'incorrect', 'disabled'); // 間違えた選択肢は操作不可に
             feedbackText.textContent = 'ちがうかな？';
             feedbackText.style.color = '#1e88e5'; // 青色
-            playSE(incorrectSound.src);
+            playSE('assets/sounds/incorrect.mp3');
 
             // アニメーションが終わったら、スタイルをリセットしてdisabled状態だけ残す
             selectedOption.addEventListener('animationend', () => {
@@ -150,6 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const bgm = document.getElementById('bgm');
         if (bgm) {
             bgm.play().catch(error => console.log("BGMの自動再生がブロックされました:", error));
+        }
+        if (typeof preloadAudioSources === 'function') {
+            preloadAudioSources(SOUND_EFFECTS);
         }
         bgmInitialized = true;
     }

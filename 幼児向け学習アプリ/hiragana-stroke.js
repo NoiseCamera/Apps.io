@@ -398,6 +398,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']
   ];
 
+  // プリロードする音声ファイルのリストを生成
+  const SOUND_EFFECTS = HIRAGANA_GYO.flat()
+    .filter(char => char !== '　')
+    .map(char => `assets/sounds/hiragana/${char}.mp3`);
+
   // 特定の文字・画数の番号表示位置を上書きするためのデータ
   const STROKE_NUMBER_POS_OVERRIDES = {
     'あ': {
@@ -482,8 +487,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeBgm() {
     if (bgmInitialized) return;
     const bgm = document.getElementById('bgm');
-    if (!bgm) return;
-    bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    if (bgm) {
+      bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+    }
+    if (typeof preloadAudioSources === 'function') {
+      preloadAudioSources(SOUND_EFFECTS);
+    }
     bgmInitialized = true;
   }
 

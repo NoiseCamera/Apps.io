@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.advancedModeToggle = document.getElementById('advanced-mode-toggle');
             this.minuteDisplayToggle = document.getElementById('minute-display-toggle');
 
+            // このゲームで使う効果音のリスト
+            this.SOUND_EFFECTS = [
+                'assets/sounds/seikai.mp3',
+                'assets/sounds/incorrect.mp3'
+            ];
+
             // State
             this.state = {
                 mode: 'read', // 'read' or 'set'
@@ -57,8 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeBgm() {
             if (this.state.bgmInitialized) return;
             const bgm = document.getElementById('bgm');
-            if (!bgm) return;
-            bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+            if (bgm) {
+                bgm.play().catch(error => console.log('BGMの再生にはユーザーの操作が必要です。', error));
+            }
+            if (typeof preloadAudioSources === 'function') {
+                preloadAudioSources(this.SOUND_EFFECTS);
+            }
             this.state.bgmInitialized = true;
         }
 

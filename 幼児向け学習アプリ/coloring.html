@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ぬりえ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="coloring.css"> <!-- 新しいCSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header id="main-header">
+        <h1>ぬりえ</h1>
+    </header>
+
+    <main>
+        <div id="coloring-layout">
+            <div id="left-toolbar" class="toolbar">
+                <!-- 最近使った色パレット -->
+                <div id="recent-colors-wrapper">
+                    <p class="palette-title">さいきん つかった いろ</p>
+                    <div id="recent-color-palette"></div>
+                </div>
+                <div id="color-palette"></div>
+            </div>
+            <div id="canvas-wrapper">
+                <canvas id="coloring-canvas"></canvas>
+                <!-- ぬりえの線画画像はJSで読み込む -->
+            </div>
+            <div id="right-toolbar" class="toolbar">
+                <p>すきな いろを えらんで<br>ぬってみよう！</p>
+                <hr>
+                <a href="coloring-select.html" class="action-btn" id="change-image-btn">えを えらびなおす</a>
+                <hr>
+                <button id="clear-btn" class="action-btn">やりなおす</button>
+                <button id="save-btn" class="action-btn">ほぞんする</button>
+                <hr>
+                <button id="undo-btn" class="action-btn" disabled>もどる</button>
+                <button id="redo-btn" class="action-btn" disabled>すすむ</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="settings.js"></script>
+    <script src="nurie-data.js"></script> <!-- ぬりえデータファイルを追加 -->
+    <script src="coloring.js"></script> <!-- 新しいJS -->
+</body>
+</html>
