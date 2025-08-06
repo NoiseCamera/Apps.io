@@ -110,9 +110,23 @@ header p {
     background-color: #e1f5fe; /* Light Cyan */
     border-color: #29b6f6; /* Light Blue */
 }
-.app-link[href="coloring.html"] {
+/* ぬりえ選択画面へのリンクにスタイルを適用 */
+.app-link[href="coloring-select.html"] {
     background-color: #f1f8e9; /* Light Green */
     border-color: #aed581; /* Light Green */
+}
+/* 以下、未設定だったアプリのスタイルを追加 */
+.app-link[href="shape-matching.html"] {
+    background-color: #e8eaf6; /* 薄いインディゴ */
+    border-color: #5c6bc0; /* インディゴ */
+}
+.app-link[href="gacha.html"] {
+    background-color: #fff8e1; /* 薄いアンバー */
+    border-color: #ffc107; /* アンバー */
+}
+.app-link[href="collection.html"] {
+    background-color: #efebe9; /* 薄いブラウン */
+    border-color: #8d6e63; /* ブラウン */
 }
 
 .app-link:hover {
@@ -159,8 +173,18 @@ header p {
 .app-link[href="drawing-board.html"] h3 {
     color: #039be5; /* Blue */
 }
-.app-link[href="coloring.html"] h3 {
+.app-link[href="coloring-select.html"] h3 {
     color: #558b2f; /* Green */
+}
+/* 以下、未設定だったアプリのタイトル色を追加 */
+.app-link[href="shape-matching.html"] h3 {
+    color: #3f51b5;
+}
+.app-link[href="gacha.html"] h3 {
+    color: #ff8f00;
+}
+.app-link[href="collection.html"] h3 {
+    color: #5d4037;
 }
 
 .app-link p {

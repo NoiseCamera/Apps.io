@@ -1,0 +1,75 @@
+/* menu-style.css */
+/* アプリ選択画面の新しい配色 */
+
+/* 基本設定 */
+body {
+    background-color: #f7f9fc; /* 明るく清潔感のあるライトブルーの背景 */
+    color: #333; /* 基本の文字色を少し柔らかく */
+    font-family: 'Kosugi Maru', sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* ヘッダー */
+#main-header {
+    background: linear-gradient(135deg, #81d4fa, #4fc3f7); /* 明るい空色のグラデーション */
+    color: white;
+    padding: 20px 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    border-bottom: 5px solid #29b6f6;
+}
+
+#main-header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+/* メインコンテンツエリア */
+main {
+    padding: 20px;
+}
+
+/* アプリ選択グリッドのコンテナ */
+/* HTMLに <div id="app-grid"> のような要素があると想定しています */
+#app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* レスポンシブ対応 */
+    gap: 25px; /* カード間の余白 */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 各アプリへのリンク（カード） */
+/* HTMLに <a href="..." class="app-card"> のような要素があると想定しています */
+.app-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    color: #4a4a4a; /* カード内の文字色 */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+    border-bottom: 5px solid transparent; /* ホバー時のボーダー用のスペース */
+    min-height: 120px; /* 高さを揃える（アイコンがないので少し小さく） */
+}
+
+/* カードのホバー（マウスを乗せた時）効果 */
+.app-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    border-bottom-color: #ff8a65; /* ホバー時にオレンジのボーダーを表示 */
+}
+
+/* カード内のアプリ名 */
+.app-card p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.5em; /* アイコンがないので文字を大きく */
+    line-height: 1.4; /* 2行になっても大丈夫なように */
+}

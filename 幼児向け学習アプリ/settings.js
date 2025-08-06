@@ -225,7 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- BGM Element Creation ---
   // すべてのページでBGMが利用できるように、<audio>要素を動的に生成する
   // これにより、各ゲームのJSファイルでgetElementById('bgm')が常に成功するようになる
-  if (!document.getElementById('bgm')) {
+  // bodyに 'no-bgm' クラスがない場合のみBGM要素を生成
+  if (!document.body.classList.contains('no-bgm') && !document.getElementById('bgm')) {
     const bgmAudio = document.createElement('audio');
     bgmAudio.id = 'bgm';
     bgmAudio.src = 'assets/sounds/bgm5.mp3'; // BGMのソースをここで指定
@@ -298,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const bgmVolumeSlider = document.getElementById('bgm-volume');
   const seVolumeSlider = document.getElementById('se-volume');
   const bgmVolumeLabel = document.querySelector('label[for="bgm-volume"]');
+  const bgmVolumeControl = bgmVolumeSlider.closest('.volume-control');
   const seVolumeLabel = document.querySelector('label[for="se-volume"]');
   const modalPointsCount = document.getElementById('modal-points-count');
 
@@ -401,6 +403,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ホーム画面なら「えらぶがめんへ」ボタンを隠し、そうでなければ表示する
       backToMenuLink.style.display = isHomePage ? 'none' : 'inline-block';
+
+      // BGMがないページではBGM音量設定を隠す
+      if (document.body.classList.contains('no-bgm')) {
+          bgmVolumeControl.style.display = 'none';
+      } else {
+          bgmVolumeControl.style.display = 'block';
+      }
 
       settingsModal.classList.remove('hidden');
   });

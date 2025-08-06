@@ -235,6 +235,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 動画が終了したら次の動画を自動再生
         videoPlayer.addEventListener('ended', () => {
+            // ポイントを追加
+            if (typeof addPoints === 'function') {
+                addPoints(1);
+                // 簡単なフィードバックをタイトル部分に表示
+                const originalTitle = movieTitle.textContent;
+                movieTitle.textContent = "★ ほしを 1こ ゲット！ ★";
+                setTimeout(() => {
+                    // 次の動画のタイトルに切り替わるので、元に戻す必要はないかもしれないが、念のため
+                    if (movieTitle.textContent === "★ ほしを 1こ ゲット！ ★") {
+                        movieTitle.textContent = originalTitle;
+                    }
+                }, 2000);
+            }
+
             const nextIndex = (currentMovieIndex + 1) % MOVIES.length;
             selectMovieByIndex(nextIndex, true); // 次は自動再生する
         });
