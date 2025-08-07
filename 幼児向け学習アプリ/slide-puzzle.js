@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // このゲームで使う効果音のリスト
   const SOUND_EFFECTS = [
-    'assets/sounds/win.mp3'
+    'assets/sounds/kirakira.mp3'
   ];
 
   // --- Game Configuration ---
@@ -334,10 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // 難易度に応じてポイントを追加 (3x3: 3点, 4x4: 4点, 5x5: 5点)
       addPoints(gridSize);
 
-      // 効果音を再生
-      stopTimer();
-      playSE('assets/sounds/win.mp3');
-
       // The puzzle is solved!
       // 1. Find the last piece (the one that was empty).
       const lastPiece = puzzleGrid.querySelector(`[data-value='${emptyValue}']`);
@@ -368,6 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // 4. Wait for a moment to let the user appreciate the completed puzzle,
       //    then show the win message.
       setTimeout(() => {
+        // 効果音を紙吹雪のタイミングで再生
+        stopTimer();
+        playSE(winSound.src);
+
+        // コンテンツが増えてもボタンがはみ出さないようにレイアウトを調整
+        winMessage.style.overflowY = 'auto'; // 縦スクロールを許可
+        winMessage.style.paddingTop = '1rem';
+        winMessage.style.paddingBottom = '1rem';
+
         winMessage.classList.remove('hidden');
         createConfetti();
       }, 1500); // 1.5 seconds

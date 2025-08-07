@@ -186,11 +186,14 @@
 
 /* クリア結果表示エリア */
 #win-stats {
-  margin: 5px 0 15px 0;
-  padding: 10px 25px;
+  margin: 0; /* HTMLの順序変更に伴い、マージンをリセット */
+  padding: 10px 30px; /* 上下の内側余白を狭く */
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
-  display: inline-block; /* 中身に合わせて幅を調整 */
+  display: flex; /* Flexboxを適用して横並びに */
+  justify-content: center; /* 中央揃え */
+  align-items: center; /* 垂直方向も中央に */
+  gap: 2rem; /* テキスト間のスペース */
 }
 
 /* クリア結果のテキストスタイル */
@@ -198,7 +201,7 @@
   font-size: 1.4em;
   font-weight: bold;
   color: #4a4a4a;
-  margin: 8px 0;
+  margin: 0; /* 横並びにしたので上下マージンをリセット */
   background: none; /* 親要素のグラデーションを解除 */
   -webkit-background-clip: initial;
   background-clip: initial;
@@ -219,8 +222,8 @@
 #win-message img {
   max-width: 80%;
   max-height: 60%;
-  margin-top: 20px;
-  margin-bottom: 10px; /* ボタンとの間隔 */
+  margin-top: 10px;
+  margin-bottom: 10px; /* 結果表示との間隔を狭く */
   border-radius: 10px;
   border: 5px solid white;
   animation: win-image-appear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards; /* 0.5秒遅れて開始、バウンドするイージング */
@@ -283,7 +286,7 @@
 
 /* クリア画面のボタン */
 .win-buttons {
-  margin-top: 20px;
+  margin-top: 15px; /* 結果表示との間隔を狭く */
   display: flex;
   gap: 20px;
 }

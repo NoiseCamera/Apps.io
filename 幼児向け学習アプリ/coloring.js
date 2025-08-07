@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be 
         '#3498DB', '#2980B9', '#1ABC9C', '#16A085',
         '#2ECC71', '#27AE60', '#AED6F1', '#A9DFBF',
         // 6段目：きいろ・そのほか
-        '#F1C40F', '#F39C12', '#34495E', '#7F8C8D',
+        '#F1C40F', '#F39C12', '#4B0082', '#7F8C8D', // 濃い灰色(#34495E)を、線と誤認されない濃い紫色に変更
         '#FCF3CF', '#F9E79F', '#BDC3C7', '#95A5A6'
     ];
 
@@ -89,11 +89,14 @@ document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be 
         // 拡大・縮小の基準点を左上（0, 0）に設定して、座標計算のずれを防ぐ
         canvas.style.transformOrigin = '0 0';
 
+        // カーソルをぬりつぶしアイコンに設定
+        canvas.style.cursor = 'crosshair';
+
         loadRecentColors();
         createRecentColorsPalette(); // Populate recent color palette
         createColorPalette();        // Populate the color palette
         addEventListeners();           // Attach event listeners to DOM elements
-        loadLineArt();               // Load the line art image
+        loadLineArt();               // Load the line art image 
         updateUI();                  // Update the UI based on initial state
         updateUndoRedoButtons();     // Update the undo/redo button states
     
@@ -174,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         const newColor = { r: 85, g: 85, b: 85 }; // 濃い灰色 (#555555)
-        const colorThreshold = 100; // この明るさ以下のピクセルを線とみなす
-        const alphaThreshold = 200; // この不透明度以上のピクセルを対象とする
+        const colorThreshold = 100; // この明るさ以下のピクセルを線とみなす100
+        const alphaThreshold = 200; // この不透明度以上のピクセルを対象とする200
 
         for (let i = 0; i < data.length; i += 4) {
             // ピクセルが黒（またはそれに近い色）で、かつ透明でない場合
@@ -342,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be 
       // クリック位置と矩形の左上の差をスケールで割るだけで正しい座標が計算できる
       const x = (clientX - rect.left) / scale;
       const y = (clientY - rect.top) / scale;
-    
         floodFill(Math.floor(x * dpr), Math.floor(y * dpr), hexToRgba(currentColor));
     }
     
@@ -472,9 +474,10 @@ function saveCanvas() {
         link.click();
     }
 
-function updateUI() {
+    function updateUI() {
         // すべてのカラーボタン（通常パレット＋最近使った色パレット）の選択状態を更新
         document.querySelectorAll('#left-toolbar .color-btn').forEach(btn => {
+            // coloring.css に .color-btn.selected のスタイルがあることを想定
             btn.classList.toggle('selected', btn.dataset.color === currentColor);
         });
     }
@@ -535,45 +538,36 @@ function hexToRgba(hex) {
      * @param {number} startY - 塗りつぶし開始点のY座標
      * @param {object} fillColor - 塗りつぶす色 {r, g, b, a}
      */
-function floodFill(startX, startY, fillColor) {
-        // --- 塗りつぶし条件を改善 ---
-        // 以前はクリックした場所の色と「似ている色」を塗りつぶしていましたが、
-        // これだと線の周りのアンチエイリアス（ぼかし）部分が塗り残しになることがありました。
-        //
-        // 新しい方法では、「境界線の色ではない部分」をすべて塗りつぶします。
-        // これにより、線のギリギリまでキレイに色が塗られるようになります。
-
+    function floodFill(startX, startY, fillColor) {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-
+ 
         const startPos = (startY * canvasWidth + startX) * 4;
-
-        // 1. 境界線判定
-        // 境界線の色（黒や濃い灰色）を定義します。
-        // RGBの合計値がこの値以下なら線とみなします。アンチエイリアスを考慮して少し甘めに設定。
-        const boundaryThreshold = 300; // 線の色を灰色にしたため、境界値も調整 (85+85+85=255)
-
-        // クリックした場所が境界線なら何もしない
-        if (data[startPos] + data[startPos + 1] + data[startPos + 2] < boundaryThreshold) {
+        const startColor = {
+            r: data[startPos],
+            g: data[startPos + 1],
+            b: data[startPos + 2],
+            a: data[startPos + 3]
+        };
+ 
+        // --- 判定基準の定義 ---
+        const boundaryColor = { r: 85, g: 85, b: 85 };
+        const boundaryTolerance = 40; // 境界線とみなす色の許容誤差
+ 
+        // 1. クリックした場所が、すでに塗ろうとしている色と同じなら何もしない
+        if (startColor.r === fillColor.r && startColor.g === fillColor.g && startColor.b === fillColor.b) {
             return;
         }
-
-        // 2. 塗りつぶし色と同じなら何もしない
-        // クリックした場所がすでに塗ろうとしている色と同じなら処理を終了
-        if (data[startPos] === fillColor.r &&
-            data[startPos + 1] === fillColor.g &&
-            data[startPos + 2] === fillColor.b) {
-            return;
+ 
+        if (typeof playSE === 'function') {
+            playSE('assets/sounds/fill.mp3');
         }
-
-        if (typeof playSE === 'function') playSE('assets/sounds/fill.mp3');
-        // addRecentColorはselectColorで行うように変更したため、ここでは不要
-
+ 
         const pixelStack = [[startX, startY]];
         const visited = new Uint8Array(canvasWidth * canvasHeight);
-
+ 
         while (pixelStack.length > 0) {
             const [x, y] = pixelStack.pop();
             const currentPos = (y * canvasWidth + x) * 4;
@@ -583,19 +577,25 @@ function floodFill(startX, startY, fillColor) {
                 continue;
             }
 
-            // 現在のピクセルが境界線でなければ塗りつぶす
-            if (data[currentPos] + data[currentPos + 1] + data[currentPos + 2] >= boundaryThreshold) {
-                data[currentPos] = fillColor.r;
-                data[currentPos + 1] = fillColor.g;
-                data[currentPos + 2] = fillColor.b;
-                data[currentPos + 3] = fillColor.a;
-                visited[visitedPos] = 1; // 訪問済みにマーク
-
-                pixelStack.push([x + 1, y]);
-                pixelStack.push([x - 1, y]);
-                pixelStack.push([x, y + 1]);
-                pixelStack.push([x, y - 1]);
+            // 3. 現在のピクセルが「境界線」なら、そこは塗らずに探索を終了
+            if (Math.abs(data[currentPos] - boundaryColor.r) < boundaryTolerance &&
+                Math.abs(data[currentPos + 1] - boundaryColor.g) < boundaryTolerance &&
+                Math.abs(data[currentPos + 2] - boundaryColor.b) < boundaryTolerance &&
+                data[currentPos + 3] > 200) {
+                continue;
             }
+ 
+            // 4. 境界線でなければ、塗りつぶして隣のピクセルを探索リストに追加
+            data[currentPos] = fillColor.r;
+            data[currentPos + 1] = fillColor.g;
+            data[currentPos + 2] = fillColor.b;
+            data[currentPos + 3] = fillColor.a; // alpha
+            visited[visitedPos] = 1;
+
+            pixelStack.push([x + 1, y]); // right
+            pixelStack.push([x - 1, y]); // left
+            pixelStack.push([x, y + 1]); // down
+            pixelStack.push([x, y - 1]); // up
         }
         ctx.putImageData(imageData, 0, 0);
         saveState(); // 塗りつぶし後に履歴を保存

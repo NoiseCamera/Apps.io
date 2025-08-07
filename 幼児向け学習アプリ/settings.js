@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!document.body.classList.contains('no-bgm') && !document.getElementById('bgm')) {
     const bgmAudio = document.createElement('audio');
     bgmAudio.id = 'bgm';
-    bgmAudio.src = 'assets/sounds/bgm5.mp3'; // BGMのソースをここで指定
+    bgmAudio.src = 'assets/sounds/bgm.mp3'; // BGMのソースをここで指定
     bgmAudio.loop = true;
     bgmAudio.preload = 'auto'; // BGMファイルを事前に読み込むようブラウザにヒントを与える
     document.body.appendChild(bgmAudio);

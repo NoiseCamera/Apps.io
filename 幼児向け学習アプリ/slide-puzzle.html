@@ -8,6 +8,19 @@
   <link rel="stylesheet" href="settings.css">
   <link rel="stylesheet" href="buttons.css">
   <link rel="stylesheet" href="slide-puzzle.css">
+  <style>
+    /* 時間と回数の表示を横並びにするためのスタイル */
+    #controls .stats-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem; /* テキスト間のスペース */
+      margin-bottom: 1rem; /* ボタンとの間隔 */
+    }
+    #controls .stats-container p {
+      margin: 0; /* p要素のデフォルトマージンをリセット */
+    }
+  </style>
 </head>
 <body>
   <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
@@ -37,8 +50,10 @@
       </div>
     </div>
     <div id="controls">
-      <p>うごかした かいすう: <span id="move-count">0</span></p>
-      <p>じかん: <span id="time-count">00:00</span></p>
+      <div class="stats-container">
+        <p>うごかした かいすう: <span id="move-count">0</span></p>
+        <p>じかん: <span id="time-count">00:00</span></p>
+      </div>
       <button id="shuffle-btn">もういちど まぜる</button>
     </div>
   </main>
@@ -51,11 +66,11 @@
 
   <div id="win-message" class="overlay hidden">
     <p>クリア！おめでとう！</p>
+    <img id="win-image" src="assets/images/usagi.png" alt="完成した絵">
     <div id="win-stats">
       <p>かかったじかん: <span id="win-time">00:00</span></p>
       <p>うごかしたかいすう: <span id="win-moves">0</span></p>
     </div>
-    <img id="win-image" src="assets/images/usagi.png" alt="完成した絵">
     <div class="win-buttons">
       <button id="play-again-btn">もういちど あそぶ</button>
       <a href="index.html" id="back-to-menu-btn" class="button-style">えらぶがめんへ</a>

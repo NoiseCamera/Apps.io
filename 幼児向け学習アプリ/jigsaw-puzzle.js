@@ -533,8 +533,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    selectedPiece.dx = mouseX - offsetX;
-    selectedPiece.dy = mouseY - offsetY;
+    // Calculate the new potential position
+    const newDx = mouseX - offsetX;
+    const newDy = mouseY - offsetY;
+
+    // ピースがキャンバスの端から完全に見えなくならないように位置を制限する
+    // ピースの半分までは画面外に出られるようにマージンを設ける
+    const marginX = selectedPiece.width / 2;
+    const marginY = selectedPiece.height / 2;
+
+    // Math.maxとMath.minを使って、座標を指定の範囲内に収める (clamp)
+    selectedPiece.dx = Math.max(-marginX, Math.min(newDx, canvas.width - marginX));
+    selectedPiece.dy = Math.max(-marginY, Math.min(newDy, canvas.height - marginY));
 
     draw();
   }
