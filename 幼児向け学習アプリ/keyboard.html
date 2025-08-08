@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>けんばんあそび</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="keyboard.css">
+</head>
+<body>
+    <!-- BGMは他のアプリに合わせて任意で追加・変更してください -->
+    <audio id="bgm" src="assets/sounds/bgm_piano.mp3" loop></audio>
+
+    <header>
+        <h1>けんばんあそび</h1>
+        <p id="instruction-text">すきな けんばんを おしてね！</p>
+    </header>
+
+    <div id="keyboard-mode-selector">
+        <button id="mode-play" class="button-style selected">えんそうモード</button>
+        <button id="mode-quiz" class="button-style">おとあてクイズ</button>
+    </div>
+
+    <main>
+        <div id="quiz-feedback"></div>
+        <div id="keyboard-container" class="play-mode">
+            <div class="piano">
+                <div class="key white" data-note="do"><span>ド</span></div>
+                <div class="key white" data-note="re"><span>レ</span></div>
+                <div class="key white" data-note="mi"><span>ミ</span></div>
+                <div class="key white" data-note="fa"><span>ファ</span></div>
+                <div class="key white" data-note="so"><span>ソ</span></div>
+                <div class="key white" data-note="ra"><span>ラ</span></div>
+                <div class="key white" data-note="shi"><span>シ</span></div>
+                <div class="key white" data-note="do2"><span>ド</span></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="settings.js"></script>
+    <script src="keyboard.js"></script>
+</body>
+</html>

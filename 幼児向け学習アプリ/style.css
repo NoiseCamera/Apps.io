@@ -128,6 +128,10 @@ header p {
     background-color: #efebe9; /* 薄いブラウン */
     border-color: #8d6e63; /* ブラウン */
 }
+.app-link[href="keyboard.html"] {
+    background-color: #fce4ec; /* 薄いピンク */
+    border-color: #ec407a; /* ピンク */
+}
 
 .app-link:hover {
     transform: translateY(-5px);
@@ -185,6 +189,9 @@ header p {
 }
 .app-link[href="collection.html"] h3 {
     color: #5d4037;
+}
+.app-link[href="keyboard.html"] h3 {
+    color: #ec407a;
 }
 
 .app-link p {
