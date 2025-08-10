@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>タイピングれんしゅう</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="typing.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <style>
+        /* おたくモード用のスタイル */
+        body.adult-mode {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        body.adult-mode h1 {
+            color: #e74c3c;
+            text-shadow: 2px 2px 4px #000;
+        }
+        body.adult-mode #question-display {
+            color: #f1c40f;
+        }
+        body.adult-mode .difficulty-btn {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border: 1px solid #95a5a6;
+        }
+        body.adult-mode .difficulty-btn.selected {
+            background-color: #e74c3c;
+            color: #fff;
+            border-color: #e74c3c;
+        }
+        body.adult-mode .stat-item {
+            background-color: #34495e;
+            border: 1px solid #7f8c8d;
+        }
+        body.adult-mode .main-btn,
+        body.adult-mode #stop-game-btn {
+            background-color: #c0392b;
+        }
+        body.adult-mode .modal-content {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border: 2px solid #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgm" loop></audio>
+
+    <header>
+        <h1>タイピングれんしゅう</h1>
+        <p>もんだいをみて、おなじように にゅうりょくしてね！</p>
+    </header>
+
+    <main id="typing-app-container">
+        <div id="game-stats">
+            <div class="stat-item" id="time-left-container">のこりじかん: <span id="time-left">60</span></div>
+            <div class="stat-item hidden" id="elapsed-time-container">けいかじかん: <span id="elapsed-time">0</span></div>
+            <div class="stat-item">スコア: <span id="score">0</span></div>
+        </div>
+
+        <div id="difficulty-selector">
+            <button class="difficulty-btn" data-difficulty="easy">かんたん</button>
+            <button class="difficulty-btn selected" data-difficulty="normal">ふつう</button>
+            <button class="difficulty-btn" data-difficulty="hard">むずかしい</button>
+            <button class="difficulty-btn" data-difficulty="training">れんしゅう</button>
+        </div>
+
+        <div id="question-container">
+            <p id="question-romaji"></p>
+            <p id="question-display">スタートボタンを おしてね！</p>
+            <span id="countdown-number" class="hidden">3</span>
+            <button id="start-game-btn" class="main-btn">ゲームスタート！</button>
+        </div>
+
+        <button id="stop-game-btn" class="main-btn hidden">やめる</button>
+
+        <input type="text" id="typing-input-hidden">
+        <div id="virtual-keyboard"></div>
+    </main>
+
+    <div id="result-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>けっか</h2>
+            <div class="result-stats">
+                <div class="result-stat-item">
+                    <p>スコア</p>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="result-stat-item">
+                    <p>せいかいりつ</p>
+                    <div class="value-unit-container">
+                        <span id="accuracy">0</span><span class="unit">%</span>
+                    </div>
+                </div>
+                <div class="result-stat-item">
+                    <p>タイピングそくど</p>
+                    <div class="value-unit-container">
+                        <span id="wpm-score">0</span><span class="unit">WPM</span>
+                    </div>
+                </div>
+            </div>
+            <div id="typed-words-container" class="hidden">
+                <h3>たいぷした ことば</h3>
+                <div id="typed-words-list"></div>
+            </div>
+            <button id="play-again-btn" class="main-btn">もういちどあそぶ</button>
+        </div>
+    </div>
+
+    <script src="typing-words.js"></script>
+    <script src="typing-words-adult.js"></script>
+    <script src="settings.js"></script>
+    <script src="typing.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const bgm = document.getElementById('bgm');
+
+        // 再生したいBGMのリスト。assets/sounds/ フォルダにあるファイル名を指定してください。
+        const bgmList = [
+            'assets/sounds/bgm_typing.mp3',
+            'assets/sounds/bgm3.mp3',
+            'assets/sounds/bgm4.mp3'
+        ];
+
+        if (bgm && bgmList.length > 0) {
+            // ページが読み込まれた時に、リストからランダムにBGMを1つ選んで設定します。
+            const randomIndex = Math.floor(Math.random() * bgmList.length);
+            bgm.src = bgmList[randomIndex];
+            bgm.load(); // BGMファイルを読み込みます
+        }
+    });
+    </script>
+</body>
+</html>

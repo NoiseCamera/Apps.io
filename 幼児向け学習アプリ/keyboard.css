@@ -20,6 +20,19 @@
     top: 2px; /* 少し押し込まれたように見せる */
 }
 
+/* アクションボタンのコンテナ（デモ演奏など） */
+#action-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#action-buttons .button-style {
+    background-color: #00acc1; /* シアン */
+    box-shadow: 0 5px 0 #00838f;
+}
+
 /* クイズのフィードバック表示エリア */
 #quiz-feedback {
     font-size: 2.5em;
@@ -58,7 +71,7 @@
 
 /* 白鍵の共通スタイル */
 .key.white {
-    width: 70px;
+    width: 80px; /* 鍵盤の幅を広げました */
     height: 280px;
     border: 1px solid #888;
     border-radius: 0 0 10px 10px;
@@ -104,7 +117,7 @@
 /* スマホ向けのレスポンシブ対応 */
 @media (max-width: 768px) {
     .key.white {
-        width: 11vw; /* 画面幅に応じて幅を調整 */
+        width: 12vw; /* 画面幅に応じて幅を調整 */
         height: 45vw;
         margin: 0 1vw;
     }
@@ -129,4 +142,34 @@
     margin-left: 10px;
     vertical-align: middle; /* テキストと高さを合わせる */
     background-color: #4caf50; /* 緑色 (buttons.cssの決定ボタンなどと同じ) */
+}
+
+/* --- 録音モードのスタイル --- */
+
+/* 録音コントロールエリア */
+#record-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    height: 50px; /* レイアウトがガタつかないように高さを確保 */
+}
+
+#record-controls.hidden {
+    display: none;
+}
+
+/* 録音・再生ボタンの個別スタイル */
+#record-controls #record-btn { background-color: #f44336; /* 赤 */ }
+#record-controls #play-btn { background-color: #4caf50; /* 緑 */ }
+#record-controls #stop-btn { background-color: #607d8b; /* 青灰色 */ }
+
+/* 録音中の点滅アニメーション */
+#record-controls #record-btn.recording {
+    animation: recording-blink 1.5s infinite ease-in-out;
+}
+
+@keyframes recording-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.02); }
 }

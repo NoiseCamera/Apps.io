@@ -376,25 +376,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgmVolume = bgmVolumeSlider.value;
     const seVolume = seVolumeSlider.value;
     applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
-
-    // 動的に追加したスタイルシートを削除する
-    const tempStyle = document.getElementById('temp-buttons-css');
-    if (tempStyle) {
-      tempStyle.remove();
-    }
   };
 
   settingsBtn.addEventListener('click', () => {
       modalPointsCount.textContent = getPoints(); // モーダルを開くたびにポイントを更新
-
-      // buttons.cssを動的に読み込む（すでに追加されていなければ）
-      if (!document.getElementById('temp-buttons-css')) {
-        const link = document.createElement('link');
-        link.id = 'temp-buttons-css';
-        link.rel = 'stylesheet';
-        link.href = 'buttons.css';
-        document.head.appendChild(link);
-      }
 
       // 現在のページがホーム画面 (index.html) かどうかをチェック
       const path = window.location.pathname;

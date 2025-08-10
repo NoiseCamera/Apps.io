@@ -1,0 +1,513 @@
+/* typing.css */
+
+/* --- Header --- */
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    color: #29b6f6; /* 明るい水色 */
+    font-size: 2.2em;
+    margin: 0 0 5px 0;
+    text-shadow: 2px 2px 0 #ffffff, 4px 4px 0 rgba(41, 182, 246, 0.2);
+}
+
+header p {
+    color: #0288d1; /* やや濃い水色 */
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* --- Main Layout --- */
+#typing-app-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* --- Game Stats --- */
+#game-stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #795548; /* 茶色 */
+    margin-bottom: 20px;
+    background-color: #fff9c4; /* 明るい黄色 */
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.stat-item {
+    min-width: 150px;
+}
+
+/* --- Difficulty Selector --- */
+#difficulty-selector {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#difficulty-selector .difficulty-btn {
+    background-color: #c8e6c9; /* 明るい緑 */
+    color: #2e7d32; /* 濃い緑 */
+    box-shadow: 0 5px 0 #81c784; /* やや濃い緑 */
+}
+
+#difficulty-selector .difficulty-btn.selected {
+    background-color: #4caf50; /* 緑 */
+    color: #fff;
+    top: 3px;
+}
+/* --- Question Display --- */
+#question-container {
+    background-color: #fff0f5; /* かわいい薄ピンク */
+    border: 3px solid #f06292; /* 明るいピンクの枠線 */
+    border-radius: 10px;
+    padding: 15px; /* パディングを少し減らす */
+    margin-bottom: 20px;
+    min-height: 120px; /* 高さを調整 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px; /* 要素間のスペースを狭くする */
+    position: relative; /* カウントダウン用 */
+}
+
+/* カウントダウン中のスタイル */
+#question-container.countdown-active {
+    background-color: #212121; /* やや明るい黒 */
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* カウントダウン中は問題文を非表示にする */
+#question-container.countdown-active #question-romaji,
+#question-container.countdown-active #question-display {
+    visibility: hidden;
+}
+
+#question-romaji {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2.8em; /* フォントサイズを調整 */
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+    height: auto; /* 高さを自動に */
+}
+
+/* ゲーム開始前など、ローマ字表示が空の時は高さをなくして中央揃えを正確にする */
+#question-romaji:empty {
+    display: none;
+}
+
+#question-display {
+    font-size: 2.8em; /* フォントサイズを調整 */
+    color: #5d4037; /* 読みやすい濃い茶色 */
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* カウントダウンのスタイル */
+#countdown-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 800;
+    font-size: 7em; /* 表示エリアの高さに収まるように調整 */
+    color: #ff9800; /* オレンジ */
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+    z-index: 10;
+}
+
+/* カウントダウン中の数字の色 */
+#question-container.countdown-active #countdown-number {
+    color: #fff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+#countdown-number.start-text {
+    font-size: 3em; /* 表示エリアの高さに収まるように調整 */
+}
+
+/* JSで付け外しされるアニメーションクラス */
+.countdown-animation {
+    animation: countdown-pulse 1s ease-in-out;
+}
+
+@keyframes countdown-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+
+/* Character styling within the question */
+#question-display span {
+    transition: color 0.2s, background-color 0.2s;
+}
+
+/* タイプ済みの文字のスタイル */
+.char-typed {
+    color: #bdbdbd; /* グレーアウト */
+}
+
+/* --- ローマ字の指ごとの色分け --- */
+.color-pinky-l { color: #c62828; }
+.color-ring-l { color: #e64a19; }
+.color-middle-l { color: #fbc02d; }
+.color-index-l { color: #388e3c; }
+.color-index-r { color: #0277bd; }
+.color-middle-r { color: #303f9f; }
+.color-ring-r { color: #5e35b1; }
+.color-pinky-r { color: #d81b60; }
+
+/* --- Hidden Input --- */
+#typing-input-hidden {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    opacity: 0;
+}
+
+/* --- Buttons --- */
+/* スタートボタンは問題文エリアの中央に配置 */
+#start-game-btn {
+    /* main-btn のスタイルを上書き */
+    background-color: #ff7043; /* 明るいオレンジ */
+    box-shadow: 0 6px 0 #e64a19;
+}
+
+#start-game-btn:active {
+    box-shadow: 0 2px 0 #e64a19;
+}
+
+#stop-game-btn {
+    background-color: #78909c; /* グレー */
+    box-shadow: 0 6px #546e7a;
+    display: block;
+    margin: 20px auto 0; /* 上に20px、左右にautoで中央揃え */
+}
+
+/* --- Virtual Keyboard --- */
+#virtual-keyboard {
+    margin-top: 15px; /* 少し詰める */
+    padding: 15px;
+    background-color: #e3f2fd; /* 明るい水色 */
+    border-radius: 15px; /* 角丸も少し大きく */
+    user-select: none; /* Prevent text selection */
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* 物理キーボードのように、行の開始位置をずらすためのスペーサー */
+.keyboard-row:nth-child(2)::before {
+    content: '';
+    display: block;
+    width: 32.5px; /* 半キー分のスペーサー */
+    flex-shrink: 0; /* 縮まないようにする */
+}
+
+.keyboard-row:nth-child(3)::before {
+    content: '';
+    display: block;
+    width: 97.5px; /* 1.5キー分のスペーサー */
+    flex-shrink: 0; /* 縮まないようにする */
+}
+
+.keyboard-key {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 700;
+    font-size: 1.3em; /* 少し小さくしてバランス調整 */
+    text-transform: uppercase;
+    color: #4e342e;
+    min-width: 55px;  /* 少し小さく */
+    height: 55px;   /* 少し小さく */
+    margin: 0 5px;
+    border: 1px solid #b0bec5;
+    border-radius: 10px; /* 角丸も少し大きく */
+    background-color: #fff;
+    box-shadow: 0 5px 0 #9e9e9e; /* 影を調整 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.07s ease-out;
+    position: relative;
+    top: 0;
+}
+
+/* --- 指ごとのキーボードの色分け --- */
+.finger-pinky-l { background-color: #ffcdd2; box-shadow: 0 5px 0 #c62828; }
+.finger-ring-l { background-color: #ffccbc; box-shadow: 0 5px 0 #e64a19; }
+.finger-middle-l { background-color: #fff9c4; box-shadow: 0 5px 0 #fbc02d; }
+.finger-index-l { background-color: #c8e6c9; box-shadow: 0 5px 0 #388e3c; }
+.finger-index-r { background-color: #b3e5fc; box-shadow: 0 5px 0 #0277bd; }
+.finger-middle-r { background-color: #c5cae9; box-shadow: 0 5px 0 #303f9f; }
+.finger-ring-r { background-color: #d1c4e9; box-shadow: 0 5px 0 #5e35b1; }
+.finger-pinky-r { background-color: #f8bbd0; box-shadow: 0 5px 0 #d81b60; }
+
+.keyboard-key:active, .keyboard-key.active {
+    top: 3px;
+    box-shadow: 0 2px 0 #666;
+    filter: brightness(1.1);
+}
+
+/* Backspaceキーの特別なスタイル */
+.key-backspace {
+    background-color: #b0bec5;
+    box-shadow: 0 5px 0 #78909c;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px 30px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 450px;
+}
+
+.modal-content h2 {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 800;
+    color: #ff8f00; /* オレンジ */
+    font-size: 2.2em;
+    margin-bottom: 20px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+}
+
+.result-stat-item {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 700;
+    color: #607d8b;
+    font-size: 1.2em;
+}
+.result-stat-item p {
+    margin: 0;
+    color: #78909c;
+    font-size: 0.9em;
+}
+
+.value-unit-container {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.2em;
+}
+
+.result-stat-item span {
+    font-size: 3em;
+    display: inline; /* blockから変更 */
+    color: #ff8f00; /* オレンジ */
+}
+
+.result-stat-item .unit {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #78909c;
+}
+
+/* --- Typed Words List in Result Modal --- */
+#typed-words-container {
+    margin-top: 15px;
+    text-align: left;
+    max-height: 120px; /* 一定の高さでスクロール可能に */
+    overflow-y: auto;
+    background-color: #fafafa;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#typed-words-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #5d4037; /* 問題文のひらがなと同じ色 */
+    text-align: center;
+}
+
+#typed-words-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.typed-word-item {
+    background-color: #e3f2fd; /* キーボード背景と同じ色 */
+    color: #0288d1; /* ヘッダーのテキストと同じ色 */
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+/* --- Settings Button & Points Counter --- */
+#points-counter {
+    position: fixed;
+    top: 20px;
+    right: 80px; /* settings button width + margin */
+    background-color: #ffca28; /* Yellow, like a star */
+    color: #795548; /* Brown text */
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 8px 15px 8px 40px; /* Left padding for the star icon */
+    border-radius: 20px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    z-index: 1001; /* Above most content, below modal */
+    transition: transform 0.2s ease-out;
+}
+
+#points-counter::before {
+    content: '★';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ff8f00; /* Orange star */
+    font-size: 1.2em;
+}
+
+/* Animation when points are added */
+#points-counter.points-added {
+    transform: scale(1.15);
+}
+
+#settings-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 2em;
+    border-radius: 50%;
+    border: none;
+    background-color: #b0bec5; /* Blue-grey */
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    z-index: 1001;
+    transition: background-color 0.2s;
+}
+
+#settings-btn:hover {
+    background-color: #78909c;
+}
+
+/* --- Settings Modal --- */
+#settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1002; /* result-modalより手前に表示 */
+}
+
+.settings-content {
+    background-color: #fff;
+    padding: 25px 35px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 480px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    border: 5px solid #81d4fa; /* 明るい水色の枠 */
+}
+
+.settings-content h2 {
+    font-weight: 800;
+    color: #0288d1; /* やや濃い水色 */
+    font-size: 2em;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.points-display-modal {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #795548;
+    background-color: #fff9c4; /* 明るい黄色 */
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.volume-control {
+    margin-bottom: 20px;
+}
+
+.volume-control label {
+    display: block;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #546e7a;
+    margin-bottom: 10px;
+}
+
+.volume-control input[type="range"] {
+    width: 80%;
+}
+
+.settings-buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}

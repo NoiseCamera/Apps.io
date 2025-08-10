@@ -24,10 +24,20 @@
     <div id="keyboard-mode-selector">
         <button id="mode-play" class="button-style selected">えんそうモード</button>
         <button id="mode-quiz" class="button-style">おとあてクイズ</button>
+        <button id="mode-record" class="button-style">ろくおんモード</button>
+    </div>
+
+    <div id="action-buttons">
+        <button id="demo-play-btn" class="button-style">♪ デモえんそう</button>
     </div>
 
     <main>
         <div id="quiz-feedback"></div>
+        <div id="record-controls" class="hidden">
+            <button id="record-btn" class="button-style">● ろくおん</button>
+            <button id="play-btn" class="button-style" disabled>▶ さいせい</button>
+            <button id="stop-btn" class="button-style" disabled>■ ていし</button>
+        </div>
         <div id="keyboard-container" class="play-mode">
             <div class="piano">
                 <div class="key white" data-note="do"><span>ド</span></div>
