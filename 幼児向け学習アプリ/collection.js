@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     const collectionGrid = document.getElementById('collection-grid');
     const collectionStats = document.getElementById('collection-stats');
     const completeRewardDiv = document.getElementById('complete-reward');

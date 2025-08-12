@@ -1,5 +1,8 @@
 // DOMの読み込みが完了したら処理を開始
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // HTML要素の取得
     const num1Elem = document.getElementById('num1');
     const operatorElem = document.getElementById('operator');

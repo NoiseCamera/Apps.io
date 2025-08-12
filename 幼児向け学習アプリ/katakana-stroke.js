@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
+  // ダブルタップによるズームを防止
+  document.body.style.touchAction = 'manipulation';
+
   const characterGrid = document.getElementById('character-grid');
   const modelCharDisplay = document.getElementById('model-character-display');
   const canvas = document.getElementById('stroke-canvas');

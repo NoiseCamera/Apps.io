@@ -1,6 +1,9 @@
 // keyboard.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- DOM Elements ---
     const piano = document.querySelector('.piano');
     const modePlayBtn = document.getElementById('mode-play');
@@ -35,11 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { note: 'do', time: 500 }, { note: 'do', time: 500 },
         { note: 'so', time: 500 }, { note: 'so', time: 500 },
         { note: 'ra', time: 500 }, { note: 'ra', time: 500 },
-        { note: 'so', time: 800 },
+        { note: 'so', time: 1000 },
         { note: 'fa', time: 500 }, { note: 'fa', time: 500 },
         { note: 'mi', time: 500 }, { note: 'mi', time: 500 },
         { note: 're', time: 500 }, { note: 're', time: 500 },
-        { note: 'do', time: 800 }
+        { note: 'do', time: 1000 },
+        { note: 'fa', time: 500 }, { note: 'fa', time: 500 },
+        { note: 'mi', time: 500 }, { note: 'mi', time: 500 },
+        { note: 're', time: 500 }, { note: 're', time: 500 },
+        { note: 'do', time: 10000 },
+        { note: 'fa', time: 500 }, { note: 'fa', time: 500 },
+        { note: 'mi', time: 500 }, { note: 'mi', time: 500 },
+        { note: 're', time: 500 }, { note: 're', time: 500 },
+        { note: 'do', time: 1000 },
+        { note: 'do', time: 500 }, { note: 'do', time: 500 },
+        { note: 'so', time: 500 }, { note: 'so', time: 500 },
+        { note: 'ra', time: 500 }, { note: 'ra', time: 500 },
+        { note: 'so', time: 1000 }
     ];
 
     if (!piano) {

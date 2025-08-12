@@ -1,0 +1,200 @@
+/* maze-game.css */
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px); /* ヘッダーと余白を除いた高さ */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+main#game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+#game-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+#difficulty-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.difficulty-btn {
+    padding: 8px 16px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    background-color: #fff;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.difficulty-btn.selected {
+    background-color: #ec407a; /* Pink */
+    color: white;
+    border-color: #ec407a;
+}
+
+.stat-item {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #555;
+}
+
+.stat-label {
+    color: #e91e63; /* Darker Pink */
+}
+
+#maze-wrapper {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1 / 1; /* 正方形を維持 */
+    background-color: #fffde7; /* Soft cream for the path */
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#maze-canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 5px;
+}
+
+/* --- On-screen D-pad for touch devices --- */
+#d-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 180px;
+    height: 180px;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+#d-pad.hidden {
+    display: none;
+}
+
+.d-pad-btn {
+    font-size: 2rem;
+    border: 2px solid #f06292; /* Pink border */
+    background-color: #fce4ec; /* Light pink background */
+    border-radius: 50%;
+    color: #555;
+    cursor: pointer;
+    user-select: none; /* ボタンのテキスト選択を防ぐ */
+    -webkit-tap-highlight-color: transparent; /* タップ時のハイライトを消す */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.d-pad-btn:active {
+    background-color: #f8bbd0; /* Darker light pink */
+}
+
+#d-pad-up    { grid-area: 1 / 2 / 2 / 3; }
+#d-pad-left  { grid-area: 2 / 1 / 3 / 2; }
+#d-pad-right { grid-area: 2 / 3 / 3 / 4; }
+#d-pad-down  { grid-area: 3 / 2 / 4 / 3; }
+
+
+/* --- Win Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: modal-pop 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    max-width: 90vw;
+}
+
+@keyframes modal-pop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h2 {
+    color: #ec407a; /* Pink */
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.modal-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.points-feedback {
+    font-size: 1.5rem !important;
+    font-weight: bold;
+    color: #ffc107; /* 星の色 */
+    margin-top: 20px !important;
+    margin-bottom: 25px !important;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 600px) {
+    #app-container {
+        height: auto;
+    }
+    #game-controls {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    .stat-item {
+        font-size: 1.2rem;
+        padding: 8px 15px;
+    }
+    #d-pad {
+        width: 150px;
+        height: 150px;
+    }
+    .d-pad-btn {
+        font-size: 1.5rem;
+    }
+}

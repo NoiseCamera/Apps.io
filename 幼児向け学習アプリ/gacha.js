@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     const gachaButton = document.getElementById('gacha-button');
     const gachaImage = document.getElementById('gacha-image');
     const rewardModal = document.getElementById('reward-modal');

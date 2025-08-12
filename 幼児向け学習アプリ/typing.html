@@ -116,24 +116,5 @@
     <script src="typing-words-adult.js"></script>
     <script src="settings.js"></script>
     <script src="typing.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const bgm = document.getElementById('bgm');
-
-        // 再生したいBGMのリスト。assets/sounds/ フォルダにあるファイル名を指定してください。
-        const bgmList = [
-            'assets/sounds/bgm_typing.mp3',
-            'assets/sounds/bgm3.mp3',
-            'assets/sounds/bgm4.mp3'
-        ];
-
-        if (bgm && bgmList.length > 0) {
-            // ページが読み込まれた時に、リストからランダムにBGMを1つ選んで設定します。
-            const randomIndex = Math.floor(Math.random() * bgmList.length);
-            bgm.src = bgmList[randomIndex];
-            bgm.load(); // BGMファイルを読み込みます
-        }
-    });
-    </script>
 </body>
 </html>

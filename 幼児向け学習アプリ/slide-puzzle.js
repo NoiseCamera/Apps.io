@@ -1,6 +1,9 @@
 // Wait for the DOM to be fully loaded before running the script.
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ダブルタップによるズームを防止
+  document.body.style.touchAction = 'manipulation';
+
   // --- DOM Element References ---
   const gameArea = document.getElementById('game-area');
   const puzzleGrid = document.getElementById('puzzle-grid');

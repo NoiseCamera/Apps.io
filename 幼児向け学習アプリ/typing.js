@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     const timeLeftContainer = document.getElementById('time-left-container');
     const timeLeftDisplay = document.getElementById('time-left');
     const elapsedTimeContainer = document.getElementById('elapsed-time-container');
@@ -44,12 +47,33 @@ document.addEventListener('DOMContentLoaded', () => {
         'finger-ring-r': ['O', 'L'],
         'finger-pinky-r': ['P', '-'],
     };
+    // ★追加: ローマ字の入力バリエーションを定義 (双方向)
+    const ROMAJI_VARIANTS = {
+        'SHI': ['SI'], 'SI': ['SHI'],
+        'CHI': ['TI'], 'TI': ['CHI'],
+        'TSU': ['TU'], 'TU': ['TSU'],
+        'FU': ['HU'], 'HU': ['FU'],
+        'JI': ['ZI', 'DI'], 'ZI': ['JI', 'DI'], 'DI': ['JI', 'ZI'],
+        'ZU': ['DU'], 'DU': ['ZU'],
+        'SHA': ['SYA'], 'SYA': ['SHA'],
+        'SHU': ['SYU'], 'SYU': ['SHU'],
+        'SHO': ['SYO'], 'SYO': ['SHO'],
+        'CHA': ['TYA', 'CYA'], 'TYA': ['CHA', 'CYA'], 'CYA': ['CHA', 'TYA'],
+        'CHU': ['TYU', 'CYU'], 'TYU': ['CHU', 'CYU'], 'CYU': ['CHU', 'TYU'],
+        'CHO': ['TYO', 'CYO'], 'TYO': ['CHO', 'CYO'], 'CYO': ['CHO', 'TYO'],
+        'JA': ['ZYA'], 'JYA': ['JA'], // JYAはJAの別名として扱うことが多い
+        'JU': ['ZYU'], 'JYU': ['JU'],
+        'JO': ['ZYO'], 'ZYO': ['JO'],
+        'NN': ['N'], // 「ん」の入力バリエーション
+    };
     const SOUNDS = {
         type: 'assets/sounds/type.mp3',
         correct: 'assets/sounds/seikai2.mp3',      // 単語正解 (他のゲームと統一)
         wrong: 'assets/sounds/fuseikai.mp3',   // タイプミス (他のゲームと統一)
         finish: 'assets/sounds/finish.mp3',     // ゲーム終了・モード解除
-        secret: 'assets/sounds/seikai2.mp3'     // 裏コード成功
+        secret: 'assets/sounds/seikai2.mp3',     // 裏コード成功
+        bgmNormal: 'assets/sounds/bgm.mp3',      // 通常BGM
+        bgmOtaku: 'assets/sounds/otaku.mp3'      // おたくモードBGM
     };
     const SOUND_EFFECTS = Object.values(SOUNDS);
     // キーと指のマッピングを逆引きできるように作成
@@ -64,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameState = {
         score: 0,
         timeLeft: 0,
-        elapsedTime: 0,
+        elapsedTime: 0, // 経過時間
         timerId: null,
         currentWord: null,    // { h: 'ひらがな', r: '表示用R' , rSanitized: 'ASCIIのみ大文字' }
         typedRomaji: '',
@@ -84,9 +108,79 @@ document.addEventListener('DOMContentLoaded', () => {
     const SECRET_CODE = 'OTAKU';
 
     // --- Helpers ---
+    /**
+     * ★追加: ローマ字の入力パターンをすべて生成する
+     * @param {string} baseRomaji - 元となるローマ字文字列
+     * @returns {string[]} - 生成されたすべてのパターンの配列
+     */
+    function generateRomajiPatterns(baseRomaji) {
+        const patterns = new Set([baseRomaji]);
+        const queue = [baseRomaji];
+        const processed = new Set(queue);
+
+        while (queue.length > 0) {
+            const current = queue.shift();
+            for (let i = 0; i < current.length; i++) {
+                // 3文字、2文字、1文字の順で部分文字列をチェック
+                for (let len = 3; len >= 1; len--) {
+                    if (i + len > current.length) continue;
+                    const sub = current.substring(i, i + len);
+                    if (ROMAJI_VARIANTS[sub]) {
+                        for (const variant of ROMAJI_VARIANTS[sub]) {
+                            const newPattern = current.substring(0, i) + variant + current.substring(i + len);
+                            if (!processed.has(newPattern)) {
+                                patterns.add(newPattern);
+                                queue.push(newPattern);
+                                processed.add(newPattern);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Array.from(patterns);
+    }
+
     function sanitizeRomaji(str) {
         if (!str) return '';
         return String(str).toUpperCase().replace(/[^A-Z-]/g, '');
+    }
+
+    /**
+     * ★追加: BGMを切り替える関数
+     * @param {string} newSrc - 新しいBGMのパス
+     */
+    function switchBgm(newSrc) {
+        const bgm = document.getElementById('bgm');
+        if (!bgm) return;
+
+        // 現在再生中のソース(currentSrc)と、これから設定するソース(src)の両方からファイル名を取得
+        // currentSrcは実際に読み込まれているメディアのURLを返し、より信頼性が高い
+        const currentSrc = bgm.currentSrc || bgm.src;
+        const currentFileName = currentSrc ? currentSrc.split('/').pop() : '';
+        const newFileName = newSrc.split('/').pop();
+
+        // ファイル名が異なる場合のみ、BGMを切り替える
+        if (currentFileName !== newFileName) {
+            bgm.src = newSrc;
+            bgm.load(); // 新しいソースを読み込む
+            const playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // ユーザーが操作するまで再生できないエラーは、コンソールに表示しすぎないように制御
+                    if (error.name !== 'NotAllowedError') {
+                        console.error("BGMの再生に失敗しました:", error);
+                    }
+                });
+            }
+        } else if (bgm.paused) {
+            // 同じ曲でも一時停止している場合は再生する
+            bgm.play().catch(error => {
+                if (error.name !== 'NotAllowedError') {
+                    console.error("BGMの再生(再試行)に失敗しました:", error);
+                }
+            });
+        }
     }
 
     // --- Initialization functions (BGM/SFX) ---
@@ -163,6 +257,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game control: start / end / countdown ---
     function startGame() {
+        // ★追加: モードに応じてBGMを切り替える
+        if (gameConfig.isAdultMode) {
+            switchBgm(SOUNDS.bgmOtaku);
+        } else {
+            // 通常モードまたはゲーム初回起動時
+            switchBgm(SOUNDS.bgmNormal);
+        }
+
         initializeBGM();
 
         // リセット（カウントダウン開始前は isPlaying=false）
@@ -309,21 +411,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomIndex = Math.floor(Math.random() * wordPool.length);
         const word = wordPool[randomIndex];
 
-        // 表示用ローマ字と、比較用（アルファベットのみ大文字）を保持
-        const displayR = String(word.r || '').toUpperCase();
-        const sanitizedR = sanitizeRomaji(displayR);
+        // ★変更: 複数の入力パターンを生成する
+        const baseRomaji = sanitizeRomaji(String(word.r || '').toUpperCase());
 
-        // 安全性: sanitizedR が空の場合は別の単語を選ぶ（ただの保険）
-        if (sanitizedR.length === 0) {
-            // 再帰的に次を選ぶ（wordPool は sanitized length >0 になっているはずなので通常はここに来ない）
+        if (baseRomaji.length === 0) {
             nextQuestion();
             return;
         }
 
+        const allPatterns = generateRomajiPatterns(baseRomaji);
+
         gameState.currentWord = {
             h: word.h,
-            r: displayR,
-            rSanitized: sanitizedR
+            r: String(word.r || '').toUpperCase(), // 元の表示用ローマ字
+            patterns: allPatterns,                 // 全ての入力パターン
+            displayRomaji: allPatterns[0]          // 現在画面に表示する用のローマ字
         };
 
         // 表示更新
@@ -340,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const hiragana = cw.h || '';
-        const romaji = cw.rSanitized || '';
+        const romaji = cw.displayRomaji || ''; // ★変更: 表示用ローマ字を使う
         const typed = gameState.typedRomaji || '';
 
         // ひらがな表示（元の文字列そのまま）
@@ -378,22 +480,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // currentWord があるか（ないなら無視）
         const cw = gameState.currentWord;
-        if (!cw || !cw.rSanitized) return;
+        if (!cw || !cw.patterns) return;
 
-        const romaji = cw.rSanitized;
-        const nextChar = romaji[gameState.typedRomaji.length];
+        // ★変更: 複数のパターンにマッチするかチェック
+        const potentialTyped = gameState.typedRomaji + key;
+        const matchingPattern = cw.patterns.find(p => p.startsWith(potentialTyped));
 
-        // nextChar が undefined のとき（すでに完了している等）は無視
-        if (!nextChar) return;
-
-        if (key === nextChar) {
+        if (matchingPattern) { // 正解
             if (typeof playSE === 'function') playSE(SOUNDS.type);
-            gameState.typedRomaji += key;
+            gameState.typedRomaji = potentialTyped;
+            cw.displayRomaji = matchingPattern; // 表示を更新
             gameState.totalTyped++;
             gameState.totalCorrect++;
 
-            // 完了判定（sanitized 長さで比較）
-            if (gameState.typedRomaji.length === romaji.length) {
+            // ★変更: パターンリストに含まれるかで完了判定
+            if (cw.patterns.includes(gameState.typedRomaji)) {
                 if (typeof playSE === 'function') playSE(SOUNDS.correct);
                 gameState.score++;
                 scoreDisplay.textContent = gameState.score;
@@ -416,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateQuestionDisplay();
             }
         } else {
-            // 不正解: サウンドのみ・typed はリセットしない（以前の仕様に合わせる）
+            // 不正解
             if (typeof playSE === 'function') playSE(SOUNDS.wrong);
             gameState.totalTyped++;
             // 表示更新（間違いを反映しない設計ならここでは変化なし）
@@ -431,7 +532,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gameState.isPlaying) return;
         if (!gameState.typedRomaji || gameState.typedRomaji.length === 0) return;
 
+        const cw = gameState.currentWord;
         gameState.typedRomaji = gameState.typedRomaji.slice(0, -1);
+
+        // ★追加: 表示用ローマ字を再評価
+        if (cw) {
+            const matchingPattern = cw.patterns.find(p => p.startsWith(gameState.typedRomaji)) || cw.patterns[0];
+            cw.displayRomaji = matchingPattern;
+        }
         updateQuestionDisplay();
         highlightNextKey();
         showKeyFeedback('Backspace');
@@ -447,10 +555,12 @@ document.addEventListener('DOMContentLoaded', () => {
             questionDisplay.textContent = 'おたくモード';
             questionRomajiDisplay.textContent = 'OTONA-MODE';
             if (typeof playSE === 'function') playSE(SOUNDS.secret);
+            // ★変更: BGMの切り替えはゲーム開始時に行うため、ここでは何もしない
         } else {
             questionDisplay.textContent = 'こどもモード';
             questionRomajiDisplay.textContent = 'KODOMO-MODE';
             if (typeof playSE === 'function') playSE(SOUNDS.finish); // 違う音でフィードバック
+            switchBgm(SOUNDS.bgmNormal);
         }
 
         // 2秒後に表示をリセット
@@ -475,10 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function highlightNextKey() {
         virtualKeyboardContainer.querySelectorAll('.key-highlight').forEach(el => el.classList.remove('key-highlight'));
 
-        const cw = gameState.currentWord;
-        if (!gameState.isPlaying || !cw || !cw.rSanitized) return;
+        const cw = gameState.currentWord; // ★変更: displayRomaji を使う
+        if (!gameState.isPlaying || !cw || !cw.displayRomaji) return;
 
-        const nextChar = cw.rSanitized[gameState.typedRomaji.length];
+        const nextChar = cw.displayRomaji[gameState.typedRomaji.length];
         if (nextChar) {
             const keyElement = virtualKeyboardContainer.querySelector(`[data-key="${nextChar}"]`);
             if (keyElement) keyElement.classList.add('key-highlight');

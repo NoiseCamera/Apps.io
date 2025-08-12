@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- DOM Elements ---
     const questionShapeContainer = document.getElementById('question-shape-container');
     const optionsContainer = document.getElementById('options-container');

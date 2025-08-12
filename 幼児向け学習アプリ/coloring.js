@@ -1,5 +1,8 @@
 // coloring.js
 document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be fully loaded before executing the script
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- DOM Elements ---
     const canvas = document.getElementById('coloring-canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });

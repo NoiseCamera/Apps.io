@@ -222,6 +222,9 @@ async function playSE(src) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ダブルタップによるズームを防止
+  document.body.style.touchAction = 'manipulation';
+
   // --- BGM Element Creation ---
   // すべてのページでBGMが利用できるように、<audio>要素を動的に生成する
   // これにより、各ゲームのJSファイルでgetElementById('bgm')が常に成功するようになる

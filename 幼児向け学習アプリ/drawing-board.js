@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- DOM Elements ---
     const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true }); // for flood fill

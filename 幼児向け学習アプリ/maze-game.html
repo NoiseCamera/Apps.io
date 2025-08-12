@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>めいろゲーム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="maze-game.css">
+    <link rel="icon" href="assets/images/favicon.ico">
+</head>
+<body>
+    <audio id="bgm" src="assets/sounds/bgm5.mp3" loop></audio>
+
+    <div id="app-container">
+        <header>
+            <h1>めいろゲーム</h1>
+        </header>
+
+        <main id="game-area">
+            <div id="game-controls">
+                <div id="difficulty-selector">
+                    <button class="difficulty-btn selected" data-size="11">かんたん</button>
+                    <button class="difficulty-btn" data-size="21">ふつう</button>
+                    <button class="difficulty-btn" data-size="31">むずかしい</button>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">じかん:</span>
+                    <span id="time-count">00:00</span>
+                </div>
+            </div>
+
+            <div id="maze-wrapper">
+                <canvas id="maze-canvas"></canvas>
+            </div>
+
+            <div id="d-pad" class="hidden">
+                <button class="d-pad-btn" id="d-pad-up">▲</button>
+                <button class="d-pad-btn" id="d-pad-left">◀</button>
+                <button class="d-pad-btn" id="d-pad-right">▶</button>
+                <button class="d-pad-btn" id="d-pad-down">▼</button>
+            </div>
+        </main>
+
+        <!-- Win Modal -->
+        <div id="win-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>ゴール！</h2>
+                <p>クリアタイム: <span id="win-time"></span></p>
+                <p class="points-feedback">★ ほしを <span id="win-points"></span>こ ゲット！ ★</p>
+                <button id="play-again-btn" class="button-style">もういっかい あそぶ</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Shared scripts -->
+    <script src="settings.js"></script>
+    <!-- Game specific script -->
+    <script src="maze-game.js"></script>
+</body>
+</html>

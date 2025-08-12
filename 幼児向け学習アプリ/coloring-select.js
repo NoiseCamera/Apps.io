@@ -1,5 +1,8 @@
 // coloring-select.js
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     const grid = document.getElementById('nurie-grid');
 
     if (typeof NURIE_IMAGES !== 'undefined' && NURIE_IMAGES.length > 0) {

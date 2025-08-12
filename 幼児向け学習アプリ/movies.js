@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- DOM Elements ---
     const videoPlayer = document.getElementById('video-player');
     const movieTitle = document.getElementById('movie-title');

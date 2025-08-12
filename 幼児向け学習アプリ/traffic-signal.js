@@ -1,5 +1,8 @@
 // traffic-signal.js
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     // --- Audio Element Creation ---
     // 必要な音声ファイルを動的に生成してDOMに追加する
     // これにより、settings.jsから音量が一括制御できるようになる

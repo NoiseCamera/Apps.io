@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // ダブルタップによるズームを防止
+  document.body.style.touchAction = 'manipulation';
+
   // --- DOM Element References ---
   const canvas = document.getElementById('puzzle-canvas');
   const ctx = canvas.getContext('2d');

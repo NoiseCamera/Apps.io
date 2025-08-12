@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
+
     const hiraganaContainer = document.getElementById('hiragana-container');
     let bgmInitialized = false; // BGMの初期化が完了したか
     let isPlaying = false; // 音声が再生中かどうかのフラグ
