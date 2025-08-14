@@ -1,0 +1,329 @@
+/* programming-game.css */
+
+/* --- メインレイアウト --- */
+#programming-app-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative; /* ゴミ箱の配置基準にする */
+    align-items: flex-start; /* 上端揃え */
+}
+
+/* --- 左側：ステージエリア --- */
+#stage-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 難易度選択ボタンのコンテナ */
+#difficulty-selector {
+    display: flex;
+    gap: 10px;
+}
+
+/* 難易度選択ボタンのスタイル */
+.difficulty-btn {
+    padding: 8px 16px;
+    font-size: 1rem;
+    background-color: #bdbdbd; /* 未選択の色 */
+    box-shadow: 0 4px #9e9e9e;
+}
+
+.difficulty-btn.selected {
+    background-color: #ff9800; /* 選択中の色 */
+    box-shadow: 0 2px #f57c00;
+    top: 2px;
+}
+
+#canvas-wrapper {
+    border: 3px solid #888;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    line-height: 0; /* canvas下の余分なスペースを削除 */
+}
+
+#game-canvas {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    aspect-ratio: 1 / 1; /* 正方形を維持 */
+}
+
+#controls {
+    display: flex;
+    gap: 15px;
+}
+
+/* --- 実行・リセットボタンの共通スタイル --- */
+.button-style {
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    position: relative;
+    top: 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    -webkit-tap-highlight-color: transparent; /* スマホのタップハイライトを消す */
+}
+
+.button-style:hover:not(:disabled) {
+    top: -2px;
+}
+
+.button-style:active:not(:disabled) {
+    top: 2px;
+}
+
+.button-style:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    top: 0 !important; /* disabled時は動かない */
+}
+
+/* 実行ボタン */
+#run-btn { background-color: #4caf50; box-shadow: 0 5px #388e3c; }
+#run-btn:hover:not(:disabled) { box-shadow: 0 7px #388e3c; }
+#run-btn:active:not(:disabled) { box-shadow: 0 2px #388e3c; }
+
+/* リセットボタン */
+#reset-btn { background-color: #ff9800; box-shadow: 0 5px #f57c00; }
+#reset-btn:hover:not(:disabled) { box-shadow: 0 7px #f57c00; }
+#reset-btn:active:not(:disabled) { box-shadow: 0 2px #f57c00; }
+
+/* --- 右側：エディタエリア --- */
+#editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #f0f8ff; /* AliceBlue */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    min-height: 400px; /* ドラッグ操作しやすいように高さを確保 */
+}
+
+.editor-header {
+    display: flex;
+    justify-content: center; /* テキストを中央に配置 */
+    align-items: center;
+    border-bottom: 2px solid #b3d4fc;
+    position: relative; /* ゴミ箱の配置基準にする */
+}
+
+#editor-area h3 {
+    margin: 0;
+    color: #005a9c;
+    padding-bottom: 5px;
+    border-bottom: none; /*線を親要素に移動*/
+}
+
+/* --- コマンドパレット（ドラッグ元のコマンド置き場） --- */
+#command-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+}
+
+.command-block {
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: grab;
+    transition: background-color 0.2s, transform 0.2s;
+    user-select: none; /* テキスト選択を防ぐ */
+    -webkit-user-select: none; /* Safari用 */
+    -webkit-tap-highlight-color: transparent; /* スマホのタップハイライトを消す */
+}
+
+/* コマンドブロック内の画像のスタイル */
+.command-block img {
+    width: 100%;
+    height: 40px; /* 画像の高さを指定 */
+    object-fit: contain; /* アスペクト比を保ちつつフィット */
+    pointer-events: none; /* 画像がドラッグイベントを邪魔しないように */
+    -webkit-user-select: none; /* テキスト選択を防ぐ */
+    user-select: none;
+}
+
+.command-block:active {
+    cursor: grabbing;
+    transform: translateY(2px);
+}
+
+/* コマンドごとの色分け */
+.command-block[data-command="うえに 1 すすむ"] {
+    background-color: #ef5350; /* 赤 */
+    box-shadow: 0 4px #d32f2f;
+}
+.command-block[data-command="うえに 1 すすむ"]:hover { background-color: #e57373; }
+.command-block[data-command="うえに 1 すすむ"]:active { box-shadow: 0 2px #d32f2f; }
+
+.command-block[data-command="したに 1 すすむ"] {
+    background-color: #42a5f5; /* 青 */
+    box-shadow: 0 4px #1e88e5;
+}
+.command-block[data-command="したに 1 すすむ"]:hover { background-color: #64b5f6; }
+.command-block[data-command="したに 1 すすむ"]:active { box-shadow: 0 2px #1e88e5; }
+
+.command-block[data-command="ひだりに 1 すすむ"] {
+    background-color: #66bb6a; /* 緑 */
+    box-shadow: 0 4px #388e3c;
+}
+.command-block[data-command="ひだりに 1 すすむ"]:hover { background-color: #81c784; }
+.command-block[data-command="ひだりに 1 すすむ"]:active { box-shadow: 0 2px #388e3c; }
+
+.command-block[data-command="みぎに 1 すすむ"] {
+    background-color: #ffca28; /* 黄色 */
+    box-shadow: 0 4px #ffa000;
+}
+.command-block[data-command="みぎに 1 すすむ"]:hover { background-color: #ffd54f; }
+.command-block[data-command="みぎに 1 すすむ"]:active { box-shadow: 0 2px #ffa000; }
+
+/* --- プログラムエリア（ドロップ先のグリッド） --- */
+#program-area {
+    background-color: #e3f2fd; /* 薄い青 */
+    border: 2px dashed #90caf9;
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 200px;
+    display: grid;
+    /* JSで列数や行数を変更することを想定 */
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    align-content: start; /* 上から詰める */
+}
+
+.program-slot {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    min-height: 50px; /* コマンドブロックの高さに合わせる */
+    transition: background-color 0.2s;
+    display: flex; /* 中に入ったブロックを中央揃え */
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- ドラッグ＆ドロップ、タッチ操作中のスタイル --- */
+
+/* ドラッグ/タッチ操作で移動中の要素の元の場所のスタイル */
+.dragging {
+    opacity: 0.5;
+}
+
+/* 実行中のコマンドブロックのスタイル */
+.command-block.is-executing {
+    /* 背景色は元のまま、光彩と明るさで実行中を示す */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 10px rgba(66, 164, 245, 0.8); /* 白い光と青い光彩 */
+    transform: translateY(-2px) scale(1.08);
+    filter: brightness(1.2); /* 全体を少し明るくする */
+    transition: all 0.1s ease-in-out;
+    z-index: 5; /* 他のブロックより手前に表示 */
+}
+
+/* タッチ操作で指に追従するクローンのスタイル */
+.touch-clone {
+    position: fixed; /* 画面に追従 */
+    pointer-events: none; /* 下の要素を検知できるように */
+    z-index: 1000;
+    transform: scale(1.1); /* 少し大きくして目立たせる */
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+/* ドロップ先の候補を示すプレースホルダーのスタイル */
+.placeholder {
+    background-color: #a5d6a7; /* 緑色 */
+    border: 2px dashed #66bb6a;
+    border-radius: 8px;
+    min-height: 50px;
+}
+
+/* --- ゴミ箱エリア --- */
+#trash-area {
+    position: absolute; /* ヘッダーに対して絶対配置に変更 */
+    bottom: auto;
+    right: 0; /* 右端に配置 */
+    font-size: 2.5rem;
+    padding: 5px;
+    border-radius: 50%;
+    transition: transform 0.2s, background-color 0.2s, opacity 0.3s;
+    opacity: 0; /* 通常時は非表示 */
+    visibility: hidden;
+}
+
+#trash-area.visible {
+    opacity: 0.7;
+    visibility: visible;
+}
+
+#trash-area.hover {
+    transform: scale(1.2);
+    background-color: #ffcdd2; /* 赤色でハイライト */
+    opacity: 1;
+}
+
+/* --- ゴールモーダルのスタイル --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #ffffff, #e6e9f0);
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: scale(1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.hidden .modal-content {
+    transform: scale(0.9);
+}
+
+.modal-content h2 { font-size: 2.5rem; color: #ff9800; margin-bottom: 10px; }
+.modal-content .goal-message { font-size: 1.2rem; color: #333; margin-bottom: 20px; }
+.modal-content .goal-points { font-size: 1.5rem; color: #4caf50; font-weight: bold; margin-bottom: 30px; }
+
+/* 「もういちど」ボタンはオレンジ色にする */
+#play-again-btn { background-color: #ff9800; box-shadow: 0 5px #f57c00; }
+#play-again-btn:hover:not(:disabled) { box-shadow: 0 7px #f57c00; }
+#play-again-btn:active:not(:disabled) { box-shadow: 0 2px #f57c00; }
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+    #programming-app-container {
+        flex-direction: column;
+        padding: 10px;
+    }
+}

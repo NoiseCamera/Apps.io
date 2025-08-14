@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>プログラミングであそぼう</title>
+    <!-- 共通スタイルと、このゲーム専用のスタイルを読み込む -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="programming-game.css">
+    <link rel="icon" href="assets/images/favicon.ico">
+</head>
+<body>
+    <!-- ヘッダー：タイトルと戻るボタン -->
+    <header>
+        <h1>プログラミングであそぼう</h1>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main id="programming-app-container">
+        <!-- 左側：ステージと操作ボタン -->
+        <div id="stage-area">
+            <div id="difficulty-selector">
+                <button class="difficulty-btn selected" data-difficulty="easy">かんたん</button>
+                <button class="difficulty-btn" data-difficulty="normal">ふつう</button>
+                <button class="difficulty-btn" data-difficulty="hard">むずかしい</button>
+            </div>
+            <div id="canvas-wrapper">
+                <canvas id="game-canvas" width="500" height="500"></canvas>
+            </div>
+            <div id="controls">
+                <button id="run-btn" class="button-style">じっこう</button>
+                <button id="reset-btn" class="button-style">リセット</button>
+            </div>
+        </div>
+
+        <!-- 右側：コードエディタと命令の例 -->
+        <div id="editor-area">
+            <div class="editor-header">
+                <h3>つかう めいれい</h3>
+                <div id="trash-area">🗑️</div>
+            </div>
+            <div id="command-palette">
+                <div class="command-block" draggable="true" data-command="うえに 1 すすむ">
+                    <img src="assets/images/ue.png" alt="うえ" draggable="false">
+                </div>
+                <div class="command-block" draggable="true" data-command="したに 1 すすむ">
+                    <img src="assets/images/sita.png" alt="した" draggable="false">
+                </div>
+                <div class="command-block" draggable="true" data-command="ひだりに 1 すすむ">
+                    <img src="assets/images/hidari.png" alt="ひだり" draggable="false">
+                </div>
+                <div class="command-block" draggable="true" data-command="みぎに 1 すすむ">
+                    <img src="assets/images/migi.png" alt="みぎ" draggable="false">
+                </div>
+            </div>
+
+            <h3>プログラム</h3>
+            <div id="program-area">
+                <!-- ここにコマンドブロックがドラッグ＆ドロップされる -->
+                <div class="program-slot"></div>
+                <div class="program-slot"></div>
+                <div class="program-slot"></div>
+                <div class="program-slot"></div>
+                <div class="program-slot"></div>
+                <div class="program-slot"></div>
+            </div>
+        </div>
+
+        <!-- ゴールしたときに表示するモーダル -->
+        <div id="goal-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>クリア！</h2>
+                <p class="goal-message">おめでとう！</p>
+                <p class="goal-points">★ <span id="goal-points-span">10</span>こ ゲット！ ★</p>
+                <button id="play-again-btn" class="button-style">もういちど あそぶ</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="settings.js"></script>
+    <script src="programming-game.js"></script>
+</body>
+</html>
