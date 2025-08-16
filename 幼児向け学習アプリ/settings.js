@@ -132,7 +132,7 @@ function initializeWebAudio() {
     if (audioContext) return;
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
+
         // --- SE Setup ---
         seGainNode = audioContext.createGain();
         seGainNode.connect(audioContext.destination);
@@ -145,7 +145,7 @@ function initializeWebAudio() {
         if (bgmElement && !bgmSourceNode) {
             bgmSourceNode = audioContext.createMediaElementSource(bgmElement);
             bgmGainNode = audioContext.createGain();
-            
+
             // オーディオグラフを接続: BGM要素 -> BGMゲイン -> スピーカー
             bgmSourceNode.connect(bgmGainNode);
             bgmGainNode.connect(audioContext.destination);
@@ -222,56 +222,56 @@ async function playSE(src) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ダブルタップによるズームを防止
-  document.body.style.touchAction = 'manipulation';
+    // ダブルタップによるズームを防止
+    document.body.style.touchAction = 'manipulation';
 
-  // --- BGM Element Creation ---
-  // すべてのページでBGMが利用できるように、<audio>要素を動的に生成する
-  // これにより、各ゲームのJSファイルでgetElementById('bgm')が常に成功するようになる
-  // bodyに 'no-bgm' クラスがない場合のみBGM要素を生成
-  if (!document.body.classList.contains('no-bgm') && !document.getElementById('bgm')) {
-    const bgmAudio = document.createElement('audio');
-    bgmAudio.id = 'bgm';
-    bgmAudio.src = 'assets/sounds/bgm.mp3'; // BGMのソースをここで指定
-    bgmAudio.loop = true;
-    bgmAudio.preload = 'auto'; // BGMファイルを事前に読み込むようブラウザにヒントを与える
-    document.body.appendChild(bgmAudio);
-  }
+    // --- BGM Element Creation ---
+    // すべてのページでBGMが利用できるように、<audio>要素を動的に生成する
+    // これにより、各ゲームのJSファイルでgetElementById('bgm')が常に成功するようになる
+    // bodyに 'no-bgm' クラスがない場合のみBGM要素を生成
+    if (!document.body.classList.contains('no-bgm') && !document.getElementById('bgm')) {
+        const bgmAudio = document.createElement('audio');
+        bgmAudio.id = 'bgm';
+        bgmAudio.src = 'assets/sounds/bgm.mp3'; // BGMのソースをここで指定
+        bgmAudio.loop = true;
+        bgmAudio.preload = 'auto'; // BGMファイルを事前に読み込むようブラウザにヒントを与える
+        document.body.appendChild(bgmAudio);
+    }
 
-  // --- ポイント表示機能 ---
-  // ポイントカウンターを動的に生成してbodyに追加
-  const pointsCounter = document.createElement('div');
-  pointsCounter.id = 'points-counter';
-  document.body.appendChild(pointsCounter);
+    // --- ポイント表示機能 ---
+    // ポイントカウンターを動的に生成してbodyに追加
+    const pointsCounter = document.createElement('div');
+    pointsCounter.id = 'points-counter';
+    document.body.appendChild(pointsCounter);
 
-  /**
-   * ポイント表示を更新する関数
-   * @param {number} points - 表示するポイント数
-   */
-  function updatePointsDisplay(points) {
-      pointsCounter.textContent = points;
-      // ポイントが追加されたときにアニメーションクラスを追加
-      pointsCounter.classList.add('points-added');
-      // アニメーションが終わったらクラスを削除
-      setTimeout(() => {
-          pointsCounter.classList.remove('points-added');
-      }, 500);
-  }
+    /**
+     * ポイント表示を更新する関数
+     * @param {number} points - 表示するポイント数
+     */
+    function updatePointsDisplay(points) {
+        pointsCounter.textContent = points;
+        // ポイントが追加されたときにアニメーションクラスを追加
+        pointsCounter.classList.add('points-added');
+        // アニメーションが終わったらクラスを削除
+        setTimeout(() => {
+            pointsCounter.classList.remove('points-added');
+        }, 500);
+    }
 
-  // ポイント更新イベントをリッスン
-  window.addEventListener('pointsUpdated', (e) => {
-      updatePointsDisplay(e.detail.points);
-  });
+    // ポイント更新イベントをリッスン
+    window.addEventListener('pointsUpdated', (e) => {
+        updatePointsDisplay(e.detail.points);
+    });
 
-  // --- DOM Element Creation ---
-  // Create settings button
-  const settingsBtn = document.createElement('button');
-  settingsBtn.id = 'settings-btn';
-  settingsBtn.innerHTML = '⚙️'; // Gear emoji
-  document.body.appendChild(settingsBtn);
+    // --- DOM Element Creation ---
+    // Create settings button
+    const settingsBtn = document.createElement('button');
+    settingsBtn.id = 'settings-btn';
+    settingsBtn.innerHTML = '⚙️'; // Gear emoji
+    document.body.appendChild(settingsBtn);
 
-  // Create settings modal
-  const modalHTML = `
+    // Create settings modal
+    const modalHTML = `
     <div id="settings-modal" class="hidden">
       <div class="settings-content">
         <h2>おんりょう せってい</h2>
@@ -293,141 +293,141 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
   `;
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-  // --- DOM Element References ---
-  const settingsModal = document.getElementById('settings-modal');
-  const closeSettingsBtn = document.getElementById('close-settings-btn');
-  const backToMenuLink = document.getElementById('back-to-menu-link');
-  const bgmVolumeSlider = document.getElementById('bgm-volume');
-  const seVolumeSlider = document.getElementById('se-volume');
-  const bgmVolumeLabel = document.querySelector('label[for="bgm-volume"]');
-  const bgmVolumeControl = bgmVolumeSlider.closest('.volume-control');
-  const seVolumeLabel = document.querySelector('label[for="se-volume"]');
-  const modalPointsCount = document.getElementById('modal-points-count');
+    // --- DOM Element References ---
+    const settingsModal = document.getElementById('settings-modal');
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    const backToMenuLink = document.getElementById('back-to-menu-link');
+    const bgmVolumeSlider = document.getElementById('bgm-volume');
+    const seVolumeSlider = document.getElementById('se-volume');
+    const bgmVolumeLabel = document.querySelector('label[for="bgm-volume"]');
+    const bgmVolumeControl = bgmVolumeSlider.closest('.volume-control');
+    const seVolumeLabel = document.querySelector('label[for="se-volume"]');
+    const modalPointsCount = document.getElementById('modal-points-count');
 
-  // --- Functions ---
+    // --- Functions ---
 
-  /**
-   * Applies volume settings to all relevant audio elements on the page.
-   * @param {number} bgmVolume - BGM volume (0.0 to 1.0)
-   * @param {number} seVolume - Sound Effect volume (0.0 to 1.0)
-   */
-  function applyVolumeSettings(bgmVolume, seVolume) {
-    // --- BGM Volume ---
-    if (bgmGainNode) {
-        // Web Audio APIが有効な場合、GainNodeで音量を制御
-        bgmGainNode.gain.value = bgmVolume;
-    } else {
-        // まだ有効でない場合（ユーザー操作前）、<audio>要素の音量を直接制御
-        const bgmElement = document.getElementById('bgm');
-        if (bgmElement) {
-            bgmElement.volume = bgmVolume;
+    /**
+     * Applies volume settings to all relevant audio elements on the page.
+     * @param {number} bgmVolume - BGM volume (0.0 to 1.0)
+     * @param {number} seVolume - Sound Effect volume (0.0 to 1.0)
+     */
+    function applyVolumeSettings(bgmVolume, seVolume) {
+        // --- BGM Volume ---
+        if (bgmGainNode) {
+            // Web Audio APIが有効な場合、GainNodeで音量を制御
+            bgmGainNode.gain.value = bgmVolume;
+        } else {
+            // まだ有効でない場合（ユーザー操作前）、<audio>要素の音量を直接制御
+            const bgmElement = document.getElementById('bgm');
+            if (bgmElement) {
+                bgmElement.volume = bgmVolume;
+            }
+        }
+
+        // --- Video Volume (Web Audio APIの対象外なので、常に直接制御) ---
+        document.querySelectorAll('video').forEach(video => {
+            video.volume = bgmVolume;
+        });
+
+        // --- SE Volume (Web Audio API) ---
+        if (seGainNode) {
+            seGainNode.gain.value = seVolume;
         }
     }
 
-    // --- Video Volume (Web Audio APIの対象外なので、常に直接制御) ---
-    document.querySelectorAll('video').forEach(video => {
-        video.volume = bgmVolume;
+    /**
+     * Loads volume settings from localStorage and applies them.
+     */
+    function loadAndApplySettings() {
+        // Get stored values, or use defaults (BGM: 0.3, SE: 0.5)
+        const bgmVolume = localStorage.getItem('bgmVolume') || 0.15;
+        const seVolume = localStorage.getItem('seVolume') || 0.7;
+
+        bgmVolumeSlider.value = bgmVolume;
+        seVolumeSlider.value = seVolume;
+
+        // スライダーの横に現在の音量をパーセント表示する
+        if (bgmVolumeLabel) {
+            bgmVolumeLabel.textContent = `BGM (おんがく): ${Math.round(bgmVolume * 100)}%`;
+        }
+        if (seVolumeLabel) {
+            seVolumeLabel.textContent = `こうかおん (SE): ${Math.round(seVolume * 100)}%`;
+        }
+
+        applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
+
+        // ポイント表示も初期化
+        const currentPoints = getPoints();
+        updatePointsDisplay(currentPoints);
+        if (modalPointsCount) modalPointsCount.textContent = currentPoints;
+    }
+
+    // --- Event Listeners ---
+
+    // ユーザーによる最初の操作でWeb Audio APIを初期化する
+    document.body.addEventListener('click', initializeWebAudio, { once: true });
+    document.body.addEventListener('touchstart', initializeWebAudio, { once: true });
+
+    /**
+     * モーダルを閉じる際の共通処理
+     */
+    const handleClose = () => {
+        settingsModal.classList.add('hidden');
+        // モーダルを閉じる際に、最終的な音量設定を再適用して確実にする
+        const bgmVolume = bgmVolumeSlider.value;
+        const seVolume = seVolumeSlider.value;
+        applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
+    };
+
+    settingsBtn.addEventListener('click', () => {
+        modalPointsCount.textContent = getPoints(); // モーダルを開くたびにポイントを更新
+
+        // 現在のページがホーム画面 (index.html) かどうかをチェック
+        const path = window.location.pathname;
+        // ローカルファイルでの閲覧とサーバーでの閲覧の両方に対応
+        const isHomePage = path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('/HTML/幼児向け学習アプリ/');
+
+        // ホーム画面なら「えらぶがめんへ」ボタンを隠し、そうでなければ表示する
+        backToMenuLink.style.display = isHomePage ? 'none' : 'inline-block';
+
+        // BGMがないページではBGM音量設定を隠す
+        if (document.body.classList.contains('no-bgm')) {
+            bgmVolumeControl.style.display = 'none';
+        } else {
+            bgmVolumeControl.style.display = 'block';
+        }
+
+        settingsModal.classList.remove('hidden');
+    });
+    closeSettingsBtn.addEventListener('click', handleClose);
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            handleClose();
+        }
     });
 
-    // --- SE Volume (Web Audio API) ---
-    if (seGainNode) {
-        seGainNode.gain.value = seVolume;
-    }
-  }
+    bgmVolumeSlider.addEventListener('change', (e) => {
+        const newVolume = e.target.value;
+        if (bgmVolumeLabel) {
+            bgmVolumeLabel.textContent = `BGM (おんがく): ${Math.round(newVolume * 100)}%`;
+        }
+        localStorage.setItem('bgmVolume', newVolume);
+        applyVolumeSettings(parseFloat(newVolume), parseFloat(seVolumeSlider.value));
+    });
 
-  /**
-   * Loads volume settings from localStorage and applies them.
-   */
-  function loadAndApplySettings() {
-    // Get stored values, or use defaults (BGM: 0.3, SE: 0.5)
-    const bgmVolume = localStorage.getItem('bgmVolume') || 0.15;
-    const seVolume = localStorage.getItem('seVolume') || 0.7;
+    seVolumeSlider.addEventListener('change', (e) => {
+        const newVolume = e.target.value;
+        if (seVolumeLabel) {
+            seVolumeLabel.textContent = `こうかおん (SE): ${Math.round(newVolume * 100)}%`;
+        }
+        localStorage.setItem('seVolume', newVolume);
+        applyVolumeSettings(parseFloat(bgmVolumeSlider.value), parseFloat(newVolume));
+        // 設定が反映されたか確認するために、テスト音を再生します
+        playSE('assets/sounds/seikai.mp3');
+    });
 
-    bgmVolumeSlider.value = bgmVolume;
-    seVolumeSlider.value = seVolume;
-
-    // スライダーの横に現在の音量をパーセント表示する
-    if (bgmVolumeLabel) {
-        bgmVolumeLabel.textContent = `BGM (おんがく): ${Math.round(bgmVolume * 100)}%`;
-    }
-    if (seVolumeLabel) {
-        seVolumeLabel.textContent = `こうかおん (SE): ${Math.round(seVolume * 100)}%`;
-    }
-
-    applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
-
-    // ポイント表示も初期化
-    const currentPoints = getPoints();
-    updatePointsDisplay(currentPoints);
-    if(modalPointsCount) modalPointsCount.textContent = currentPoints;
-  }
-
-  // --- Event Listeners ---
-
-  // ユーザーによる最初の操作でWeb Audio APIを初期化する
-  document.body.addEventListener('click', initializeWebAudio, { once: true });
-  document.body.addEventListener('touchstart', initializeWebAudio, { once: true });
-
-  /**
-   * モーダルを閉じる際の共通処理
-   */
-  const handleClose = () => {
-    settingsModal.classList.add('hidden');
-    // モーダルを閉じる際に、最終的な音量設定を再適用して確実にする
-    const bgmVolume = bgmVolumeSlider.value;
-    const seVolume = seVolumeSlider.value;
-    applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
-  };
-
-  settingsBtn.addEventListener('click', () => {
-      modalPointsCount.textContent = getPoints(); // モーダルを開くたびにポイントを更新
-
-      // 現在のページがホーム画面 (index.html) かどうかをチェック
-      const path = window.location.pathname;
-      // ローカルファイルでの閲覧とサーバーでの閲覧の両方に対応
-      const isHomePage = path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('/HTML/幼児向け学習アプリ/');
-
-      // ホーム画面なら「えらぶがめんへ」ボタンを隠し、そうでなければ表示する
-      backToMenuLink.style.display = isHomePage ? 'none' : 'inline-block';
-
-      // BGMがないページではBGM音量設定を隠す
-      if (document.body.classList.contains('no-bgm')) {
-          bgmVolumeControl.style.display = 'none';
-      } else {
-          bgmVolumeControl.style.display = 'block';
-      }
-
-      settingsModal.classList.remove('hidden');
-  });
-  closeSettingsBtn.addEventListener('click', handleClose);
-  settingsModal.addEventListener('click', (e) => {
-    if (e.target === settingsModal) {
-      handleClose();
-    }
-  });
-
-  bgmVolumeSlider.addEventListener('change', (e) => {
-    const newVolume = e.target.value;
-    if (bgmVolumeLabel) {
-        bgmVolumeLabel.textContent = `BGM (おんがく): ${Math.round(newVolume * 100)}%`;
-    }
-    localStorage.setItem('bgmVolume', newVolume);
-    applyVolumeSettings(parseFloat(newVolume), parseFloat(seVolumeSlider.value));
-  });
-
-  seVolumeSlider.addEventListener('change', (e) => {
-    const newVolume = e.target.value;
-    if (seVolumeLabel) {
-        seVolumeLabel.textContent = `こうかおん (SE): ${Math.round(newVolume * 100)}%`;
-    }
-    localStorage.setItem('seVolume', newVolume);
-    applyVolumeSettings(parseFloat(bgmVolumeSlider.value), parseFloat(newVolume));
-    // 設定が反映されたか確認するために、テスト音を再生します
-    playSE('assets/sounds/seikai.mp3');
-  });
-
-  // --- Initialization ---
-  loadAndApplySettings();
+    // --- Initialization ---
+    loadAndApplySettings();
 });

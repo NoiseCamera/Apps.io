@@ -3,17 +3,18 @@
 /* --- メインレイアウト --- */
 #programming-app-container {
     display: flex;
+    /* flex-direction: column; を削除して横並びに戻す */
     gap: 20px;
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
     position: relative; /* ゴミ箱の配置基準にする */
-    align-items: flex-start; /* 上端揃え */
+    align-items: flex-start; /* 上端揃えに戻す */
 }
 
 /* --- 左側：ステージエリア --- */
 #stage-area {
-    flex: 1;
+    flex: 1; /* スペースを均等に分ける */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,7 +102,7 @@
 
 /* --- 右側：エディタエリア --- */
 #editor-area {
-    flex: 1;
+    flex: 1; /* スペースを均等に分ける */
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -110,21 +111,62 @@
     border-radius: 10px;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
     min-height: 400px; /* ドラッグ操作しやすいように高さを確保 */
+    position: relative; /* ゴミ箱の配置基準にする */
 }
 
 .editor-header {
-    display: flex;
-    justify-content: center; /* テキストを中央に配置 */
-    align-items: center;
+    /* display: flex; を削除し、タイトルを中央に配置できるようにする */
+    align-items: center; /* 上下中央揃え */
     border-bottom: 2px solid #b3d4fc;
-    position: relative; /* ゴミ箱の配置基準にする */
+    position: relative; /* コントロール類を絶対配置するための基準点にする */
+    text-align: center; /* ★タイトルを中央に配置 */
 }
 
 #editor-area h3 {
     margin: 0;
     color: #005a9c;
     padding-bottom: 5px;
-    border-bottom: none; /*線を親要素に移動*/
+    display: inline-block; /* ★text-align: center を適用するため */
+}
+
+/* --- ズームコントロールのスタイル --- */
+#zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute; /* ★ヘッダー右端に絶対配置 */
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.zoom-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #bbdefb; /* Light blue */
+    color: #0d47a1; /* Dark blue */
+    box-shadow: 0 3px #90caf9;
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+}
+.zoom-btn:hover { background-color: #90caf9; }
+.zoom-btn:active { top: 2px; box-shadow: 0 1px #90caf9; }
+
+#zoom-level-display {
+    font-weight: bold;
+    color: #005a9c;
+    font-size: 1rem;
+    min-width: 50px;
+    text-align: center;
 }
 
 /* --- コマンドパレット（ドラッグ元のコマンド置き場） --- */
@@ -147,16 +189,121 @@
     user-select: none; /* テキスト選択を防ぐ */
     -webkit-user-select: none; /* Safari用 */
     -webkit-tap-highlight-color: transparent; /* スマホのタップハイライトを消す */
+    /* 問題点1：矢印の表示ズレを修正 */
+    display: flex;
+    align-items: center; /* 上下中央揃え */
+    justify-content: center; /* 左右中央揃え */
+    gap: 0.5em; /* 要素間の隙間 */
+}
+
+/* --- 繰り返しブロックのスタイル --- */
+.loop-block {
+    flex-direction: column;
+    padding: 2px; /* さらに詰める */
+    background-color: #ab47bc; /* 紫色 */
+    box-shadow: 0 4px #7b1fa2;
+    min-width: 75px; /* サイズを半分に */
+}
+.loop-block:hover { background-color: #ce93d8; }
+.loop-block:active { box-shadow: 0 2px #7b1fa2; }
+
+.loop-header {
+    background-color: rgba(0,0,0,0.1);
+    padding: 2px 4px; /* さらに詰める */
+    border-radius: 5px;
+    margin-bottom: 2px; /* さらに詰める */
+    color: white;
+    font-weight: bold;
+    font-size: 0.7rem; /* 文字をさらに小さく */
+    /* pointer-events: none; を削除し、ヘッダーを掴めるようにする */
+    cursor: grab; /* 掴めることをカーソルで示す */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px; /* さらに詰める */
+}
+
+/* プルダウンリストのスタイル */
+.loop-count-selector {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: bold;
+    font-size: 0.8em; /* 親要素に合わせてさらに小さく */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    padding: 1px 2px; /* さらに詰める */
+    cursor: pointer;
+}
+
+/* プルダウンリストのオプションのスタイル */
+.loop-count-selector option {
+    color: black; /* 文字色を黒に */
+    background-color: white; /* 背景色を白に */
+}
+
+.dragging .loop-header {
+    cursor: grabbing;
+}
+
+.loop-body {
+    /* 問題点2, 3：ブロック操作のしにくさを改善 */
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 10px; /* ドロップしやすいように余白を確保 */
+    min-height: 60px; /* 中が空でも、ドロップできる高さを確保 */
+    display: flex;
+    /* flex-direction: column; を削除し、横並び・折り返しに */
+    flex-wrap: wrap;
+    gap: 10px; /* program-areaと合わせる */
+    align-items: flex-start; /* 左揃えにする */
+    align-content: flex-start; /* 折り返し時の縦方向の揃えを上揃えに */
+    border: 2px dashed transparent; /* ドロップ先の目印用の枠線（通常は透明） */
+    transition: border-color 0.2s;
+}
+
+/* プログラムエリア内の繰り返しブロックは、中身がコンパクトになるように調整 */
+#program-area .loop-body {
+    /* ★入れ子の中のブロックをGridレイアウトで2列に並べます */
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: center; /* グリッド全体を中央に配置 */
+    /* 高さは中身に応じて自動で変わるようにheight指定を削除 */
+    box-sizing: border-box;
+    padding: 5px;
+    gap: 5px;
+}
+
+/* --- ★入れ子の中のブロックを小さくするスタイル --- */
+
+/* 入れ子内の通常ブロック */
+#program-area .loop-body .command-block {
+    padding: 2px 4px;
+    gap: 4px;
+    min-height: 25px;
+}
+
+/* 入れ子内のブロックの画像 */
+#program-area .loop-body .command-block img {
+    width: 36px;
+    height: 24px;
+}
+
+/* 入れ子内の繰り返しブロック（入れ子の入れ子） */
+#program-area .loop-body .loop-block {
+    min-width: auto; /* 幅が自動で縮まるように */
+}
+
+/* 入れ子内の繰り返しブロックのヘッダー */
+#program-area .loop-body .loop-header {
+    font-size: 0.6rem;
 }
 
 /* コマンドブロック内の画像のスタイル */
 .command-block img {
-    width: 100%;
+    width: 60px; /* 固定幅に変更して横長になるのを防ぐ */
     height: 40px; /* 画像の高さを指定 */
     object-fit: contain; /* アスペクト比を保ちつつフィット */
     pointer-events: none; /* 画像がドラッグイベントを邪魔しないように */
-    -webkit-user-select: none; /* テキスト選択を防ぐ */
-    user-select: none;
 }
 
 .command-block:active {
@@ -199,29 +346,46 @@
     border: 2px dashed #90caf9;
     border-radius: 8px;
     padding: 10px;
-    min-height: 200px;
-    display: grid;
-    /* JSで列数や行数を変更することを想定 */
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    min-height: 300px; /* 高さを十分に確保 */
+    /*
+     * 問題点2：ブロックの並び替えをしやすくするため、gridからflexに変更します。
+     * これでブロックは一列に縦に並び、直感的に並び替えができるようになります。
+     */
+    display: flex; /* ★ブロックを並べる */
+    flex-direction: row; /* ★横並びに変更 */
+    flex-wrap: wrap; /* ★折り返しを許可 */
     gap: 10px;
-    align-content: start; /* 上から詰める */
+    align-items: flex-start; /* ブロックを上端に揃える */
+    transform-origin: top left; /* ★拡大・縮小の基点を左上に設定 */
+    transition: transform 0.2s ease-in-out; /* スムーズなズーム効果 */
+    touch-action: none; /* ★ピンチ操作時にページのスクロールやズームを防ぐ */
 }
 
 .program-slot {
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 8px;
-    min-height: 50px; /* コマンドブロックの高さに合わせる */
+    min-height: 50px; /* ブロックと同じくらいの高さを確保 */
+    width: 100px; /* ★横並び用の幅に変更 */
     transition: background-color 0.2s;
     display: flex; /* 中に入ったブロックを中央揃え */
     align-items: center;
     justify-content: center;
 }
 
+/* 繰り返しブロックの中のスロットは、これまで通り幅いっぱいに広げる */
+.loop-body > .program-slot {
+    width: 100%;
+}
+
 /* --- ドラッグ＆ドロップ、タッチ操作中のスタイル --- */
 
 /* ドラッグ/タッチ操作で移動中の要素の元の場所のスタイル */
-.dragging {
+/* ★ドラッグ中の要素は半透明にし、少し持ち上がったように見せる */
+.command-block.dragging {
     opacity: 0.5;
+    transform: rotate(3deg); /* 少し傾ける */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* 影を大きく */
+    z-index: 1001; /* ゴミ箱やモーダルより手前に */
 }
 
 /* 実行中のコマンドブロックのスタイル */
@@ -234,6 +398,12 @@
     z-index: 5; /* 他のブロックより手前に表示 */
 }
 
+/* 実行中の繰り返しブロックのヘッダー */
+.loop-header.is-executing {
+    background-color: rgba(255, 255, 100, 0.5);
+    box-shadow: 0 0 10px yellow;
+}
+
 /* タッチ操作で指に追従するクローンのスタイル */
 .touch-clone {
     position: fixed; /* 画面に追従 */
@@ -243,36 +413,56 @@
     box-shadow: 0 8px 15px rgba(0,0,0,0.2);
 }
 
-/* ドロップ先の候補を示すプレースホルダーのスタイル */
+/* --- ★プレースホルダーのスタイルを以前の「スロット」形式に戻します --- */
 .placeholder {
-    background-color: #a5d6a7; /* 緑色 */
-    border: 2px dashed #66bb6a;
+    box-sizing: border-box;
+    background-color: rgba(251, 192, 45, 0.5); /* 半透明の黄色 */
+    border: 2px dashed #fbc02d; /* 黄色の破線 */
     border-radius: 8px;
-    min-height: 50px;
+    transition: all 0.1s ease-in-out;
+}
+
+/* プログラムエリアと繰り返しブロック内のプレースホルダーは、ブロックがはまるスロットのように見せます */
+#program-area > .placeholder,
+.loop-body > .placeholder {
+    width: 100px; /* ブロックの幅に合わせる */
+    height: 60px; /* ブロックの高さに合わせる */
+}
+
+/* 入れ子の中のプレースホルダーは、中のブロックに合わせて小さくします */
+#program-area .loop-body > .placeholder {
+    width: 44px;
+    height: 30px;
+}
+
+/* --- ★ドラッグオーバー中のエリアをハイライト --- */
+/* JSでドラッグオーバー時に .drag-over クラスを付与することを想定 */
+#program-area.drag-over,
+.loop-body.drag-over {
+    /* ハイライト用の背景色を少し濃くする */
+    background-color: #d0e8fb;
+    transition: background-color 0.2s;
 }
 
 /* --- ゴミ箱エリア --- */
 #trash-area {
-    position: absolute; /* ヘッダーに対して絶対配置に変更 */
-    bottom: auto;
-    right: 0; /* 右端に配置 */
-    font-size: 2.5rem;
+    position: absolute; /* ヘッダーの右端に絶対配置する */
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%); /* 上下中央に揃えるための調整 */
+    font-size: 2.5rem; /* ヘッダーに合わせてサイズを調整 */
     padding: 5px;
-    border-radius: 50%;
-    transition: transform 0.2s, background-color 0.2s, opacity 0.3s;
-    opacity: 0; /* 通常時は非表示 */
-    visibility: hidden;
-}
-
-#trash-area.visible {
+    border-radius: 10px;
+    transition: transform 0.2s, background-color 0.2s;
     opacity: 0.7;
-    visibility: visible;
+    cursor: pointer;
+    background-color: transparent; /* 通常時の背景は透明に */
 }
 
 #trash-area.hover {
-    transform: scale(1.2);
+    transform: translateY(-50%) scale(1.2); /* 中央揃えを維持しつつ拡大 */
     background-color: #ffcdd2; /* 赤色でハイライト */
-    opacity: 1;
+    opacity: 1; /* TWEAK */
 }
 
 /* --- ゴールモーダルのスタイル --- */

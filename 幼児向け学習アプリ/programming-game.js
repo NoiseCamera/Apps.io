@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const goalModal = document.getElementById('goal-modal');
     const goalPointsSpan = document.getElementById('goal-points-span');
     const playAgainBtn = document.getElementById('play-again-btn');
+    const commandHeader = document.querySelector('.command-section .editor-header'); // 「つかう めいれい」のヘッダー
+    const programHeader = document.getElementById('program-header'); // 「プログラム」のヘッダー
 
     // --- 難易度設定 ---
     const DIFFICULTY_SETTINGS = {
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let offsetX = 0, offsetY = 0; // タッチ開始位置のオフセット
     let placeholder = document.createElement('div');
     placeholder.className = 'placeholder';
+    let isOverTrash = false; // タッチ操作中にゴミ箱の上にいるか
 
     // --- ゲームの定数 ---
     const GRID_SIZE = 100; // 1マスのサイズ(px)
@@ -53,13 +56,94 @@ document.addEventListener('DOMContentLoaded', () => {
         isLoaded: false,
         isMoving: false, // 実行中かどうかを管理
     };
+    let bgm; // BGM要素をグローバルで保持
 
+    // --- スケール（ズーム）関連の状態 ---
+    const zoom = {
+        level: 1.0,
+        step: 0.1,
+        min: 0.5,
+        max: 1.5,
+        controlsContainer: null,
+        levelDisplay: null,
+    };
+
+    /**
+     * 繰り返しブロック内のプルダウンリストにイベントを設定する
+     * @param {HTMLElement} loopBlock - 設定対象の .loop-block 要素
+     */
+    function setupLoopBlockEvents(loopBlock) {
+        const selector = loopBlock.querySelector('.loop-count-selector');
+        if (!selector) return;
+
+        // プルダウンの操作中にドラッグが始まらないようにする
+        selector.addEventListener('mousedown', e => e.stopPropagation());
+        selector.addEventListener('touchstart', e => e.stopPropagation());
+
+        // プルダウンの値が変更されたら、data-command属性を更新する
+        selector.addEventListener('change', (e) => {
+            const block = e.target.closest('.loop-block');
+            if (block) {
+                block.dataset.command = `loop ${e.target.value}`;
+            }
+        });
+    }
+
+    /**
+     * プログラムエリアのズームコントロールUIを生成してDOMに追加する
+     */
+    function createZoomControls() {
+        if (!programHeader) return;
+
+        zoom.controlsContainer = document.createElement('div');
+        zoom.controlsContainer.id = 'zoom-controls';
+
+        const zoomOutBtn = document.createElement('button');
+        zoomOutBtn.id = 'zoom-out-btn';
+        zoomOutBtn.textContent = '－';
+        zoomOutBtn.title = 'しゅくしょう';
+        zoomOutBtn.classList.add('zoom-btn');
+        zoomOutBtn.addEventListener('click', () => handleZoom(-zoom.step));
+
+        zoom.levelDisplay = document.createElement('span');
+        zoom.levelDisplay.id = 'zoom-level-display';
+
+        const zoomInBtn = document.createElement('button');
+        zoomInBtn.id = 'zoom-in-btn';
+        zoomInBtn.textContent = '＋';
+        zoomInBtn.title = 'かくだい';
+        zoomInBtn.classList.add('zoom-btn');
+        zoomInBtn.addEventListener('click', () => handleZoom(zoom.step));
+
+        zoom.controlsContainer.appendChild(zoomOutBtn);
+        zoom.controlsContainer.appendChild(zoom.levelDisplay);
+        zoom.controlsContainer.appendChild(zoomInBtn);
+
+        programHeader.appendChild(zoom.controlsContainer);
+        // 初期表示を更新
+        updateZoomDisplay();
+    }
+
+    /** ズームの表示を更新する */
+    function updateZoomDisplay() {
+        programArea.style.transform = `scale(${zoom.level})`;
+        zoom.levelDisplay.textContent = `${Math.round(zoom.level * 100)}%`;
+    }
     /**
      * 初期化処理
      */
     function init() {
+        // ゴミ箱を「プログラム」ヘッダーの右端に移動させます。
+        // これにより、ズームコントロールとゴミ箱が同じエリアにまとまります。
+        if (commandHeader) {
+            commandHeader.appendChild(trashArea);
+        }
+
+        // ズームコントロールUIを生成
+        createZoomControls();
+
         // このゲーム専用のBGMに設定
-        const bgm = document.getElementById('bgm');
+        bgm = document.getElementById('bgm');
         if (bgm) {
             const newBgmSrc = 'assets/sounds/bgm6.mp3'; // 存在するBGMファイルに変更
             // 現在のBGMソースと異なる場合のみ変更する
@@ -106,6 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
             button.draggable = true;
             button.addEventListener('dragstart', handleDragStart);
             button.addEventListener('dragend', handleDragEnd);
+            // 繰り返しブロックの場合は、中の要素にもイベントリスナーを設定
+            if (button.classList.contains('loop-block')) {
+                const loopBody = button.querySelector('.loop-body');
+                if (loopBody) {
+                    loopBody.addEventListener('dragover', handleDragOver);
+                    loopBody.addEventListener('drop', handleDrop);
+                }
+                // ★追加: 繰り返しブロックのプルダウンにイベントを設定
+                setupLoopBlockEvents(button);
+            }
             button.addEventListener('touchstart', handleTouchStart, { passive: false });
         });
 
@@ -124,6 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // タッチ操作のグローバルイベント
         document.addEventListener('touchmove', handleTouchMove, { passive: false });
         document.addEventListener('touchend', handleTouchEnd);
+
+        // ★追加: ピンチイン・アウトによるズーム機能のイベントを設定
+        setupPinchZoomEvents();
     }
 // programming-game.js - Part 2/5
     
@@ -291,25 +388,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * プログラムエリアのスロットを更新する
-     * ブロックが置かれていない空のスロットを一定数確保する
+     * Scratchのように、コンテナが空の場合にのみドロップ先を示すスロットを1つ表示します
      */
     function updateSlots() {
-        const currentBlocks = programArea.querySelectorAll('.command-block').length;
-        const currentSlots = programArea.querySelectorAll('.program-slot').length;
-        const totalElements = currentBlocks + currentSlots;
-        const INITIAL_SLOTS = 6; // 常に最低でもこの数のスロットは表示したい
+        const manageContainer = (container) => {
+            const hasBlocks = container.querySelector(':scope > .command-block');
+            const hasSlot = container.querySelector(':scope > .program-slot');
 
-        // 既存のスロットを一旦全て削除
-        programArea.querySelectorAll('.program-slot').forEach(slot => slot.remove());
+            // ブロックがなく、スロットもない場合、スロットを1つ追加
+            if (!hasBlocks && !hasSlot) {
+                const slot = document.createElement('div');
+                slot.className = 'program-slot';
+                container.appendChild(slot);
+            } else if (hasBlocks && hasSlot) {
+                // ブロックがある場合、スロットをすべて削除
+                container.querySelectorAll(':scope > .program-slot').forEach(slot => slot.remove());
+            }
+        };
 
-        // 必要なスロット数を計算して追加
-        const slotsToAdd = Math.max(0, INITIAL_SLOTS - currentBlocks);
-
-        for (let i = 0; i < slotsToAdd; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'program-slot';
-            programArea.appendChild(slot);
-        }
+        // メインのプログラムエリアと、すべての繰り返しブロックの中身を管理
+        manageContainer(programArea);
+        document.querySelectorAll('#program-area .loop-body').forEach(manageContainer);
     }
 
 
@@ -400,14 +499,19 @@ document.addEventListener('DOMContentLoaded', () => {
         drawCharacter(); // スタート位置に再描画
         // ユーザーが位置リセットを認識できるよう、少し待機
         await sleep(200);
-
+ 
         try {
-            const commands = buildCommandsFromDOM();
+            const commands = buildCommandsFromDOM(programArea);
             await executeCommands(commands);
         } catch (error) {
             console.error("プログラムの実行中にエラーが発生しました:", error);
             alert("プログラムの実行中にエラーがおきました。");
         } finally {
+            // 実行中のハイライトをすべてクリア
+            document.querySelectorAll('.is-executing').forEach(el => {
+                el.classList.remove('is-executing');
+            });
+
             // ゴールモーダルが表示されている場合は、ボタンを無効のままにする
             if (goalModal.classList.contains('hidden')) {
                 character.isMoving = false;
@@ -417,17 +521,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-
-
     /**
      * 命令のリストを順番に実行する
      * @param {Array} commands - 実行する命令オブジェクトの配列
      */
     async function executeCommands(commands) {
+        // ゴールなどで実行が中断されたかチェック
+        if (!character.isMoving) return;
+
         for (const command of commands) {            
             const el = command.element;
             if (el) el.classList.add('is-executing');
+
+            // 繰り返しコマンドの処理
+            if (command.type === 'loop') {
+                const header = el.querySelector('.loop-header');
+                if (header) header.classList.add('is-executing');
+                for (let i = 0; i < command.count; i++) {
+                    await executeCommands(command.commands);
+                    if (!character.isMoving) return; // 中の処理でゴールした場合
+                }
+                if (header) header.classList.remove('is-executing');
+                // finallyでis-executingが外されるのでここでは不要
+                if (el) el.classList.remove('is-executing');
+                continue; // ループコマンド自体の移動処理は不要
+            }
 
             try {
             let targetX = character.x;
@@ -473,10 +591,27 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 // 実行が終わったらハイライトを解除
                 if (el) el.classList.remove('is-executing');
+                if (!character.isMoving) break; // ゴールしたらループを抜ける
             }
         }
     }
 
+    /**
+     * ズームレベルを更新する
+     * @param {number} change - ズームレベルの変化量 (+0.1 or -0.1)
+     */
+    function handleZoom(change) {
+        let newLevel = zoom.level + change;
+        // 上限・下限を設定
+        newLevel = Math.max(zoom.min, Math.min(zoom.max, newLevel));
+        // 浮動小数点数の誤差を丸める
+        newLevel = Math.round(newLevel * 10) / 10;
+
+        if (newLevel !== zoom.level) {
+            zoom.level = newLevel;
+            updateZoomDisplay();
+        }
+    }
     /**
      * ゴールに到達したときの処理
      */
@@ -571,50 +706,156 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    /**
+     * ★追加: プログラムエリアのピンチイン・ピンチアウト操作のイベントリスナーを設定する
+     */
+    function setupPinchZoomEvents() {
+        let initialPinchDistance = 0;
+        let lastScale = 1.0; // ピンチ開始時のスケールを保存
+
+        // 2本の指の間の距離を計算する関数
+        function getDistance(touches) {
+            const touch1 = touches[0];
+            const touch2 = touches[1];
+            return Math.sqrt(
+                Math.pow(touch2.clientX - touch1.clientX, 2) +
+                Math.pow(touch2.clientY - touch1.clientY, 2)
+            );
+        }
+
+        // タッチが開始された時の処理
+        programArea.addEventListener('touchstart', (e) => {
+            // 2本指でのタッチの場合のみ処理
+            if (e.touches.length === 2) {
+                e.preventDefault(); // ブラウザのデフォルトのズームを無効化
+                initialPinchDistance = getDistance(e.touches);
+                lastScale = zoom.level; // 現在のズームレベルを保存
+            }
+        }, { passive: false }); // preventDefaultを呼ぶためにpassive: falseが必要
+
+        // 指を動かした時の処理
+        programArea.addEventListener('touchmove', (e) => {
+            // 2本指でのタッチの場合のみ処理
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                if (initialPinchDistance <= 0) return; // 予期せぬエラーを防ぐ
+
+                const currentPinchDistance = getDistance(e.touches);
+                const scaleRatio = currentPinchDistance / initialPinchDistance;
+
+                // ピンチ開始時のスケールに、現在の指の距離の比率を掛けて新しいスケールを計算
+                let newScale = lastScale * scaleRatio;
+
+                // スケールが極端に大きくなったり小さくなったりしないように範囲を制限
+                newScale = Math.max(zoom.min, Math.min(zoom.max, newScale));
+
+                // 計算したスケールをグローバルなzoomオブジェクトに反映
+                zoom.level = newScale;
+                
+                // 表示を更新
+                updateZoomDisplay();
+            }
+        }, { passive: false });
+
+        // 指が離れた時の処理
+        programArea.addEventListener('touchend', (e) => {
+            // 2本指の操作が終わったら、距離をリセット
+            if (e.touches.length < 2) {
+                initialPinchDistance = 0;
+            }
+        });
+    }
+
 // programming-game.js - Part 3/5
 
     /**
      * プログラムエリアのDOMから命令のリストを構築する
      * @returns {Array} 命令オブジェクトの配列
      */
-    function buildCommandsFromDOM() {
+    function buildCommandsFromDOM(container) {
         const commands = [];
-        const commandElements = programArea.querySelectorAll('.command-block');
+        // containerの直下の子要素である.command-blockのみを取得
+        const commandElements = container.querySelectorAll(':scope > .command-block');
 
         commandElements.forEach(el => {
             const commandStr = el.dataset.command;
             if (!commandStr) return;
 
-            // 正規表現でコマンドを解析
-            const moveUpMatch = commandStr.match(/うえに\s*(\d+)\s*すすむ/);
-            if (moveUpMatch) {
-                commands.push({ type: 'move_up', steps: parseInt(moveUpMatch[1], 10), element: el });
-                return;
-            }
+            // 繰り返しブロックの場合
+            if (commandStr.startsWith('loop')) {
+                const loopBody = el.querySelector('.loop-body');
+                commands.push({
+                    type: 'loop',
+                    count: parseInt(commandStr.split(' ')[1], 10),
+                    commands: buildCommandsFromDOM(loopBody), // 再帰的に中のコマンドを解析
+                    element: el
+                });
+            } else {
+                // 通常のコマンドの場合
+                const moveUpMatch = commandStr.match(/うえに\s*(\d+)\s*すすむ/);
+                if (moveUpMatch) {
+                    commands.push({ type: 'move_up', steps: parseInt(moveUpMatch[1], 10), element: el });
+                    return;
+                }
 
-            const moveDownMatch = commandStr.match(/したに\s*(\d+)\s*すすむ/);
-            if (moveDownMatch) {
-                commands.push({ type: 'move_down', steps: parseInt(moveDownMatch[1], 10), element: el });
-                return;
-            }
+                const moveDownMatch = commandStr.match(/したに\s*(\d+)\s*すすむ/);
+                if (moveDownMatch) {
+                    commands.push({ type: 'move_down', steps: parseInt(moveDownMatch[1], 10), element: el });
+                    return;
+                }
 
-            const moveLeftMatch = commandStr.match(/ひだりに\s*(\d+)\s*すすむ/);
-            if (moveLeftMatch) {
-                commands.push({ type: 'move_left', steps: parseInt(moveLeftMatch[1], 10), element: el });
-                return;
-            }
+                const moveLeftMatch = commandStr.match(/ひだりに\s*(\d+)\s*すすむ/);
+                if (moveLeftMatch) {
+                    commands.push({ type: 'move_left', steps: parseInt(moveLeftMatch[1], 10), element: el });
+                    return;
+                }
 
-            const moveRightMatch = commandStr.match(/みぎに\s*(\d+)\s*すすむ/);
-            if (moveRightMatch) {
-                commands.push({ type: 'move_right', steps: parseInt(moveRightMatch[1], 10), element: el });
-                return;
+                const moveRightMatch = commandStr.match(/みぎに\s*(\d+)\s*すすむ/);
+                if (moveRightMatch) {
+                    commands.push({ type: 'move_right', steps: parseInt(moveRightMatch[1], 10), element: el });
+                    return;
+                }
             }
-            // 他のコマンドもここに追加可能
         });
 
         return commands;
     }
 
+    // --- Helper function for D&D ---
+
+    /**
+     * ドロップ先のコンテナと座標から、プレースホルダーを挿入すべき要素（またはnull）を返す
+     * @param {HTMLElement} container - ドロップ先のコンテナ (.program-area or .loop-body)
+     * @param {number} x - マウス/タッチのX座標
+     * @param {number} y - マウス/タッチのY座標
+     * @returns {HTMLElement|null} - プレースホルダーの前に挿入する要素。末尾の場合はnull
+     */
+    function getDragBeforeElement(container, x, y) {
+        // コンテナ内のドラッグ可能な子要素（ドラッグ中の自身は除く）と空のスロットを取得
+        const draggableElements = [...container.querySelectorAll(':scope > .command-block:not(.dragging), :scope > .program-slot')];
+
+        // program-area と loop-body の両方を、折り返し可能な横並びとして扱う
+        if (container.id === 'program-area' || container.classList.contains('loop-body')) {
+            // 横並びで折り返しがある場合、Y座標（行）を優先して判断する必要がある
+            const beforeElement = draggableElements.find(child => {
+                const box = child.getBoundingClientRect();
+
+                // カーソルが要素の行よりも上にある場合、その要素の前に挿入
+                if (y < box.top) {
+                    return true;
+                }
+                // カーソルが要素と同じ行にある場合、X座標で判断
+                if (y >= box.top && y <= box.bottom) {
+                    const childCenterX = box.left + box.width / 2;
+                    return x < childCenterX;
+                }
+                // カーソルが要素の行より下にある場合は、次の要素をチェック
+                return false;
+            });
+            return beforeElement || null;
+        }
+        return null; // ここには到達しない想定
+    }
     // --- Drag and Drop Event Handlers ---
 
     /**
@@ -629,9 +870,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             draggedElement.classList.add('dragging');
         }, 0);
-
-        // ゴミ箱を表示
-        trashArea.classList.add('visible');
     }
 
     /**
@@ -648,8 +886,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (placeholder.parentElement) {
             placeholder.remove();
         }
-        // ゴミ箱を非表示
-        trashArea.classList.remove('visible');
+        // ★追加: ゴミ箱のハイライトを解除
+        trashArea.classList.remove('hover');
     }
 
     /**
@@ -658,18 +896,33 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function handleDragOver(e) {
         e.preventDefault(); // ドロップを許可するために必須
-        const target = e.target;
 
-        // プログラムエリア内での並び替え
-        if (target.classList.contains('command-block') && target !== draggedElement) {
-            const rect = target.getBoundingClientRect();
-            const nextElement = (e.clientY > rect.top + rect.height / 2) ? target.nextSibling : target;
-            programArea.insertBefore(placeholder, nextElement);
-        } else if (target.classList.contains('program-slot')) {
-             programArea.insertBefore(placeholder, target);
-        } else if (target === programArea && !programArea.querySelector('.command-block')) {
-            // エリアが空の場合
-            programArea.appendChild(placeholder);
+        // ドロップ先がコマンドパレット内なら、プレースホルダーを表示しない
+        const isOverPalette = !!e.target.closest('#command-palette');
+        if (isOverPalette) {
+            if (placeholder.parentElement) placeholder.remove();
+            trashArea.classList.remove('hover'); // ゴミ箱のハイライトも消す
+            return;
+        }
+
+        // ゴミ箱の上にいるかチェックし、hoverクラスをトグル
+        const isOverTrashArea = !!e.target.closest('#trash-area');
+        trashArea.classList.toggle('hover', isOverTrashArea && !isDraggingFromPalette);
+
+        const dropContainer = e.target.closest('.loop-body, #program-area');
+        // ドロップ可能なコンテナがない、またはゴミ箱の上にある場合はプレースホルダーを配置しない
+        if (!dropContainer || isOverTrashArea) {
+            if (placeholder.parentElement) placeholder.remove();
+            return;
+        }
+
+        const beforeElement = getDragBeforeElement(dropContainer, e.clientX, e.clientY);
+
+        // プレースホルダーを適切な位置に挿入
+        if (beforeElement) {
+            dropContainer.insertBefore(placeholder, beforeElement);
+        } else {
+            dropContainer.appendChild(placeholder);
         }
     }
 
@@ -679,20 +932,44 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function handleDrop(e) {
         e.preventDefault();
+        e.stopPropagation(); // イベントのバブリングを停止
         if (!placeholder.parentElement) return;
 
         let newElement;
         if (isDraggingFromPalette) {
             // パレットからならクローンを作成
             newElement = draggedElement.cloneNode(true);
+            newElement.draggable = true;
+            newElement.addEventListener('dragstart', handleDragStart);
+            newElement.addEventListener('dragend', handleDragEnd);
+            newElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+            // 繰り返しブロックの場合は、中のイベントリスナーを再設定
+            if (newElement.classList.contains('loop-block')) {
+                const loopBody = newElement.querySelector('.loop-body');
+                if (loopBody) {
+                    loopBody.addEventListener('dragover', handleDragOver);
+                    loopBody.addEventListener('drop', handleDrop);
+                }
+                // ★追加: クローンした繰り返しブロックにもイベントを設定
+                setupLoopBlockEvents(newElement);
+            }
             newElement.classList.remove('dragging');
         } else {
             // エリア内移動なら本人
             newElement = draggedElement;
         }
 
-        // プレースホルダーの位置に新しい要素を挿入
-        placeholder.parentElement.replaceChild(newElement, placeholder);
+        // ドロップ先がスロットの上か、ブロックの間かを判定して挿入
+        const dropTarget = placeholder.nextElementSibling;
+        if (dropTarget && dropTarget.classList.contains('program-slot') && dropTarget.parentElement === placeholder.parentElement) {
+            // プレースホルダーの直後がスロットの場合、そのスロットを置き換える
+            dropTarget.parentElement.replaceChild(newElement, dropTarget);
+            placeholder.remove(); // プレースホルダーを別途削除
+        } else {
+            // それ以外（ブロックの間や末尾）の場合は、プレースホルダーを置き換える
+            placeholder.parentElement.replaceChild(newElement, placeholder);
+        }
+
         updateSlots();
     }
 
@@ -709,6 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
             draggedElement.remove();
             updateSlots();
         }
+        // ★追加: ゴミ箱のハイライトを解除
+        trashArea.classList.remove('hover');
     }
 // programming-game.js - Part 4/5
 
@@ -729,6 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         draggedElement = target;
         isDraggingFromPalette = draggedElement.parentElement.id === 'command-palette';
+        isOverTrash = false; // タッチ開始時にリセット
 
         // パレットからならクローンを作成して追従させる
         clone = draggedElement.cloneNode(true);
@@ -749,9 +1029,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDraggingFromPalette) {
             draggedElement.classList.add('dragging');
         }
-
-        // ゴミ箱を表示
-        trashArea.classList.add('visible');
     }
 
     /**
@@ -768,39 +1045,41 @@ document.addEventListener('DOMContentLoaded', () => {
         clone.style.left = `${touch.clientX - offsetX}px`;
         clone.style.top = `${touch.clientY - offsetY}px`;
 
-        // ドロップ先のプレースホルダーを更新
-        // cloneを一時的に非表示にして、下の要素を取得
-        clone.style.display = 'none';
+        clone.style.visibility = 'hidden';
         const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-        clone.style.display = '';
+        clone.style.visibility = 'visible';
 
-        const dropTarget = elementBelow ? elementBelow.closest('.command-block, .program-slot, #program-area, #trash-area') : null;
-
-        // 既存のプレースホルダーを削除
-        if (placeholder.parentElement) {
-            placeholder.remove();
-        }
-
-        if (dropTarget) {
-            if (dropTarget.classList.contains('command-block') && dropTarget !== draggedElement) {
-                const rect = dropTarget.getBoundingClientRect();
-                const nextElement = (touch.clientY > rect.top + rect.height / 2) ? dropTarget.nextSibling : dropTarget;
-                programArea.insertBefore(placeholder, nextElement);
-            } else if (dropTarget.classList.contains('program-slot')) {
-                programArea.insertBefore(placeholder, dropTarget);
-            } else if (dropTarget.id === 'program-area' && !programArea.querySelector('.command-block')) {
-                programArea.appendChild(placeholder);
-            }
+        // ドロップ先がコマンドパレット内なら、プレースホルダーを表示しない
+        const isOverPalette = elementBelow ? !!elementBelow.closest('#command-palette') : false;
+        if (isOverPalette) {
+            if (placeholder.parentElement) placeholder.remove();
+            trashArea.classList.remove('hover');
+            isOverTrash = false;
+            return;
         }
 
         // ゴミ箱の上にあるかチェック
-        if (dropTarget && dropTarget.id === 'trash-area') {
-            trashArea.classList.add('hover');
+        isOverTrash = elementBelow ? !!elementBelow.closest('#trash-area') : false;
+        trashArea.classList.toggle('hover', isOverTrash && !isDraggingFromPalette);
+
+        // --- プレースホルダーの表示ロジックを統一 ---
+        const dropContainer = elementBelow ? elementBelow.closest('.loop-body, #program-area') : null;
+
+        if (isOverTrash || !dropContainer) {
+            if (placeholder.parentElement) {
+                placeholder.remove();
+            }
+            return;
+        }
+
+        const beforeElement = getDragBeforeElement(dropContainer, touch.clientX, touch.clientY);
+        if (beforeElement) {
+            dropContainer.insertBefore(placeholder, beforeElement);
         } else {
-            trashArea.classList.remove('hover');
+            dropContainer.appendChild(placeholder);
         }
     }
-
+    
     /**
      * タッチが終了したときの処理
      * @param {TouchEvent} e
@@ -809,39 +1088,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!draggedElement || !clone) return;
 
         // ゴミ箱のハイライトを解除
-        trashArea.classList.remove('hover', 'visible');
+        trashArea.classList.remove('hover');
 
-        // ドロップ位置を最終決定
+        // クローンを一時的に非表示にして、指を離した位置の真下にある要素を取得
+        clone.style.visibility = 'hidden';
         const touch = e.changedTouches[0];
-        clone.style.display = 'none';
         const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-        clone.style.display = '';
+        clone.style.visibility = 'visible';
 
-        const dropTarget = elementBelow ? elementBelow.closest('#program-area, #trash-area') : null;
+        // ゴミ箱にドロップされたか判定
+        const isDroppedOnTrash = elementBelow ? !!elementBelow.closest('#trash-area') : false;
 
-        if (dropTarget && dropTarget.id === 'trash-area') {
-            // ゴミ箱にドロップ
-            if (!isDraggingFromPalette) {
-                draggedElement.remove();
-            }
-        } else if (placeholder.parentElement) {
-            // プログラムエリアにドロップ
-            let newElement;
-            if (isDraggingFromPalette) {
-                newElement = draggedElement.cloneNode(true);
-            } else {
-                newElement = draggedElement;
-                draggedElement.classList.remove('dragging');
-            }
-            placeholder.parentElement.replaceChild(newElement, placeholder);
+        if (isDroppedOnTrash && !isDraggingFromPalette) {
+            // ゴミ箱にドロップ（パレットからは削除しない）
+            draggedElement.remove();
         } else {
-            // 有効なドロップ先でない場合
-            if (!isDraggingFromPalette) {
-                draggedElement.classList.remove('dragging');
+            // ドロップ可能なコンテナ（プログラムエリアまたはループ内）を探す
+            const dropContainer = elementBelow ? elementBelow.closest('.loop-body, #program-area') : null;
+            if (dropContainer) {
+                // ドロップコンテナ内にドロップ
+                let newElement;
+                if (isDraggingFromPalette) {
+                    newElement = draggedElement.cloneNode(true);
+                    newElement.draggable = true;
+                    newElement.addEventListener('dragstart', handleDragStart);
+                    newElement.addEventListener('dragend', handleDragEnd);
+                    newElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+                    if (newElement.classList.contains('loop-block')) {
+                        const loopBody = newElement.querySelector('.loop-body');
+                        if (loopBody) {
+                            loopBody.addEventListener('dragover', handleDragOver);
+                            loopBody.addEventListener('drop', handleDrop);
+                        }
+                        // ★追加: クローンした繰り返しブロックにもイベントを設定
+                        setupLoopBlockEvents(newElement);
+                    }
+                } else {
+                    newElement = draggedElement;
+                    draggedElement.classList.remove('dragging');
+                }
+
+                // touchmove中のプレースホルダーは無視し、最終的なタッチ位置でドロップ先を決定する
+                const beforeElement = getDragBeforeElement(dropContainer, touch.clientX, touch.clientY);
+
+                if (beforeElement && beforeElement.classList.contains('program-slot')) {
+                    // ドロップ先がスロットの場合、そのスロットを置き換える
+                    beforeElement.parentElement.replaceChild(newElement, beforeElement);
+                } else if (beforeElement) {
+                    // ドロップ先がブロックの間の場合、その手前に挿入する
+                    dropContainer.insertBefore(newElement, beforeElement);
+                } else {
+                    // ドロップ先が末尾の場合、コンテナの最後に追加する
+                    dropContainer.appendChild(newElement);
+                }
+            } else {
+                // 有効なドロップ先でない場合（元の場所に戻す）
+                if (!isDraggingFromPalette) {
+                    draggedElement.classList.remove('dragging');
+                }
             }
         }
 
-        // クローンとプレースホルダーを削除
+        // クローンとプレースホルダーをDOMから削除
         clone.remove();
         if (placeholder.parentElement) {
             placeholder.remove();
@@ -850,6 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 状態をリセット
         draggedElement = null;
         clone = null;
+        isOverTrash = false;
         updateSlots();
     }
 // programming-game.js - Part 5/5

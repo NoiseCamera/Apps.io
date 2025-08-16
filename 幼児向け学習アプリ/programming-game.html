@@ -9,9 +9,11 @@
     <link rel="stylesheet" href="settings.css">
     <link rel="stylesheet" href="buttons.css">
     <link rel="stylesheet" href="programming-game.css">
-    <link rel="icon" href="assets/images/favicon.ico">
 </head>
 <body>
+    <!-- BGM：JS側で 'bgm6.mp3' を指定しているため、ここで要素を用意します -->
+    <audio id="bgm" src="assets/sounds/bgm6.mp3" loop></audio>
+
     <!-- ヘッダー：タイトルと戻るボタン -->
     <header>
         <h1>プログラミングであそぼう</h1>
@@ -37,35 +39,53 @@
 
         <!-- 右側：コードエディタと命令の例 -->
         <div id="editor-area">
-            <div class="editor-header">
-                <h3>つかう めいれい</h3>
-                <div id="trash-area">🗑️</div>
-            </div>
-            <div id="command-palette">
-                <div class="command-block" draggable="true" data-command="うえに 1 すすむ">
-                    <img src="assets/images/ue.png" alt="うえ" draggable="false">
+            <section class="command-section">
+                <div class="editor-header">
+                    <h3>つかう めいれい</h3>
+                    <div id="trash-area">🗑️</div>
                 </div>
-                <div class="command-block" draggable="true" data-command="したに 1 すすむ">
-                    <img src="assets/images/sita.png" alt="した" draggable="false">
+                <div id="command-palette">
+                    <div class="command-block" draggable="true" data-command="うえに 1 すすむ">
+                        <img src="assets/images/ue.png" alt="うえ" draggable="false">
+                    </div>
+                    <div class="command-block" draggable="true" data-command="したに 1 すすむ">
+                        <img src="assets/images/sita.png" alt="した" draggable="false">
+                    </div>
+                    <div class="command-block" draggable="true" data-command="ひだりに 1 すすむ">
+                        <img src="assets/images/hidari.png" alt="ひだり" draggable="false">
+                    </div>
+                    <div class="command-block" draggable="true" data-command="みぎに 1 すすむ">
+                        <img src="assets/images/migi.png" alt="みぎ" draggable="false">
+                    </div>
+                    <!-- 繰り返しブロックを追加 -->
+                    <div class="command-block loop-block" data-command="loop 2" draggable="true">
+                        <div class="loop-header">
+                            <select class="loop-count-selector" aria-label="くりかえすかいすう">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                            </select>
+                            かい くりかえす
+                        </div>
+                        <div class="loop-body"></div>
+                    </div>
                 </div>
-                <div class="command-block" draggable="true" data-command="ひだりに 1 すすむ">
-                    <img src="assets/images/hidari.png" alt="ひだり" draggable="false">
-                </div>
-                <div class="command-block" draggable="true" data-command="みぎに 1 すすむ">
-                    <img src="assets/images/migi.png" alt="みぎ" draggable="false">
-                </div>
-            </div>
+            </section>
 
-            <h3>プログラム</h3>
-            <div id="program-area">
-                <!-- ここにコマンドブロックがドラッグ＆ドロップされる -->
-                <div class="program-slot"></div>
-                <div class="program-slot"></div>
-                <div class="program-slot"></div>
-                <div class="program-slot"></div>
-                <div class="program-slot"></div>
-                <div class="program-slot"></div>
-            </div>
+            <section class="program-section">
+                <div class="editor-header" id="program-header">
+                    <h3>プログラム</h3>
+                    <!-- ズームコントロールはJSによってここに追加されます -->
+                </div>
+                <div id="program-area">
+                    <!-- ここにコマンドブロックがドラッグ＆ドロップされます -->
+                </div>
+            </section>
         </div>
 
         <!-- ゴールしたときに表示するモーダル -->

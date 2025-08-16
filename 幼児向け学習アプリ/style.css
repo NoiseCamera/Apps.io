@@ -274,9 +274,6 @@ nav {
     padding: 0 20px; /* 画面幅が狭いときのための余白 */
 }
 
-/* アプリ選択画面のコンテナ */
-#app-container {}
-
 #calculation-container {
     background-color: #fff;
     border: 4px solid #a5d6a7; /* 薄い緑 */
