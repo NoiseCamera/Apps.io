@@ -1,0 +1,684 @@
+/* othello.css */
+
+body {
+    background-image: url('assets/images/haikei.png');
+    background-size: cover;
+    /* 画面に合わせて画像を拡大・縮小 */
+    background-position: center center;
+    /* 画像を中央に配置 */
+    background-repeat: no-repeat;
+    /* 画像を繰り返さない */
+    background-attachment: fixed;
+    /* スクロールしても背景を固定 */
+}
+
+/* --- 全体レイアウト --- */
+#othello-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 700px; /* 盤面がメインなので、横幅を少し狭める */
+    /* キャンバスより少し広め */
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.85);
+    /* 少し透けた白 */
+    border-radius: 0;
+    /* 角を四角に */
+    padding: 20px;
+    margin: 2vh auto;
+    /* 画面サイズに応じて上下に少し余白をとり、左右は中央に */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    /* AI思考中モーダルの基準位置にする */
+}
+
+/* --- ヘッダー --- */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    /* h1を中央に保つため */
+    margin-bottom: 10px;
+}
+
+.game-header h1 {
+    color: #ff9800;
+    /* オレンジ */
+    font-size: 2.2em;
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.back-to-menu-btn {
+    /* 共通スタイルで定義されているはずだが、念のため */
+    padding: 8px 16px;
+    font-size: 1em;
+    text-decoration: none;
+    border-radius: 8px;
+    z-index: 1;
+    /* h1の上に表示 */
+}
+
+/* --- ゲーム情報 (スコア・手番) --- */
+#game-info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #5d4037;
+    /* 濃い茶色 */
+}
+
+#score-display,
+#turn-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.score-label {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* .score-label.black は #game-info の色を継承します */
+.score-label.white {
+    color: #ec407a;
+    /* ピンク */
+}
+
+#black-score,
+#white-score {
+    min-width: 2ch;
+    /* 2桁になってもガタつかないように */
+    text-align: right;
+    transition: color 0.3s ease;
+}
+
+#turn-indicator {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    object-fit: contain;
+}
+
+/* 手番の時にインジケーターをアニメーションさせる */
+.turn-indicator {
+    /* JS側でcurrentPlayerに応じてクラス名が `turn-indicator black` または `turn-indicator white` になるので、
+       このセレクタで現在の手番のインジケーターのみを対象にできます */
+    animation: pulse-indicator 2s infinite ease-in-out;
+}
+
+@keyframes pulse-indicator {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 121, 107, 0);
+    }
+
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px 5px rgba(0, 121, 107, 0.5);
+    }
+}
+
+/* --- 盤面 --- */
+#board-container {
+    width: 100%;
+    max-width: 600px;
+    /* HTMLのcanvasサイズに合わせる */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    /* 角を四角に */
+    overflow: hidden;
+    /* 画像がはみ出さないように */
+}
+
+#othello-board {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    /* 正方形を維持 */
+    background-color: #00897b;
+    /* 画像読み込み失敗時の背景色 */
+    cursor: pointer;
+}
+
+/* --- ゲーム本体のレイアウト --- */
+#othello-game-body {
+    display: flex;
+    flex-direction: column; /* 常に縦並び */
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* 盤面とコントロールの間の隙間 */
+    width: 100%;
+}
+
+#board-container {
+    flex-shrink: 0; /* ボードが縮まないようにする */
+}
+
+/* --- 操作パネル --- */
+#controls {
+    display: flex;
+    flex-direction: row; /* 常に横並び */
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* ボタン間の隙間を少し詰める */
+    width: 100%;
+    margin-top: 10px; /* 盤面とのマージン */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* 難易度ボタン (style.cssのスタイルを参考に) */
+.difficulty-btn {
+    padding: 8px 16px;
+    border: 2px solid #4db6ac;
+    background-color: #e0f2f1;
+    color: #00796b;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.difficulty-btn.selected,
+.difficulty-btn:hover {
+    background-color: #00796b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 「はじめから」ボタンのスタイル */
+#reset-btn {
+    background-color: #4caf50;
+    /* 緑 */
+    box-shadow: 0 4px #388e3c;
+}
+
+#reset-btn:active:not(:disabled) {
+    box-shadow: 0 1px #388e3c;
+}
+
+/* ボタン全体のサイズを少し小さくして、すっきり見せる */
+#controls .button-style {
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+/* パスボタンのスタイル */
+#pass-button {
+    background-color: #2196f3;
+    /* 青 */
+    box-shadow: 0 4px #1976d2;
+    animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+#pass-button:active:not(:disabled) {
+    box-shadow: 0 1px #1976d2;
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* --- 結果表示モーダル --- */
+#result-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#result-modal:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* AI思考中モーダルを盤面コンテナの中央に配置するためのスタイル */
+#board-container > .modal-overlay {
+    position: absolute;
+    /* 親要素(#board-container)を基準に配置 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent; /* 背景は透明に */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    /* 他の要素より手前に表示 */
+    pointer-events: none; /* 下の要素をクリックできるようにする */
+}
+
+/* AI思考中モーダルのスタイル */
+#ai-thinking-modal .modal-content,
+#pause-modal .modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    pointer-events: auto; /* コンテンツ部分はクリック可能に */
+}
+
+#ai-thinking-modal p,
+#pause-modal p {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #004d40;
+    margin: 0;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    /* Light grey */
+    border-top: 8px solid #00796b;
+    /* Teal */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1.5s linear infinite;
+}
+
+/* 一時停止アイコンのスタイル */
+.pause-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pause-icon::before,
+.pause-icon::after {
+    content: '';
+    width: 20px;
+    height: 100%;
+    background-color: #00796b; /* Teal, same as loader */
+    border-radius: 5px;
+}
+
+/* AI難易度選択モーダルのスタイル */
+#difficulty-selection-modal.modal-overlay {
+    /* モード選択モーダルと同じスタイルを適用 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#difficulty-selector-modal {
+    margin-bottom: 30px;
+}
+
+/* 難易度選択モーダルのアクションボタンコンテナ */
+.modal-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    width: 100%;
+}
+
+/* 「もどる」ボタンの色分け */
+#back-to-mode-select-btn {
+    background-color: #f44336; /* 赤 */
+    box-shadow: 0 5px #d32f2f;
+}
+
+#back-to-mode-select-btn:active:not(:disabled) {
+    box-shadow: 0 2px #d32f2f;
+}
+
+#start-ai-game-btn {
+    background-color: #4caf50; /* 緑 */
+    box-shadow: 0 5px #388e3c;
+}
+
+#start-ai-game-btn:active:not(:disabled) {
+    box-shadow: 0 2px #388e3c;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* モード選択モーダルのスタイル */
+#mode-selection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#mode-selection-modal .modal-content {
+    background: linear-gradient(145deg, #e0f2f1, #ffffff);
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    width: 450px;
+}
+
+.mode-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mode-buttons .button-style {
+    padding: 15px 20px;
+    font-size: 1.5em;
+}
+
+/* モード選択ボタンの色分け */
+#one-player-btn {
+    background-color: #2196f3;
+    /* 青 */
+    box-shadow: 0 5px #1976d2;
+}
+
+#one-player-btn:active:not(:disabled) {
+    box-shadow: 0 2px #1976d2;
+}
+
+#two-player-btn {
+    background-color: #ff9800;
+    /* オレンジ */
+    box-shadow: 0 5px #f57c00;
+}
+
+#two-player-btn:active:not(:disabled) {
+    box-shadow: 0 2px #f57c00;
+}
+
+/* AI観戦モードボタンの色分け */
+#ai-watch-btn {
+    background-color: #673ab7; /* 紫 */
+    box-shadow: 0 5px #512da8;
+}
+
+#ai-watch-btn:active:not(:disabled) {
+    box-shadow: 0 2px #512da8;
+}
+
+.modal-content {
+    /* グラデーション背景を追加 */
+    background: linear-gradient(145deg, #e0f2f1, #ffffff);
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.3s ease-in-out;
+    max-width: 90%;
+    width: 400px;
+}
+
+#result-modal:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+#mode-selection-modal h2,
+#result-title {
+    font-size: 2.5em;
+    margin-top: 0;
+    margin-bottom: 10px;
+    /* グラデーションテキスト */
+    background: linear-gradient(45deg, #00796b, #004d40);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+
+#result-message {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+#result-scores {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 25px;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+/* 結果モーダルの「はじめから」ボタンの色分け (緑) */
+#replay-btn {
+    background-color: #4caf50;
+    /* Green */
+    box-shadow: 0 5px #388e3c;
+}
+
+#replay-btn:active:not(:disabled) {
+    box-shadow: 0 2px #388e3c;
+}
+
+#result-scores p {
+    margin: 5px 0;
+}
+
+/* --- ユーティリティ --- */
+.hidden {
+    display: none !important;
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 600px) {
+    .game-header h1 {
+        font-size: 1.8em;
+    }
+
+    #game-info {
+        flex-direction: column;
+        gap: 10px;
+        font-size: 1.2em;
+    }
+
+    .difficulty-btn {
+        padding: 6px 12px;
+        font-size: 0.9em;
+    }
+
+    #othello-container {
+        max-width: 700px; /* スマホでは元の幅に戻す */
+    }
+
+    #othello-game-body {
+        flex-direction: column; /* 縦並びに戻す */
+    }
+
+    #controls {
+        margin-top: 15px; /* 縦並びのときは少しマージンを設ける */
+        flex-direction: row; /* ボタン類を横に並べる */
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .control-group, #watch-controls {
+        flex-direction: row; /* ボタンを横並びに戻す */
+    }
+}
+
+/* --- 一時停止ボタンのスタイル --- */
+#pause-btn {
+    background-color: #81d4fa; /* 明るい水色 */
+    color: #01579b; /* 濃い青 */
+    box-shadow: 0 4px #29b6f6;
+}
+
+#pause-btn:active:not(:disabled) {
+    box-shadow: 0 1px #29b6f6;
+}
+
+/* 一時停止中のアクティブなスタイル (再開ボタンになる) */
+#pause-btn.active {
+    background-color: #ffeb3b; /* 明るい黄色 */
+    color: #5d4037;
+    box-shadow: 0 4px #fbc02d;
+}
+
+/* --- 観戦モード用コントロール --- */
+#watch-controls {
+    display: inline-flex; /* 中身に合わせて幅が決まるように */
+    align-items: center; /* 中央揃え */
+    justify-content: center;
+    gap: 8px; /* 隙間を詰める */
+    padding: 5px 10px; /* パディングを詰める */
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.speed-label {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.8em;
+}
+
+.speed-btn {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    background-color: #b3e5fc;
+    color: #01579b;
+    border-bottom: 2px solid #4fc3f7;
+    position: relative;
+    top: 0;
+}
+
+.speed-btn:hover:not(.selected) {
+    top: -1px;
+    border-bottom-width: 3px;
+    background-color: #81d4fa;
+}
+
+.speed-btn.selected {
+    background-color: #ffeb3b;
+    color: #5d4037;
+    border-bottom: 1px solid #f9a825;
+    top: 1px;
+    box-shadow: none;
+}
+
+/* 一時停止モーダルは既存の .modal-overlay を使うが、思考中モーダルより手前に表示 */
+#pause-modal {
+    z-index: 1100; /* 思考中モーダル(1001)より手前に表示 */
+}
+
+/* --- 石のアニメーション --- */
+/*
+  注意: これらのアニメーションを有効にするには、JavaScript側で
+  石を置いたとき、ひっくり返したときに、対応する石の要素に
+  それぞれ `.stone-placed`, `.stone-flipped` クラスを
+  一時的に（アニメーションの時間だけ）付与する必要があります。
+*/
+
+/* 新しく石を置いたときのアニメーション */
+@keyframes place-stone-effect {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 20px 8px rgba(255, 255, 100, 0.9);
+        /* 黄色く強く光る */
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: none;
+    }
+}
+
+/* 石がひっくり返るときの追加アニメーション */
+@keyframes flip-stone-effect {
+    50% {
+        transform: scale(1.15);
+        /* 少し大きくする */
+        filter: brightness(1.5);
+        /* 明るく光る */
+    }
+}
+
+.stone-placed {
+    animation: place-stone-effect 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stone-flipped {
+    /* 既存の回転アニメーションと同時に再生されることを想定 */
+    animation: flip-stone-effect 0.5s ease-in-out;
+}

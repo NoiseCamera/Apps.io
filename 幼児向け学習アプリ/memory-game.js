@@ -488,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ゲームをリセットする代わりに、難易度選択ができるスタート画面に戻す
             titleScreen.classList.remove('hidden');
         });
+        playAgainBtn.classList.add('colorful-btn');
 
         // スタート画面でのモード選択
         modeButtons.forEach(button => {

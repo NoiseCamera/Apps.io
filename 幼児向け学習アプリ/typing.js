@@ -64,16 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
         'JA': ['ZYA'], 'JYA': ['JA'], // JYAはJAの別名として扱うことが多い
         'JU': ['ZYU'], 'JYU': ['JU'],
         'JO': ['ZYO'], 'ZYO': ['JO'],
+        'JYO': ['ZYO', 'JO'], 'ZYO': ['JYO'],
         'NN': ['N'], // 「ん」の入力バリエーション
     };
     const SOUNDS = {
         type: 'assets/sounds/type.mp3',
         correct: 'assets/sounds/seikai2.mp3',      // 単語正解 (他のゲームと統一)
         wrong: 'assets/sounds/fuseikai.mp3',   // タイプミス (他のゲームと統一)
-        finish: 'assets/sounds/finish.mp3',     // ゲーム終了・モード解除
-        secret: 'assets/sounds/seikai2.mp3',     // 裏コード成功
-        bgmNormal: 'assets/sounds/bgm.mp3',      // 通常BGM
-        bgmOtaku: 'assets/sounds/otaku.mp3'      // おたくモードBGM
+        finish: 'assets/sounds/finish.mp3',     // ゲーム終了
+        bgmNormal: 'assets/sounds/bgm.mp3'      // 通常BGM
     };
     const SOUND_EFFECTS = Object.values(SOUNDS);
     // キーと指のマッピングを逆引きできるように作成
@@ -99,13 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let gameConfig = {
         difficulty: 'normal',
-        isAdultMode: false, // ★追加: おとなモードの状態
     };
     let bgmInitialized = false;
     let countdownIntervalId = null;
-    // ★追加: 裏コード関連
-    let secretCodeBuffer = '';
-    const SECRET_CODE = 'OTAKU';
 
     // --- Helpers ---
     /**
@@ -144,43 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function sanitizeRomaji(str) {
         if (!str) return '';
         return String(str).toUpperCase().replace(/[^A-Z-]/g, '');
-    }
-
-    /**
-     * ★追加: BGMを切り替える関数
-     * @param {string} newSrc - 新しいBGMのパス
-     */
-    function switchBgm(newSrc) {
-        const bgm = document.getElementById('bgm');
-        if (!bgm) return;
-
-        // 現在再生中のソース(currentSrc)と、これから設定するソース(src)の両方からファイル名を取得
-        // currentSrcは実際に読み込まれているメディアのURLを返し、より信頼性が高い
-        const currentSrc = bgm.currentSrc || bgm.src;
-        const currentFileName = currentSrc ? currentSrc.split('/').pop() : '';
-        const newFileName = newSrc.split('/').pop();
-
-        // ファイル名が異なる場合のみ、BGMを切り替える
-        if (currentFileName !== newFileName) {
-            bgm.src = newSrc;
-            bgm.load(); // 新しいソースを読み込む
-            const playPromise = bgm.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    // ユーザーが操作するまで再生できないエラーは、コンソールに表示しすぎないように制御
-                    if (error.name !== 'NotAllowedError') {
-                        console.error("BGMの再生に失敗しました:", error);
-                    }
-                });
-            }
-        } else if (bgm.paused) {
-            // 同じ曲でも一時停止している場合は再生する
-            bgm.play().catch(error => {
-                if (error.name !== 'NotAllowedError') {
-                    console.error("BGMの再生(再試行)に失敗しました:", error);
-                }
-            });
-        }
     }
 
     // --- Initialization functions (BGM/SFX) ---
@@ -257,12 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game control: start / end / countdown ---
     function startGame() {
-        // ★追加: モードに応じてBGMを切り替える
-        if (gameConfig.isAdultMode) {
-            switchBgm(SOUNDS.bgmOtaku);
-        } else {
-            // 通常モードまたはゲーム初回起動時
-            switchBgm(SOUNDS.bgmNormal);
+        const bgm = document.getElementById('bgm');
+        if (bgm) {
+            bgm.src = SOUNDS.bgmNormal;
+            bgm.load();
+            bgm.play().catch(e => console.error("BGMの再生に失敗しました:", e));
         }
 
         initializeBGM();
@@ -386,8 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Word selection / display ---
     function getFilteredWords() {
         const { maxLength, minLength } = DIFFICULTIES[gameConfig.difficulty];
-        // ★変更: おとなモードか、またWORDS_ADULTが存在するかで単語リストを切り替える
-        const sourceWords = (gameConfig.isAdultMode && typeof WORDS_ADULT !== 'undefined') ? WORDS_ADULT : WORDS;
+        const sourceWords = WORDS;
         // フィルタは正規化したローマ字の長さで行う（表示と判定の不整合を避けるため）
         return sourceWords.filter(word => {
             const s = sanitizeRomaji(word.r);
@@ -545,33 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showKeyFeedback('Backspace');
     }
 
-    // ★追加: おとなモード切り替え
-    function toggleAdultMode() {
-        gameConfig.isAdultMode = !gameConfig.isAdultMode;
-        document.body.classList.toggle('adult-mode', gameConfig.isAdultMode);
-
-        // モードが切り替わったことをユーザーにフィードバック
-        if (gameConfig.isAdultMode) {
-            questionDisplay.textContent = 'おたくモード';
-            questionRomajiDisplay.textContent = 'OTONA-MODE';
-            if (typeof playSE === 'function') playSE(SOUNDS.secret);
-            // ★変更: BGMの切り替えはゲーム開始時に行うため、ここでは何もしない
-        } else {
-            questionDisplay.textContent = 'こどもモード';
-            questionRomajiDisplay.textContent = 'KODOMO-MODE';
-            if (typeof playSE === 'function') playSE(SOUNDS.finish); // 違う音でフィードバック
-            switchBgm(SOUNDS.bgmNormal);
-        }
-
-        // 2秒後に表示をリセット
-        setTimeout(() => {
-            if (!gameState.isPlaying) {
-                questionDisplay.textContent = 'スタートボタンを おしてね！';
-                questionRomajiDisplay.textContent = '';
-            }
-        }, 2000);
-    }
-
     // --- UI helpers ---
     function showKeyFeedback(keyChar) {
         const lookupKey = keyChar === 'Backspace' ? 'Backspace' : String(keyChar).toUpperCase();
@@ -597,18 +526,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event listeners ---
     document.addEventListener('keydown', (e) => {
-        // ★追加: 裏コードのチェック (ゲーム中でないときだけ)
-        if (!gameState.isPlaying && e.key.length === 1 && /[a-z]/i.test(e.key)) {
-            const key = e.key.toUpperCase();
-            secretCodeBuffer = (secretCodeBuffer + key).slice(-SECRET_CODE.length);
-            if (secretCodeBuffer === SECRET_CODE) {
-                toggleAdultMode();
-                secretCodeBuffer = ''; // バッファをリセット
-                e.preventDefault(); // 他の処理を中断
-                return;
-            }
-        }
-
         // Enter でゲームスタート（スタートボタンが見えているとき）
         if (!gameState.isPlaying && e.key === 'Enter' && !startGameBtn.classList.contains('hidden')) {
             startGameBtn.click();

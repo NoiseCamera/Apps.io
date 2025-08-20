@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ようこそ！</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
@@ -12,6 +13,9 @@
     <link rel="stylesheet" href="buttons.css">
 </head>
 <body>
+
+    <!-- アプリ一覧画面用のBGM -->
+    <audio id="bgm" src="assets/sounds/title.mp3" loop></audio>
 
     <header>
         <h1>どれで あそぶ？</h1>
@@ -75,6 +79,14 @@
                     <h3>🤖 プログラミング<br>あそび</h3>
                     <p>ブロックをならべて<br>めいろをすすめ！</p>
                 </a>
+                <a href="othello.html" class="app-link">
+                    <h3>⚪⚫ オセロ<br>ゲーム</h3>
+                    <p>くろ と しろ で<br>はさみっこ！</p>
+                </a>
+                <a href="shogi.html" class="app-link">
+                    <h3>☗ わくわく<br>しょうぎ</h3>
+                    <p>にほんの でんとうてきな<br>ボードゲーム！</p>
+                </a>
             </div>
         </div>
 
@@ -123,5 +135,14 @@
         </div>
     </main>
     <script src="settings.js"></script>
+    <script>
+        // ユーザーが最初に画面をクリックしたときにBGMを再生します
+        document.body.addEventListener('click', () => {
+            const bgm = document.getElementById('bgm');
+            if (bgm && bgm.paused) {
+                bgm.play().catch(e => console.error("BGMの再生に失敗しました:", e));
+            }
+        }, { once: true });
+    </script>
 </body>
 </html>

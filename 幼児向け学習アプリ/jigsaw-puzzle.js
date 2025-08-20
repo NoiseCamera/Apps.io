@@ -674,6 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // initializePuzzle will re-attach event listeners
       initializePuzzle();
     });
+    playAgainBtn.classList.add('colorful-btn');
 
     // Initial setup
     createAnimalSelector();

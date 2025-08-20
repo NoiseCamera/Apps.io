@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>オセロゲーム | 幼児向け学習アプリ</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="othello.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- BGM：JS側で 'bgm6.mp3' を指定しているため、ここで要素を用意します -->
+    <audio id="bgm" src="assets/sounds/bgm6.mp3" loop></audio>
+    <!-- モード選択モーダル -->
+    <div id="mode-selection-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>あそびかたをえらんでね</h2>
+            <div class="mode-buttons">
+                <button id="one-player-btn" class="button-style">ひとりで あそぶ (VS AI)</button>
+                <button id="two-player-btn" class="button-style">ふたりで あそぶ</button>
+                <button id="ai-watch-btn" class="button-style">AIを みる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI難易度選択モーダル (新規追加) -->
+    <div id="difficulty-selection-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>つよさを えらんでね</h2>
+            <div id="difficulty-selector-modal" class="button-group">
+                <button class="difficulty-btn selected" data-difficulty="Weak">よわい</button>
+                <button class="difficulty-btn" data-difficulty="Normal">ふつう</button>
+                <button class="difficulty-btn" data-difficulty="Strong">つよい</button>
+                <button class="difficulty-btn" data-difficulty="Strongest">さいきょう</button>
+            </div>
+            <div class="modal-action-buttons">
+                <button id="back-to-mode-select-btn" class="button-style">もどる</button>
+                <button id="start-ai-game-btn" class="button-style">ゲームかいし</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="othello-container" class="hidden">
+        <header class="game-header">
+            <h1>オセロ</h1>
+        </header>
+
+        <div id="game-info">
+            <div id="score-display">
+                <span class="score-label black">くろ:</span>
+                <span id="black-score">2</span>
+                <span class="score-label white">しろ:</span>
+                <span id="white-score">2</span>
+            </div>
+            <div id="turn-display">
+                <span id="turn-text">くろ のばん</span>
+                <img id="turn-indicator" src="assets/images/kuro.png" alt="黒の番" class="turn-indicator">
+            </div>
+        </div>
+
+        <!-- ボードと操作パネルを横並びにするためのラッパー -->
+        <div id="othello-game-body">
+            <div id="board-container">
+                <canvas id="othello-board"></canvas>
+                <!-- 一時停止モーダル -->
+                <div id="pause-modal" class="modal-overlay hidden">
+                    <div class="modal-content">
+                        <div class="pause-icon"></div>
+                        <p>いちじていしちゅう</p>
+                    </div>
+                </div>
+                <!-- AI思考中モーダル -->
+                <div id="ai-thinking-modal" class="modal-overlay hidden">
+                    <div class="modal-content">
+                        <div class="loader"></div>
+                        <p>AIが かんがえちゅう...</p>
+                    </div>
+                </div>
+            </div>
+    
+            <div id="controls">
+                <button id="reset-btn" class="button-style">メニューにもどる</button>
+                <button id="pause-btn" class="button-style hidden">いちじていし</button>
+                <button id="pass-button" class="button-style hidden">パス</button>
+                <!-- 観戦モード用コントロール -->
+                <div id="watch-controls" class="hidden">
+                    <span class="speed-label">かんせんスピード:</span>
+                    <button class="speed-btn" data-speed="fast">はやい</button>
+                    <button class="speed-btn selected" data-speed="normal">ふつう</button>
+                    <button class="speed-btn" data-speed="slow">おそい</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結果表示モーダル -->
+    <div id="result-modal" class="hidden">
+        <div class="modal-content">
+            <h2 id="result-title"></h2>
+            <p id="result-message"></p>
+            <div id="result-scores">
+                <p>くろ: <span id="final-black-score"></span></p>
+                <p>しろ: <span id="final-white-score"></span></p>
+            </div>
+            <div class="win-buttons">
+                <button id="replay-btn" class="button-style">もういっかい</button>
+                <a href="index.html" id="back-to-menu-btn" class="button-style">メニューにもどる</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 共通スクリプト -->
+    <script src="settings.js"></script>
+    <!-- AIロジック -->
+    <script src="ai.js"></script>
+    <!-- オセロゲームのメインロジック -->
+    <script src="othello.js"></script>
+</body>
+</html>

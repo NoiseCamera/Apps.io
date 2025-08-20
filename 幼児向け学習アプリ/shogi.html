@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>わくわくしょうぎ</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="shogi.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- BGM and Sound Effects -->
+    <audio id="bgm" src="assets/sounds/bgm7.mp3" loop></audio>
+    <audio id="move-sound"></audio>
+    <audio id="capture-sound"></audio>
+    <audio id="check-sound"></audio>
+    <audio id="win-sound"></audio>
+    <audio id="lose-sound"></audio>
+
+    <!-- ポイントカウンターと設定ボタン -->
+    <!-- JSでゲーム開始時に表示されます -->
+    <div id="points-counter" class="hidden">★ <span>0</span></div>
+    <button id="settings-btn" class="hidden">⚙️</button>
+
+    <div id="shogi-app-container">
+        <header>
+            <h1>わくわく しょうぎ</h1>
+        </header>
+
+        <main id="game-container" class="hidden">
+            <!-- 相手の持ち駒エリア (右上) -->
+            <div id="opponent-captured-pieces" class="captured-pieces-area">
+                <div class="player-name">あいて</div>
+                <div class="pieces-holder"></div>
+            </div>
+
+            <!-- 将棋盤 -->
+            <div id="shogi-board-wrapper">
+                <div id="shogi-board">
+                    <!-- マスはJavaScriptで生成されます -->
+                </div>
+                <!-- AI思考中モーダルを盤面の中央に表示するため、ラッパー内に移動 -->
+                <div id="ai-thinking-modal" class="board-overlay hidden">
+                    <div class="modal-content">
+                        <p>AIが かんがえちゅう…</p>
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 自分の持ち駒エリア (左下) -->
+            <div id="player-captured-pieces" class="captured-pieces-area">
+                <div class="player-name">じぶん</div>
+                <div class="pieces-holder"></div>
+            </div>
+
+            <!-- 右側パネル (ガイドとボタン) -->
+            <div id="right-panel">
+                <aside id="move-guide">
+                    <h3>うごかしかた</h3>
+                    <div id="guide-piece-name">こまを えらんでね</div>
+                    <div id="guide-board-container">
+                        <div id="guide-board">
+                            <!-- 駒の動きがここに表示されます -->
+                        </div>
+                    </div>
+                    <p id="guide-text"></p>
+                </aside>
+                <button id="back-to-menu-from-game-btn">メニューにもどる</button>
+                <button id="undo-btn" class="hidden">まった</button>
+                <button id="pause-btn" class="hidden">いちじていし</button>
+            </div>
+
+            <!-- ゲーム情報表示 -->
+            <div id="game-info">
+                <div id="turn-display">てばん</div>
+            </div>
+
+            <!-- 観戦モード用コントロール -->
+            <div id="watch-controls" class="hidden">
+                <div class="watch-controls-label">かんせんスピード</div>
+                <div class="speed-btn-container">
+                    <button class="speed-btn" data-speed="fast">はやい</button>
+                    <button class="speed-btn selected" data-speed="normal">ふつう</button>
+                    <button class="speed-btn" data-speed="slow">おそい</button>
+                </div>
+            </div>
+            <!-- 一時停止中モーダル -->
+            <div id="pause-modal" class="board-overlay hidden">
+                <div class="modal-content">
+                    <p>いちじていしちゅう</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- ゲームモード選択モーダル -->
+        <div id="game-mode-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2>あそびかたを えらんでね</h2>
+                <button class="mode-btn" data-mode="ai">AIと たいせん</button>
+                <button class="mode-btn" data-mode="human">ひとと たいせん</button>
+                <button class="mode-btn" data-mode="watch">AIを かんせん</button>
+            </div>
+        </div>
+
+        <!-- AIレベル選択モーダル -->
+        <div id="ai-level-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>AIのつよさを えらんでね</h2>
+                <button class="level-btn" data-level="1">よわい</button>
+                <button class="level-btn" data-level="2">ふつう</button>
+                <button class="level-btn" data-level="3">つよい</button>
+                <button class="back-btn" style="margin-top: 20px;">もどる</button>
+            </div>
+        </div>
+
+        <!-- ゲーム結果モーダル -->
+        <div id="game-result-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2 id="result-title"></h2>
+                <p id="result-message"></p>
+                <button id="play-again-btn">もういちど あそぶ</button>
+                <button id="view-board-btn">ばんめんをみる</button>
+                <button id="back-to-menu-from-result-btn">メニューにもどる</button>
+            </div>
+        </div>
+
+        <!-- 成り確認モーダル -->
+        <div id="promotion-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>なりますか？</h2>
+                <p>このこまは「なる」ことができます。</p>
+                <div class="promotion-buttons">
+                    <button id="promote-yes-btn">はい</button>
+                    <button id="promote-no-btn">いいえ</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="settings.js"></script>
+    <!-- AIと思考ルーチンは別ファイルで読み込みます -->
+    <script src="shogi-ai.js"></script>
+    <!-- ゲームのメインロジック -->
+    <script src="shogi.js"></script>
+</body>
+</html>

@@ -128,6 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         await playSE('assets/sounds/gacha-fanfare.mp3'); // ファンファーレ
     }
 
+    // ボタンにスタイルを適用
+    gachaButton.classList.add('colorful-btn');
+    closeRewardBtn.classList.add('colorful-btn');
+    if (footerNavButton) {
+        footerNavButton.classList.add('colorful-btn');
+    }
+
     gachaButton.addEventListener('click', drawGacha);
 
     closeRewardBtn.addEventListener('click', () => {

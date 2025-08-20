@@ -434,6 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   function initialize() {
     shuffleBtn.addEventListener('click', startNewGame);
+    shuffleBtn.classList.add('colorful-btn');
+
     puzzleGrid.addEventListener('click', handleGridClick);
     createAnimalSelector(); // Create animal buttons
     document.addEventListener('keydown', handleKeyDown);
@@ -451,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
       winMessage.classList.add('hidden');
       startNewGame();
     });
+    playAgainBtn.classList.add('colorful-btn');
 
     createTiles();
 

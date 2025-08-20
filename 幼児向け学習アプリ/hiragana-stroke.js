@@ -974,6 +974,13 @@ document.addEventListener('DOMContentLoaded', () => {
     stepModeBtn.addEventListener('click', () => switchMode('step'));
     practiceModeBtn.addEventListener('click', () => switchMode('practice'));
 
+    // ボタンにスタイルを適用
+    replayBtn.classList.add('colorful-btn');
+    watchModeBtn.classList.add('colorful-btn');
+    practiceModeBtn.classList.add('colorful-btn');
+    stepModeBtn.classList.add('colorful-btn');
+    toggleNumbersBtn.classList.add('colorful-btn');
+
     // Canvas drawing events
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', continueDrawing);

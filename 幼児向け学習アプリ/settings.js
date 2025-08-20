@@ -379,9 +379,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const bgmVolume = bgmVolumeSlider.value;
         const seVolume = seVolumeSlider.value;
         applyVolumeSettings(parseFloat(bgmVolume), parseFloat(seVolume));
+        // ゲーム再開イベントを発行
+        window.dispatchEvent(new CustomEvent('gameResumed'));
     };
 
     settingsBtn.addEventListener('click', () => {
+        // ゲーム一時停止イベントを発行
+        window.dispatchEvent(new CustomEvent('gamePaused'));
+
         modalPointsCount.textContent = getPoints(); // モーダルを開くたびにポイントを更新
 
         // 現在のページがホーム画面 (index.html) かどうかをチェック

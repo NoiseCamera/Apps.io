@@ -126,10 +126,25 @@
     border-radius: 6px; /* 円から角丸の四角形に変更 */
     cursor: pointer;
     transition: transform 0.2s, border-color 0.2s;
+    /* === buttons.css の共通スタイルを上書き/リセット === */
+    padding: 0;
+    box-shadow: none;
+    /* topプロパティによる位置ずれを防ぐ */
+    position: relative;
+    top: 0;
 }
 
 .color-btn:hover {
     transform: scale(1.1);
+    /* buttons.css の hover効果を上書き */
+    box-shadow: none;
+    top: 0;
+}
+
+.color-btn:active {
+    /* buttons.css の active効果を上書き */
+    box-shadow: none;
+    top: 0;
 }
 
 .color-btn.selected {

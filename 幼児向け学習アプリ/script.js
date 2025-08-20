@@ -537,6 +537,11 @@ document.addEventListener('DOMContentLoaded', () => {
         hintBtn.addEventListener('click', handleHintAnimation);
     }
 
+    // 主要なボタンをカラフルにする
+    checkBtn.classList.add('colorful-btn');
+    clearBtn.classList.add('colorful-btn');
+    nextBtn.classList.add('colorful-btn');
+
     // 最初に問題を表示
     generateProblem();
 

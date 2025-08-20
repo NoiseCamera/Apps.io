@@ -271,6 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.addEventListener('click', saveCanvas);
         undoBtn.addEventListener('click', undo);
         redoBtn.addEventListener('click', redo);
+
+        // 主要なボタンにスタイルを適用
+        clearBtn.classList.add('colorful-btn');
+        saveBtn.classList.add('colorful-btn');
+        undoBtn.classList.add('colorful-btn');
+        redoBtn.classList.add('colorful-btn');
     }
 
     // --- Drawing Logic ---

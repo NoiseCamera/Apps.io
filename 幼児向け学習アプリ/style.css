@@ -148,6 +148,14 @@ header p {
     background-color: #eceff1; /* ブルーグレー */
     border-color: #78909c; /* 濃いブルーグレー */
 }
+.app-link[href="othello.html"] {
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
+}
+.app-link[href="shogi.html"] {
+    background-color: #efebe9; /* 薄いブラウン */
+    border-color: #8d6e63; /* ブラウン */
+}
 
 .app-link:hover {
     transform: translateY(-5px);
@@ -220,6 +228,12 @@ header p {
 }
 .app-link[href="programming-game.html"] h3 {
     color: #546e7a;
+}
+.app-link[href="othello.html"] h3 {
+    color: #26a69a;
+}
+.app-link[href="shogi.html"] h3 {
+    color: #5d4037;
 }
 
 .app-link p {

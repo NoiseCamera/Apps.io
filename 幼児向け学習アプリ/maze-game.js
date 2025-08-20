@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Audio Files ---
     const AUDIO_MOVE = 'assets/sounds/walk.mp3';
-    const AUDIO_WIN = 'assets/sounds/win.mp3';
+    const AUDIO_WIN = 'assets/sounds/kirakira.mp3';
 
     /**
      * --- Image Loading ---
@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Play again
         playAgainBtn.addEventListener('click', startGame);
+        playAgainBtn.classList.add('colorful-btn');
 
         // Keyboard controls
         window.addEventListener('keydown', (e) => {

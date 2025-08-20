@@ -305,6 +305,12 @@ document.addEventListener('DOMContentLoaded', () => { // Wait for the DOM to be 
         redoBtn.addEventListener('click', redo);
         window.addEventListener('resize', resizeCanvas);
 
+        // ボタンにスタイルを適用
+        clearBtn.classList.add('colorful-btn');
+        saveBtn.classList.add('colorful-btn');
+        undoBtn.classList.add('colorful-btn');
+        redoBtn.classList.add('colorful-btn');
+
         // --- Pinch Zoom & Drag Event Listeners ---
         canvasWrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
         canvasWrapper.addEventListener('touchmove', handleTouchMove, { passive: false });

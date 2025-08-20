@@ -163,7 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ボタンにイベントリスナーを設定
         runBtn.addEventListener('click', handleRunClick);
+        runBtn.classList.add('colorful-btn');
         resetBtn.addEventListener('click', resetCharacter);
+        resetBtn.classList.add('colorful-btn');
         playAgainBtn.addEventListener('click', () => {
             goalModal.classList.add('hidden');
             resetCharacter();
@@ -172,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             runBtn.disabled = false;
             resetBtn.disabled = false;
         });
+        playAgainBtn.classList.add('colorful-btn');
 
         // 難易度選択ボタンのイベントリスナー
         const difficultyButtons = document.querySelectorAll('#difficulty-selector .difficulty-btn');
