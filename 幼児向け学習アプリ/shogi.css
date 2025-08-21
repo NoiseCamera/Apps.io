@@ -339,19 +339,20 @@ main#game-container.hidden {
 
 .piece-count {
     position: absolute;
-    bottom: -5px;
-    right: -5px;
+    bottom: -7px; /* 位置を微調整 */
+    right: -7px;  /* 位置を微調整 */
     background-color: #ff69b4;
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 24px;  /* 2桁の数字が入るようにサイズを調整 */
+    height: 24px;
     font-size: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
     border: 1px solid white;
+    white-space: nowrap; /* 数字が改行されるのを防ぐための念押し */
 }
 /* --- 駒の動きガイド --- */
 /* 右側パネルのラッパー */

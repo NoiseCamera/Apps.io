@@ -1086,17 +1086,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 capturedArray.push({ name: originalName, owner: movingPiece.owner });
             }
 
-            newBoard[to.row][to.col] = movingPiece;
-            newBoard[from.row][from.col] = null;
-
+            // 常に新しいオブジェクトを作成して配置することで、予期せぬ参照の問題を完全に防ぐ
+            let pieceToPlace = { ...movingPiece };
             // 成る場合
             if (promote) {
                 const promotedName = PIECE_DATA[movingPiece.name].promoted;
                 if (promotedName) {
-                    newBoard[to.row][to.col].name = promotedName;
-                    newBoard[to.row][to.col].isPromoted = true;
+                    pieceToPlace.name = promotedName;
+                    pieceToPlace.isPromoted = true;
                 }
             }
+
+            newBoard[to.row][to.col] = pieceToPlace;
+            newBoard[from.row][from.col] = null;
         }
         return newBoard;
     }

@@ -96,12 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- キャンバス設定 ---
     function setupCanvas() {
         const container = document.getElementById('board-container');
-        // コンテナの幅と高さのうち、小さい方を基準に正方形のサイズを決定
-        const size = Math.min(container.clientWidth, container.clientHeight, 600); // 最大サイズも考慮
+        // ★修正: スマホで表示した際にclientHeightが0として計算されてしまうことがあるため、
+        //         正方形である盤面のサイズは、コンテナの幅のみを基準に決定します。
+        //         これにより、レイアウト計算のタイミングに依存せず、常に正しく盤面の大きさを取得できます。
+        const size = Math.min(container.clientWidth, 600);
         const dpr = window.devicePixelRatio || 1;
 
         // CSSでの表示サイズを設定
         canvas.style.width = `${size}px`;
+        // 高さを幅と同じに設定して正方形を保証
         canvas.style.height = `${size}px`;
 
         // 解像度を考慮した実際のピクセル数を設定
