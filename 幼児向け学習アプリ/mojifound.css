@@ -1,0 +1,259 @@
+/* 基本的なスタイル */
+body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: #f0f8ff;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* 文字がはみ出さないように */
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+}
+
+#status-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#score {
+    color: #ff6347; /* あかるいオレンジいろ */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+#timer {
+    color: #1e90ff; /* あかるいあおいろ */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+#game-area {
+    position: relative;
+    width: 100%;
+    height: 60vh; /* ゲームエリアの高さ */
+    background-color: #e6f7ff;
+    border-radius: 15px;
+    border: 3px solid #b3e5fc;
+}
+
+#question-display {
+    color: #0277bd;
+}
+
+#character-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.character {
+    position: absolute;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none; /* テキスト選択を防ぐ */
+    display: inline-block;
+    will-change: transform; /* アニメーションがスムーズになるおまじない */
+    transition: transform 0.2s ease-out;
+    padding: 5px;
+}
+
+/* 震えていない時だけホバー効果を適用する */
+.character:not(.is-shaking):hover {
+    transform: scale(1.2);
+}
+
+/* アニメーション */
+@keyframes scale-pulse {
+    0%, 100% {
+        transform: scale(1) rotate(var(--start-scale-rotate, -3deg));
+    }
+    50% {
+        transform: scale(1.4) rotate(var(--end-scale-rotate, 3deg));
+    }
+}
+
+@keyframes rotate-sway {
+    0%, 100% {
+        transform: rotate(var(--start-sway-rotate, -20deg)) scale(1);
+    }
+    50% {
+        transform: rotate(var(--end-sway-rotate, 20deg)) scale(1.15);
+    }
+}
+
+@keyframes spin-around {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.anim-scale {
+    animation: scale-pulse 3s infinite ease-in-out backwards;
+}
+
+.anim-rotate {
+    animation: rotate-sway 4s infinite ease-in-out backwards;
+}
+
+.anim-spin {
+    animation: spin-around 5s linear infinite backwards;
+}
+
+/* オーバーレイとモーダル */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.modal h2 {
+    font-size: 2.2em;
+    /* カラフルなグラデーションの文字 */
+    background: linear-gradient(45deg, #ff4757, #ffa502, #2ed573, #1e90ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 15px;
+}
+
+/* モーダル内の説明テキスト */
+.modal p {
+    font-size: 1.3em;
+    color: #007bff; /* あかるい あおいろ */
+    margin: 20px 0;
+}
+
+/* 獲得した星の表示スタイル */
+.points-feedback {
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #ff6347; /* あかるいオレンジいろ */
+    margin: 20px 0;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #ffc107;
+    color: #333;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+button:hover {
+    background-color: #ffca28;
+}
+
+/* --- 難易度選択ボタン --- */
+.difficulty-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* ボタン間のすきま */
+    margin-top: 25px;
+}
+
+.difficulty-btn {
+    padding: 12px 20px;
+    font-size: 1.3em;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    color: white;
+    transition: all 0.2s ease;
+    border-bottom: 4px solid transparent;
+}
+
+.difficulty-btn[data-difficulty="easy"] {
+    background-color: #5cb85c; /* みどり */
+    border-bottom-color: #449d44;
+}
+.difficulty-btn[data-difficulty="easy"]:hover { background-color: #6cd26c; }
+
+.difficulty-btn[data-difficulty="normal"] {
+    background-color: #f0ad4e; /* オレンジ */
+    border-bottom-color: #ec971f;
+}
+.difficulty-btn[data-difficulty="normal"]:hover { background-color: #f3bc71; }
+
+.difficulty-btn[data-difficulty="hard"] {
+    background-color: #d9534f; /* あか */
+    border-bottom-color: #c9302c;
+}
+
+/* 「メニューにもどる」ボタンのスタイル */
+#back-to-menu-button {
+    background-color: #4682B4; /* すこし くらめの あおいろ (スチールブルー) */
+    color: white;
+    margin-top: 10px;
+}
+#back-to-menu-button:hover {
+    background-color: #5a9bd8;
+}
+/* 正解時のスターエフェクト */
+.star {
+    position: fixed; /* 画面全体を基準に配置 */
+    width: 15px;
+    height: 15px;
+    background-color: #ffc107; /* 星の色（黄色） */
+    /* CSSで星の形を作る */
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    pointer-events: none; /* 星がクリックの邪魔をしないようにする */
+    z-index: 2000; /* 常に最前面に表示 */
+    /* アニメーションを適用 */
+    animation: starburst-anim 0.8s ease-out forwards;
+}
+
+@keyframes starburst-anim {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        /* JavaScriptで設定したカスタムプロパティを使って移動 */
+        transform: translate(var(--translate-x), var(--translate-y)) scale(0);
+        opacity: 0;
+    }
+}

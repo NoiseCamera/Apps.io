@@ -156,6 +156,10 @@ header p {
     background-color: #efebe9; /* 薄いブラウン */
     border-color: #8d6e63; /* ブラウン */
 }
+.app-link[href="mojifound.html"] {
+    background-color: #ede7f6; /* 薄いディープパープル */
+    border-color: #673ab7; /* ディープパープル */
+}
 
 .app-link:hover {
     transform: translateY(-5px);
@@ -234,6 +238,9 @@ header p {
 }
 .app-link[href="shogi.html"] h3 {
     color: #5d4037;
+}
+.app-link[href="mojifound.html"] h3 {
+    color: #673ab7;
 }
 
 .app-link p {

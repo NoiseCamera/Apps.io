@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ひらがな・カタカナ さがしゲーム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="mojifound.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ひらがな・カタカナ さがしゲーム</h1>
+            <div id="status-bar">
+                <div id="score">スコア: 0</div>
+                <div id="timer">のこりじかん: 60</div>
+            </div>
+        </header>
+
+        <main id="game-area">
+            <h2 id="question-display">「あ」は どこかな？</h2>
+            <div id="character-container">
+                <!-- ここにJavaScriptで文字が追加されます -->
+            </div>
+        </main>
+
+        <div id="start-screen" class="overlay visible">
+            <div class="modal">
+                <h2>ひらがな・カタカナ さがしゲーム</h2>
+                <p>むずかしさを えらんでね！</p>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn" data-difficulty="easy">やさしい (5もじ)</button>
+                    <button class="difficulty-btn" data-difficulty="normal">ふつう (10もじ)</button>
+                    <button class="difficulty-btn" data-difficulty="hard">むずかしい (15もじ)</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="overlay">
+            <div class="modal">
+                <h2>ゲームしゅうりょう！</h2>
+                <p id="final-score">あなたのスコアは 0 てんでした！</p>
+                <p class="points-feedback">★ ほしを <span id="earned-stars"></span>こ ゲット！ ★</p>
+                <button id="restart-button">もういちど あそぶ</button>
+                <button id="back-to-menu-button" style="margin-top: 10px; background-color: #6c757d;">メニューにもどる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="mojifound.js"></script>
+</body>
+</html>

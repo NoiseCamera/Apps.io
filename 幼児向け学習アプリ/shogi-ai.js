@@ -46,33 +46,39 @@ function getAIMove(boardState, level, player) {
 
     switch (level) {
         case 1: // よわい (幼児向け)
-            return findToddlerMove(boardState, allMoves);
+            return findToddlerMove(boardState, allMoves, player);
         case 2: // ふつう (駒取り・成りを優先)
-            return findBestCaptureMove(boardState, allMoves).move;
-        case 3: // つよい
-            // 深さ2で探索するNegaMax法を使用
-            return findBestMoveNegaMax(boardState, 2, player);
+            return findWeakestGoodMove(boardState, allMoves, player);
+        case 3: // つよい (NegaMax法で探索)
+            return findBestMoveNegaMax(boardState, 2, player); // 深さ2で探索
         default:
             return findRandomMove(allMoves);
     }
 }
 /**
  * AIレベル1: 幼児向け
- * - 80%の確率でランダムな手を指す
- * - 20%の確率で、取れる駒があればそれを取る
+ * - 90%の確率でランダムな手を指す
+ * - 10%の確率で、取れる駒があればその中からランダムに1つ取ってみる
  * @param {Array} boardState - 盤面状態
  * @param {Array} allMoves - 全ての合法手
+ * @param {string} player - AIプレイヤー名
  * @returns {object} 選択された手
  */
-function findToddlerMove(boardState, allMoves) {
-    if (Math.random() < 0.2) {
-        const captureMove = findBestCaptureMove(boardState, allMoves);
-        // 取れる駒がある、または成れる手があればそれを優先
-        if (captureMove.score > 0) {
-            return captureMove.move;
+function findToddlerMove(boardState, allMoves, player) {
+    // 10%の確率で駒を取ることを試みる
+    if (Math.random() < 0.1) {
+        const captureMoves = allMoves.filter(move => {
+            const targetPiece = boardState[move.to.row][move.to.col];
+            // 相手の駒を取る手
+            return targetPiece && targetPiece.owner !== player;
+        });
+
+        if (captureMoves.length > 0) {
+            // 取れる駒があるなら、その中からランダムに選ぶ
+            return findRandomMove(captureMoves);
         }
     }
-    // 基本的にはランダム
+    // 基本的には完全にランダムな手
     return findRandomMove(allMoves);
 }
 
@@ -85,47 +91,49 @@ function findRandomMove(allMoves) {
     const randomIndex = Math.floor(Math.random() * allMoves.length);
     return allMoves[randomIndex];
 }
+
 /**
- * AIレベル2: 駒取り・成り優先
- * 最も価値の高い駒を取る手、または最も価値の上がる成りを探す
+ * AIレベル2: 駒取りはするけど、一番価値の低い駒を狙う
+ * 取れる駒の中では一番価値の低いものを、成れる場合は価値の上がりが少ないものを優先する
  * @param {Array} boardState - 盤面状態
  * @param {Array} allMoves - 全ての合法手
- * @returns {{move: object, score: number}} 最も評価の高い手とそのスコア
+ * @param {string} player - AIプレイヤー名
+ * @returns {object} 選択された手
  */
-function findBestCaptureMove(boardState, allMoves) {
-    let bestMove = allMoves[0];
-    let maxScore = -Infinity;
+function findWeakestGoodMove(boardState, allMoves, player) {
+    let movesWithScore = [];
 
     for (const move of allMoves) {
-        let currentScore = 0;
+        let score = 0;
         const { piece, to, promote } = move;
 
-        // 1. 駒を取る場合の評価
+        // 駒取り評価: 価値の低い駒を取るほど高得点
         const targetPiece = boardState[to.row][to.col];
-        if (targetPiece) {
-            currentScore += PIECE_VALUES[targetPiece.name] || 0;
+        if (targetPiece && targetPiece.owner !== player) {
+            score += 100 - (PIECE_VALUES[targetPiece.name] || 0);
         }
 
-        // 2. 成る場合の評価
+        // 成り評価: 価値の上昇が少ないほど高得点
         if (promote) {
             const originalValue = PIECE_VALUES[piece.name] || 0;
             const promotedName = PIECE_DATA[piece.name].promoted;
             const promotedValue = PIECE_VALUES[promotedName] || 0;
-            currentScore += (promotedValue - originalValue);
+            score += 10 - (promotedValue - originalValue);
         }
 
-        if (currentScore > maxScore) {
-            maxScore = currentScore;
-            bestMove = move;
+        if (score > 0) {
+            movesWithScore.push({ move, score });
         }
     }
 
-    // 評価が0（駒取りも成りもない）場合は、ランダムな手を選ぶ
-    if (maxScore <= 0) {
-        return { move: findRandomMove(allMoves), score: 0 };
+    // 評価できる手（駒取り or 成り）がなければランダム
+    if (movesWithScore.length === 0) {
+        return findRandomMove(allMoves);
     }
 
-    return { move: bestMove, score: maxScore };
+    // 最もスコアが高い（＝一番しょぼい）手を選ぶ
+    movesWithScore.sort((a, b) => b.score - a.score);
+    return movesWithScore[0].move;
 }
 
 /**
@@ -159,14 +167,14 @@ function evaluateBoard(boardState, player) {
     }
 
     // 持ち駒の評価
-    const playerCaptured = boardState.playerCaptured || [];
-    const opponentCaptured = boardState.opponentCaptured || [];
+    const humanCaptured = boardState.playerCaptured || [];
+    const aiCaptured = boardState.opponentCaptured || [];
 
-    playerCaptured.forEach(p => {
+    humanCaptured.forEach(p => {
         const value = PIECE_VALUES[p.name] || 0;
         totalScore += (player === HUMAN_PLAYER) ? value : -value;
     });
-    opponentCaptured.forEach(p => {
+    aiCaptured.forEach(p => {
         const value = PIECE_VALUES[p.name] || 0;
         totalScore += (player === AI_PLAYER) ? value : -value;
     });
@@ -181,6 +189,7 @@ function evaluateBoard(boardState, player) {
 
     return totalScore;
 }
+
 /**
  * AIレベル3: NegaMax法による探索
  * @param {Array} boardState - 盤面状態

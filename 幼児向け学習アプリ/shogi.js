@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const boardElement = document.getElementById('shogi-board');
     const playerCapturedElement = document.getElementById('player-captured-pieces').querySelector('.pieces-holder');
     const opponentCapturedElement = document.getElementById('opponent-captured-pieces').querySelector('.pieces-holder');
+    // 持ち駒エリアのラベル要素 (HTML側に .captured-pieces-label があることを想定)
+    const playerCapturedLabel = document.getElementById('player-captured-pieces')?.querySelector('.captured-pieces-label');
+    const opponentCapturedLabel = document.getElementById('opponent-captured-pieces')?.querySelector('.captured-pieces-label');
     const turnDisplay = document.getElementById('turn-display');
     const undoBtn = document.getElementById('undo-btn');
     const pauseBtn = document.getElementById('pause-btn');
@@ -16,26 +19,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameModeModal = document.getElementById('game-mode-modal');
     const aiLevelModal = document.getElementById('ai-level-modal');
     const gameResultModal = document.getElementById('game-result-modal');
+    const playerSelectionModal = document.getElementById('player-selection-modal');
     const aiThinkingModal = document.getElementById('ai-thinking-modal');
     const promotionModal = document.getElementById('promotion-modal');
     const pauseModal = document.getElementById('pause-modal');
     const viewBoardBtn = document.getElementById('view-board-btn');
+    const aiHelpModal = document.getElementById('ai-help-modal');
+    const illegalMoveModal = document.getElementById('illegal-move-modal');
+    const illegalMoveText = document.getElementById('illegal-move-text');
 
+    const howToPlayModal = document.getElementById('how-to-play-modal'); // 遊び方モーダル
     // --- UI要素 ---
     const watchControls = document.getElementById('watch-controls');
     const pointsCounter = document.getElementById('points-counter');
     const settingsBtn = document.getElementById('settings-btn');
+    let rotateBtn = null; // 人対人対戦用の盤面回転ボタン
     // --- ゲーム状態管理 ---
     let board = []; // 9x9の盤面状態を保持する2次元配列
     let currentPlayer = 'player'; // 'player' or 'opponent'
     let selectedPiece = null; // { piece, row, col, isCaptured }
     let gameMode = null; // 'ai', 'human', 'tsume', 'watch'
     let aiLevel = 1;
+    let sentePlayerName = 'ぼく';
+    let gotePlayerName = 'おじいちゃん';
     let gameHistory = []; // 手の履歴を保存する配列
     let aiWatchSpeed = 'normal'; // 'fast', 'normal', 'slow'
     let lastMove = null; // { from: {row, col}, to: {row, col} }
     let isGameOver = false;
     let promotionPromise = null; // 成り確認のPromiseを管理
+    let undoUsedThisTurn = false; // このターンで「まった」を使ったか
     // 一時停止関連
     let isPaused = false;
     let wasPausedBeforeSettings = false;
@@ -103,6 +115,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 'size-xs'; // 極小
         }
     }
+
+    // --- 「遊び方」ボタンの追加 ---
+    const modeButtonsContainer = gameModeModal.querySelector('.mode-btn')?.parentNode;
+    if (modeButtonsContainer) {
+        const howToPlayBtn = document.createElement('button');
+        howToPlayBtn.id = 'how-to-play-btn';
+        howToPlayBtn.className = 'mode-btn'; // 既存のボタンスタイルを流用
+        howToPlayBtn.textContent = 'しょうぎのあそびかた';
+
+        // スタイルを少し調整して他のボタンと区別
+        howToPlayBtn.style.backgroundColor = '#28a745'; // 目立ちやすい緑色
+        howToPlayBtn.style.borderColor = '#218838';
+        howToPlayBtn.style.marginTop = '15px'; // 上のボタンとの間隔
+
+        howToPlayBtn.addEventListener('click', () => {
+            if (gameModeModal) gameModeModal.classList.add('hidden'); // メニューを隠す
+            if (howToPlayModal) howToPlayModal.classList.remove('hidden'); // 遊び方モーダルを表示
+        });
+
+        modeButtonsContainer.appendChild(howToPlayBtn);
+    }
+
     // --- モード選択ボタンのイベントリスナー ---
     gameModeModal.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -124,8 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     aiLevelModal.classList.remove('hidden');
                     break;
                 case 'human':
-                    gameMode = 'human';
-                    startGame();
+                    playerSelectionModal.classList.remove('hidden');
                     break;
                 case 'watch':
                     gameMode = 'watch';
@@ -150,6 +183,96 @@ document.addEventListener('DOMContentLoaded', () => {
         gameModeModal.classList.remove('hidden');
     });
 
+    // --- 対戦者選択モーダルのイベントリスナー ---
+    const senteSelection = playerSelectionModal.querySelector('#sente-selection');
+    const goteSelection = playerSelectionModal.querySelector('#gote-selection');
+
+    function handlePlayerSelection(e, container, playerType) {
+        const button = e.target.closest('.player-btn');
+        if (!button) return;
+
+        // 「じぶんでにゅうりょく」ボタンの処理
+        if (button.dataset.action === 'custom-input') {
+            // ボタンのHTMLに<br>が含まれているかで、デフォルト状態か判断
+            const isDefaultText = button.innerHTML.includes('<br>');
+            const currentName = !isDefaultText ? button.textContent : '';
+            const newName = prompt('なまえを いれてね', currentName);
+            if (newName && newName.trim() !== '') {
+                button.textContent = newName.trim(); // ユーザーが入力した名前をセット
+            } else {
+                // 入力がキャンセルされたり空だった場合は何もしない
+                return;
+            }
+        }
+
+        // 選択状態を更新
+        container.querySelectorAll('.player-btn').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+
+        // プレイヤー名を保存
+        if (playerType === 'sente') {
+            sentePlayerName = button.textContent;
+        } else {
+            gotePlayerName = button.textContent;
+        }
+    }
+
+    senteSelection.addEventListener('click', (e) => handlePlayerSelection(e, senteSelection, 'sente'));
+    goteSelection.addEventListener('click', (e) => handlePlayerSelection(e, goteSelection, 'gote'));
+
+    playerSelectionModal.querySelector('#start-human-game-btn').addEventListener('click', () => {
+        gameMode = 'human';
+        playerSelectionModal.classList.add('hidden');
+        startGame();
+    });
+
+    playerSelectionModal.querySelector('.back-btn').addEventListener('click', () => {
+        playerSelectionModal.classList.add('hidden');
+        gameModeModal.classList.remove('hidden');
+    });
+
+
+    // --- AIつよさ説明モーダルのイベントリスナー ---
+    const showAiHelpBtn = document.getElementById('show-ai-help-btn');
+    const closeAiHelpBtn = aiHelpModal.querySelector('.close-btn');
+
+    showAiHelpBtn.addEventListener('click', () => {
+        aiHelpModal.classList.remove('hidden');
+    });
+
+    closeAiHelpBtn.addEventListener('click', () => {
+        aiHelpModal.classList.add('hidden');
+    });
+
+    // モーダルの外側（オーバーレイ）をクリックしたときに閉じる
+    aiHelpModal.addEventListener('click', (e) => {
+        // クリックされた要素がオーバーレイ自身か確認
+        if (e.target === aiHelpModal) {
+            aiHelpModal.classList.add('hidden');
+        }
+    });
+
+    // --- 「遊び方」モーダルのイベントリスナー ---
+    if (howToPlayModal) {
+        // モーダルを閉じてメニューを再表示する共通の関数
+        const closeHowToPlayModal = () => {
+            howToPlayModal.classList.add('hidden');
+            gameModeModal.classList.remove('hidden');
+        };
+
+        // 3つの閉じる操作（×ボタン、とじるボタン、オーバーレイ）に共通の関数を割り当てる
+        const closeSpan = howToPlayModal.querySelector('.close-btn');
+        if (closeSpan) closeSpan.addEventListener('click', closeHowToPlayModal);
+
+        const closeButton = document.getElementById('close-how-to-play-modal-btn');
+        if (closeButton) closeButton.addEventListener('click', closeHowToPlayModal);
+
+        // モーダルの外側（オーバーレイ）をクリックしたときに閉じる
+        howToPlayModal.addEventListener('click', (e) => {
+            if (e.target === howToPlayModal) closeHowToPlayModal();
+        });
+    }
+
     // --- その他のUIイベントリスナー ---
     document.getElementById('back-to-menu-from-result-btn').addEventListener('click', resetGame);
     document.getElementById('play-again-btn').addEventListener('click', () => {
@@ -166,6 +289,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('back-to-menu-from-game-btn').addEventListener('click', resetGame);
     undoBtn.addEventListener('click', handleUndoClick);
     pauseBtn.addEventListener('click', toggleManualPause);
+    // 禁じ手警告モーダルの閉じるボタン
+    document.getElementById('close-illegal-move-modal-btn').addEventListener('click', () => {
+        illegalMoveModal.classList.add('hidden');
+    });
+
+    // --- 回転ボタンの作成と設定 ---
+    function createRotateButton() {
+        if (document.getElementById('rotate-btn')) return;
+
+        const btn = document.createElement('button');
+        btn.id = 'rotate-btn';
+        btn.textContent = '盤面を回転';
+        btn.className = 'game-control-btn hidden'; // 汎用クラスと初期非表示
+
+        btn.addEventListener('click', () => {
+            gameContainer.classList.toggle('view-rotated');
+            document.body.classList.toggle('game-view-rotated'); // bodyにもクラスを付与
+        });
+
+        // 「まった」ボタンの隣に挿入
+        undoBtn.parentNode.insertBefore(btn, undoBtn.nextSibling);
+        rotateBtn = btn;
+    }
+    createRotateButton();
 
     // ゲームの一時停止・再開イベントをリッスン
     window.addEventListener('gamePaused', () => {
@@ -225,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameOver = false;
         selectedPiece = null;
         lastMove = null;
+        undoUsedThisTurn = false; // 「まった」使用フラグをリセット
         gameHistory = [];
         currentPlayer = PLAYER;
 
@@ -232,6 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeBoard();
         renderBoard();
         updateTurnDisplay();
+        updateCapturedPieceLabels();
 
         // 観戦モードの場合のみ速度コントロールを表示し、「まった」ボタンを隠す
         if (gameMode === 'watch') {
@@ -244,7 +393,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             watchControls.classList.add('hidden');
             undoBtn.classList.remove('hidden');
-            pauseBtn.classList.add('hidden');
+            pauseBtn.classList.add('hidden'); // AI戦、人対人戦では非表示
+
+            // 人と対戦モードの時だけ回転ボタンを表示
+            if (rotateBtn) {
+                if (gameMode === 'human') {
+                    rotateBtn.classList.remove('hidden');
+                } else {
+                    rotateBtn.classList.add('hidden');
+                }
+            }
         }
         gameHistory.push(cloneBoardState(board, currentPlayer, lastMove));
         updateUndoButtonState();
@@ -268,18 +426,31 @@ document.addEventListener('DOMContentLoaded', () => {
         gameMode = null;
         currentPlayer = PLAYER;
         selectedPiece = null;
+        undoUsedThisTurn = false; // 「まった」使用フラグをリセット
+        sentePlayerName = 'ぼく'; // プレイヤー名をリセット
+        gotePlayerName = 'おじいちゃん'; // プレイヤー名をリセット
         isPaused = false; // 一時停止状態をリセット
+        // カスタム入力ボタンのテキストをリセット
+        const senteCustomBtn = document.getElementById('sente-custom-btn');
+        const goteCustomBtn = document.getElementById('gote-custom-btn');
+        if(senteCustomBtn) senteCustomBtn.innerHTML = 'じぶんで<br>にゅうりょく';
+        if(goteCustomBtn) goteCustomBtn.innerHTML = 'じぶんで<br>にゅうりょく';
         wasPausedBeforeSettings = false; // 記憶した状態もリセット
         if (aiTurnTimeoutId) clearTimeout(aiTurnTimeoutId); // 残っているタイマーをクリア
         lastMove = null;
         updateMoveGuide(null); // ガイドをリセット
         renderBoard(); // 空の盤面を描画
         gameResultModal.classList.add('hidden');
+        gameContainer.classList.remove('view-rotated'); // 回転状態をリセット
         gameModeModal.classList.remove('hidden');
+        playerSelectionModal.classList.add('hidden');
         watchControls.classList.add('hidden'); // 観戦モードUIを非表示
         undoBtn.classList.add('hidden');
+        if (rotateBtn) rotateBtn.classList.add('hidden');
         pauseBtn.classList.add('hidden');
         pauseModal.classList.add('hidden');
+        document.body.classList.remove('game-view-rotated'); // bodyのクラスもリセット
+        updateCapturedPieceLabels(); // ラベルをデフォルトに戻す
     }
 
     /**
@@ -319,8 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function renderBoard() {
         boardElement.innerHTML = '';
-        playerCapturedElement.innerHTML = '';
-        opponentCapturedElement.innerHTML = '';
 
         // 盤面のマスを描画
         for (let r = 0; r < 9; r++) {
@@ -345,9 +514,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         // 持ち駒を描画
+        renderAllCapturedPieces();
+        highlightLastMove();
+    }
+
+    /**
+     * 全ての持ち駒を描画する。盤面の回転状態を考慮して描画先を決定する。
+     */
+    function renderAllCapturedPieces() {
+        // 両方のコンテナをクリア
+        playerCapturedElement.innerHTML = '';
+        opponentCapturedElement.innerHTML = '';
+
+        // 常に固定の場所に描画（CSSがコンテナごと入れ替える）
         renderCapturedPieces(board.playerCaptured, playerCapturedElement, PLAYER);
         renderCapturedPieces(board.opponentCaptured, opponentCapturedElement, OPPONENT);
-        highlightLastMove();
     }
 
     /**
@@ -398,8 +579,43 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (gameMode === 'ai') {
             turnDisplay.textContent = (currentPlayer === PLAYER) ? "あなたのばん" : "AIのばん";
         } else { // human
-            turnDisplay.textContent = (currentPlayer === PLAYER) ? "あなたのばん" : "あいてのばん";
+            turnDisplay.textContent = (currentPlayer === PLAYER) ? `${sentePlayerName} のばん` : `${gotePlayerName} のばん`;
         }
+    }
+
+    /**
+     * 持ち駒エリアのプレイヤー名を更新する
+     */
+    function updateCapturedPieceLabels() {
+        // HTML側に .captured-pieces-label が存在することを前提としています
+        if (!playerCapturedLabel || !opponentCapturedLabel) return;
+
+        // ゲームが開始されていない場合はデフォルトの表示に戻す
+        if (gameMode === null) {
+            playerCapturedLabel.textContent = 'せんてのもちごま';
+            opponentCapturedLabel.textContent = 'ごてのもちごま';
+            return;
+        }
+
+        // ゲームモードに応じた名前を取得
+        let senteName, goteName;
+        if (gameMode === 'watch') {
+            senteName = 'せんて(AI)';
+            goteName = 'ごて(AI)';
+        } else if (gameMode === 'ai') {
+            senteName = 'あなた';
+            goteName = 'AI';
+        } else { // human
+            senteName = sentePlayerName;
+            goteName = gotePlayerName;
+        }
+
+        const senteLabelText = `${senteName}のもちごま`;
+        const goteLabelText = `${goteName}のもちごま`;
+
+        // 常に固定の場所に描画（CSSがコンテナごと入れ替える）
+        playerCapturedLabel.textContent = senteLabelText;
+        opponentCapturedLabel.textContent = goteLabelText;
     }
 
     /**
@@ -450,17 +666,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 isCaptured: selectedPiece.isCaptured
             };
 
-            // 合法手かチェック
-            const possibleMoves = getPossibleMovesForPiece(board, selectedPiece.piece, selectedPiece.row, selectedPiece.col, selectedPiece.isCaptured);
-            const isValidMove = possibleMoves.some(p => p.row === row && p.col === col);
+            // ★変更: まずは駒の動きのルールだけで移動可能か（擬似合法手か）をチェック
+            const pseudoLegalMoves = getPseudoLegalMovesForPiece(board, selectedPiece.piece, selectedPiece.row, selectedPiece.col, selectedPiece.isCaptured);
+            const isPseudoLegalMove = pseudoLegalMoves.some(p => p.row === row && p.col === col);
 
-            if (isValidMove) {
-                await executeMove(move);
+            if (isPseudoLegalMove) {
+                // ★変更: 次に、その手で王様が取られる状態（王手放置）にならないか、という禁じ手ルールをチェック
+                const tempBoard = applyMoveToBoard(board, move);
+                if (isCheck(tempBoard, currentPlayer)) {
+                    // 禁じ手なので警告モーダルを表示する
+                    // ★変更: 王手されている状況かどうかでメッセージを出し分ける
+                    const wasAlreadyInCheck = isCheck(board, currentPlayer);
+                    if (wasAlreadyInCheck) {
+                        showIllegalMoveModal('must_escape_check');
+                    } else {
+                        showIllegalMoveModal('self_check');
+                    }
+                } else {
+                    // 合法手なので実行
+                    await executeMove(move);
+                }
             } else {
-                // 不正な移動先なので、選択を解除するか、別の自駒なら選択し直す
+                // 擬似合法手ですらない（駒の動きのルール外）ので、選択を解除するか、別の自駒なら選択し直す
                 if (clickedPieceData && clickedPieceData.owner === currentPlayer) {
                     selectPiece(clickedPieceData, row, col, false);
                 } else {
+                    // 警告音を鳴らすなどしても良い
+                    // playSE('assets/sounds/error.mp3');
                     deselectPiece();
                 }
             }
@@ -470,6 +702,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectPiece(clickedPieceData, row, col, false);
             }
         }
+    }
+
+    /**
+     * 禁じ手警告モーダルを表示する
+     */
+    function showIllegalMoveModal(reason = 'general') {
+        if (typeof playSE === 'function') {
+            playSE('assets/sounds/fuseikai.mp3');
+        }
+        let message = '';
+        switch (reason) {
+            case 'must_escape_check':
+                message = 'おうさまが「おうて」されてるよ！<br>たすけてあげてね！';
+                break;
+            case 'self_check':
+                message = 'そのばしょにうごかすと<br>おうさまがとられちゃうよ！';
+                break;
+            case 'undo_limit':
+                message = 'まったは いちどの ばんで<br>いっかいしか つかえないよ';
+                break;
+            default:
+                message = 'しょうぎのルールでは<br>そこには うごけないよ！';
+                break;
+        }
+        illegalMoveText.innerHTML = message;
+        illegalMoveModal.classList.remove('hidden');
     }
 
     /**
@@ -528,7 +786,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!selectedPiece) return;
 
         const { piece, row, col, isCaptured } = selectedPiece;
-        const possibleMoves = getPossibleMovesForPiece(board, piece, row, col, isCaptured);
+        // ★変更: 禁じ手を含めた、見た目上動けるマスをすべてハイライトする
+        const possibleMoves = getPseudoLegalMovesForPiece(board, piece, row, col, isCaptured);
 
         possibleMoves.forEach(move => {
             const cell = boardElement.querySelector(`[data-row='${move.row}'][data-col='${move.col}']`);
@@ -734,10 +993,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // at the final size. For board pieces, the start and end sizes are the same.
             clone.style.setProperty('--end-scale', '1');
 
-            // AI(相手)の駒の向きをアニメーション中に維持する
-            const rotation = piece.owner === OPPONENT ? 'rotate(180deg)' : 'rotate(0deg)';
-            clone.style.setProperty('--piece-rotation', rotation);
-
             // アニメーションクラスを付与
             clone.classList.add('piece-moving-arc');
 
@@ -877,32 +1132,41 @@ document.addEventListener('DOMContentLoaded', () => {
      * 「まった」ボタンがクリックされたときの処理
      */
     function handleUndoClick() {
+        // このターンで既に使っていたら警告モーダルを表示
+        if (undoUsedThisTurn) {
+            showIllegalMoveModal('undo_limit');
+            return;
+        }
+        // AIのターンだったり、ゲームオーバーなら戻れない
         if (isGameOver || (gameMode === 'ai' && currentPlayer === OPPONENT)) return;
 
         // 履歴が1つ（初期状態）しかない場合は戻れない
         if (gameHistory.length <= 1) return;
 
+        let stateToRestore;
+
         // AI戦でプレイヤーのターンの場合、2手戻す（プレイヤーの手 + AIの応手）
         if (gameMode === 'ai' && currentPlayer === PLAYER) {
-            if (gameHistory.length > 2) {
-                gameHistory.pop(); // AIの応手
-                gameHistory.pop(); // プレイヤーの手
-            } else {
-                gameHistory.pop(); // プレイヤーの手
+            // 2手戻すには、初期状態 + プレイヤーの手 + AIの手 の最低3つの履歴が必要
+            if (gameHistory.length >= 3) {
+                gameHistory.pop(); // AIの応手の前の状態を破棄
+                stateToRestore = gameHistory.pop(); // 復元したいのは、プレイヤーが指す前の状態
             }
         } else {
             // それ以外（対人戦）は1手戻す
-            gameHistory.pop();
+            stateToRestore = gameHistory.pop();
         }
 
-        // 履歴の最新の状態を復元
-        const lastState = gameHistory[gameHistory.length - 1];
-        restoreFromState(lastState);
+        // 復元する状態があれば、その状態に戻す
+        if (stateToRestore) {
+            restoreFromState(stateToRestore);
+            undoUsedThisTurn = true; // 「まった」を使用したことを記録
+        }
 
         // UIを更新
         renderBoard();
         updateTurnDisplay();
-        updateUndoButtonState();
+        updateUndoButtonState(); // ボタンの状態を更新
         deselectPiece(); // 選択状態を解除
     }
 
@@ -951,17 +1215,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resultTitle.textContent = reasonText; // 「詰み」や「投了」を大きく表示
 
+        const winnerName = (winner === PLAYER) ? sentePlayerName : gotePlayerName;
+        const loserName = (winner === PLAYER) ? gotePlayerName : sentePlayerName;
+
         if (gameMode === 'watch') {
             // 観戦モードの場合
-            const winnerName = (winner === PLAYER) ? 'せんて(AI)' : 'ごて(AI)';
-            resultMessage.textContent = `${winnerName} の かち！\nすごい しょうぶだったね！`;
+            const aiWinnerName = (winner === PLAYER) ? 'せんて(AI)' : 'ごて(AI)';
+            resultMessage.textContent = `${aiWinnerName} の かち！\nすごい しょうぶだったね！`;
         } else {
             // 通常の対戦モードの場合
             if (winner === PLAYER) {
-                resultMessage.textContent = 'あなたの かち！ おめでとう！';
+                resultMessage.textContent = `${winnerName} の かち！ おめでとう！`;
                 addPoints(5); // 勝利で5ポイント
             } else {
-                resultMessage.textContent = 'あなたの まけ… つぎは がんばろう！';
+                resultMessage.textContent = `${loserName} の まけ… つぎは ${winnerName} の かち！`;
             }
         }
         gameResultModal.classList.remove('hidden');
@@ -972,6 +1239,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function switchPlayer() {
         currentPlayer = (currentPlayer === PLAYER) ? OPPONENT : PLAYER;
+        undoUsedThisTurn = false; // ターンが切り替わったので、次のプレイヤーは「まった」を使える
         updateTurnDisplay();
     }
 
@@ -994,6 +1262,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 思考時間を待つ
         await new Promise(resolve => setTimeout(resolve, thinkingTime));
+
+        // 待っている間にゲームがリセットされたり一時停止された場合は、ここで処理を中断
+        if (isGameOver || isPaused) return;
 
         // shogi-ai.js の getAIMove を呼び出す
         const bestMove = getAIMove(board, aiLevel, currentPlayer);
@@ -1042,8 +1313,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function updateUndoButtonState() {
         if (!undoBtn) return;
-        // 履歴が1つ（初期状態）より多い場合、かつAIのターン中でない場合に有効化
-        undoBtn.disabled = gameHistory.length <= 1 || (gameMode === 'ai' && currentPlayer === OPPONENT);
+        // 履歴が1つより多い、AIのターン中でない、このターンでまだ「まった」を使っていない、場合に有効化
+        undoBtn.disabled = undoUsedThisTurn || gameHistory.length <= 1 || (gameMode === 'ai' && currentPlayer === OPPONENT);
     }
 
     // --- ゲームロジック関数 (グローバルスコープ) ---
@@ -1103,7 +1374,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return newBoard;
     }
     /**
-     * 特定の駒が移動可能なすべてのマスを返す（禁じ手は考慮しない）
+     * 特定の駒が移動可能なすべてのマスを返す（王手放置などの禁じ手は考慮しない、擬似合法手）
+     * 主にUIのハイライト用
      * @param {Array} boardState - 盤面状態
      * @param {object} piece - 駒オブジェクト
      * @param {number} row - 駒の行 (-1なら持ち駒)
@@ -1111,7 +1383,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {boolean} isCaptured - 持ち駒かどうか
      * @returns {Array<{row: number, col: number}>} - 移動可能なマスの配列
      */
-    window.getPossibleMovesForPiece = function (boardState, piece, row, col, isCaptured) {
+    function getPseudoLegalMovesForPiece(boardState, piece, row, col, isCaptured) {
         if (isCaptured) {
             // 持ち駒を打つ場合
             const moves = [];
@@ -1152,40 +1424,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const [dr, dc] = move;
             const isInfinite = Math.abs(dr) === Infinity || Math.abs(dc) === Infinity;
 
-            if (isInfinite) {
-                // 飛車、角、香車のような長い動き
-                const rStep = Math.sign(dr);
-                const cStep = Math.sign(dc);
+            if (isInfinite) { // 飛車、角、香車のような長い動き
+                const rStep = Math.sign(dr), cStep = Math.sign(dc);
                 for (let i = 1; i < 9; i++) {
-                    const newRow = row + (i * rStep * direction);
-                    const newCol = col + (i * cStep * direction);
-
+                    const newRow = row + (i * rStep * direction), newCol = col + (i * cStep * direction);
                     if (newRow < 0 || newRow >= 9 || newCol < 0 || newCol >= 9) break;
                     const targetPiece = boardState[newRow][newCol];
-                    if (targetPiece) {
-                        // 相手の駒で、かつ王様でなければ取れる
-                        if (targetPiece.owner !== piece.owner && targetPiece.name !== '王' && targetPiece.name !== '玉') {
-                            moves.push({ row: newRow, col: newCol });
-                        }
-                        break; // 自分の駒か相手の王様なら、そこで止まる
-                    }
+                    if (targetPiece) { if (targetPiece.owner !== piece.owner) moves.push({ row: newRow, col: newCol }); break; }
                     moves.push({ row: newRow, col: newCol });
                 }
-            } else {
-                // 短い動き
-                const newRow = row + (dr * direction);
-                const newCol = col + (dc * direction);
+            } else { // 短い動き
+                const newRow = row + (dr * direction), newCol = col + (dc * direction);
                 if (newRow >= 0 && newRow < 9 && newCol >= 0 && newCol < 9) {
                     const targetPiece = boardState[newRow][newCol];
-                    // 空きマスか、相手の駒（王様以外）なら移動できる
-                    if (!targetPiece || (targetPiece.owner !== piece.owner && targetPiece.name !== '王' && targetPiece.name !== '玉')) {
-                        moves.push({ row: newRow, col: newCol });
-                    }
+                    if (!targetPiece || targetPiece.owner !== piece.owner) moves.push({ row: newRow, col: newCol });
                 }
             }
         }
         return moves;
     }
+    /**
+     * 特定の駒が移動可能なすべてのマスを返す（禁じ手は考慮しない）
+     * @param {Array} boardState - 盤面状態
+     * @param {object} piece - 駒オブジェクト
+     * @param {number} row - 駒の行 (-1なら持ち駒)
+     * @param {number} col - 駒の列 (-1なら持ち駒)
+     * @param {boolean} isCaptured - 持ち駒かどうか
+     * @returns {Array<{row: number, col: number}>} - 移動可能なマスの配列
+     */
+    window.getPossibleMovesForPiece = function (boardState, piece, row, col, isCaptured) {
+        // まず、駒の動きのルールだけで移動可能なマス（擬似合法手）をすべてリストアップする
+        const pseudoLegalMoves = getPseudoLegalMovesForPiece(boardState, piece, row, col, isCaptured);
+
+        // 王手放置になる手（反則手）を除外する
+        const legalMoves = pseudoLegalMoves.filter(move => {
+            const tempMove = { piece, from: { row, col }, to: move, isCaptured };
+            const tempBoard = applyMoveToBoard(boardState, tempMove);
+            return !isCheck(tempBoard, piece.owner);
+        });
+
+        return legalMoves;
+    }
+
     /**
      * 特定の駒が攻撃可能なすべてのマスを返す（王を取る動きも含む、禁じ手は考慮しない）
      * isCheckの判定のために使用する

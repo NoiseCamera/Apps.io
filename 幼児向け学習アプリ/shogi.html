@@ -27,13 +27,13 @@
 
     <div id="shogi-app-container">
         <header>
-            <h1>わくわく しょうぎ</h1>
+            <h1>わくわくしょうぎ</h1>
         </header>
 
         <main id="game-container" class="hidden">
             <!-- 相手の持ち駒エリア (右上) -->
             <div id="opponent-captured-pieces" class="captured-pieces-area">
-                <div class="player-name">あいて</div>
+                <div class="captured-pieces-label">ごてのもちごま</div>
                 <div class="pieces-holder"></div>
             </div>
 
@@ -45,7 +45,7 @@
                 <!-- AI思考中モーダルを盤面の中央に表示するため、ラッパー内に移動 -->
                 <div id="ai-thinking-modal" class="board-overlay hidden">
                     <div class="modal-content">
-                        <p>AIが かんがえちゅう…</p>
+                        <p>AIがかんがえちゅう…</p>
                         <div class="loader"></div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
 
             <!-- 自分の持ち駒エリア (左下) -->
             <div id="player-captured-pieces" class="captured-pieces-area">
-                <div class="player-name">じぶん</div>
+                <div class="captured-pieces-label">せんてのもちごま</div>
                 <div class="pieces-holder"></div>
             </div>
 
@@ -61,7 +61,7 @@
             <div id="right-panel">
                 <aside id="move-guide">
                     <h3>うごかしかた</h3>
-                    <div id="guide-piece-name">こまを えらんでね</div>
+                    <div id="guide-piece-name">こまをえらんでね</div>
                     <div id="guide-board-container">
                         <div id="guide-board">
                             <!-- 駒の動きがここに表示されます -->
@@ -99,21 +99,140 @@
         <!-- ゲームモード選択モーダル -->
         <div id="game-mode-modal" class="modal-overlay">
             <div class="modal-content">
-                <h2>あそびかたを えらんでね</h2>
-                <button class="mode-btn" data-mode="ai">AIと たいせん</button>
-                <button class="mode-btn" data-mode="human">ひとと たいせん</button>
-                <button class="mode-btn" data-mode="watch">AIを かんせん</button>
+                <h2>あそびかたをえらんでね</h2>
+                <button class="mode-btn" data-mode="ai">AIとたいせん</button>
+                <button class="mode-btn" data-mode="human">ひととたいせん</button>
+                <button class="mode-btn" data-mode="watch">AIをかんせん</button>
             </div>
         </div>
 
         <!-- AIレベル選択モーダル -->
         <div id="ai-level-modal" class="modal-overlay hidden">
             <div class="modal-content">
-                <h2>AIのつよさを えらんでね</h2>
+                <div class="modal-header">
+                    <h2>AIのつよさをえらんでね</h2>
+                    <button id="show-ai-help-btn" class="help-btn">？</button>
+                </div>
                 <button class="level-btn" data-level="1">よわい</button>
                 <button class="level-btn" data-level="2">ふつう</button>
                 <button class="level-btn" data-level="3">つよい</button>
                 <button class="back-btn" style="margin-top: 20px;">もどる</button>
+            </div>
+        </div>
+
+        <!-- 対戦者選択モーダル -->
+        <div id="player-selection-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>たいせんするひとをえらんでね</h2>
+                <div class="player-selection-container">
+                    <div class="player-side">
+                        <h3>せんて</h3>
+                        <div id="sente-selection" class="player-btn-group">
+                            <button class="player-btn selected">ぼく</button>
+                            <button class="player-btn">わたし</button>
+                            <button class="player-btn">おとうさん</button>
+                            <button class="player-btn">おかあさん</button>
+                            <button class="player-btn">おにいちゃん</button>
+                            <button class="player-btn">おねえちゃん</button>
+                            <button class="player-btn">いもうと</button>
+                            <button class="player-btn">おとうと</button>
+                            <button class="player-btn">おじいちゃん</button>
+                            <button class="player-btn">おばあちゃん</button>
+                            <button class="player-btn">いとこ</button>
+                            <button class="player-btn">おじさん</button>
+                            <button class="player-btn">おばさん</button>
+                            <button class="player-btn">せんせい</button>
+                            <button id="sente-custom-btn" class="player-btn" data-action="custom-input">じぶんで<br>にゅうりょく</button>
+                        </div>
+                    </div>
+                    <div class="player-side">
+                        <h3>ごて</h3>
+                        <div id="gote-selection" class="player-btn-group">
+                            <button class="player-btn">ぼく</button>
+                            <button class="player-btn">わたし</button>
+                            <button class="player-btn">おとうさん</button>
+                            <button class="player-btn">おかあさん</button>
+                            <button class="player-btn">おにいちゃん</button>
+                            <button class="player-btn">おねえちゃん</button>
+                            <button class="player-btn">いもうと</button>
+                            <button class="player-btn">おとうと</button>
+                            <button class="player-btn selected">おじいちゃん</button>
+                            <button class="player-btn">おばあちゃん</button>
+                            <button class="player-btn">いとこ</button>
+                            <button class="player-btn">おじさん</button>
+                            <button class="player-btn">おばさん</button>
+                            <button class="player-btn">せんせい</button>
+                            <button id="gote-custom-btn" class="player-btn" data-action="custom-input">じぶんで<br>にゅうりょく</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="start-human-game-btn" class="start-btn">たいせんかいし！</button>
+                <button class="back-btn" style="margin-top: 15px;">もどる</button>
+            </div>
+        </div>
+
+        <!-- AIのつよさ説明モーダル -->
+        <div id="ai-help-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>AIのつよさについて</h2>
+                <div class="ai-level-description">
+                    <h3>レベル1：よわい (うっかりAI)</h3>
+                    <p>ときどき、とれるコマをみのがしちゃう、うっかりやさんのAIです。しょうぎをおぼえたばかりのキミにぴったり！</p>
+                </div>
+                <div class="ai-level-description">
+                    <h3>レベル2：ふつう (へたっぴAI)</h3>
+                    <p>コマをとるのはすきだけど、どれをとるかはきぶんしだい。ちょっとだけかんがえてくるよ。</p>
+                </div>
+                <div class="ai-level-description">
+                    <h3>レベル3：つよい (ほんきAI)</h3>
+                    <p>すうてさきまでよんで、いちばんいい手をえらんでくる、ほんきのAIです。うでだめしにどうぞ！</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 禁じ手警告モーダル -->
+        <div id="illegal-move-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <p id="illegal-move-text" class="warning-text"></p>
+                <button id="close-illegal-move-modal-btn" class="ok-btn">わかった</button>
+            </div>
+        </div>
+
+        <!-- 「遊び方」説明モーダル -->
+        <div id="how-to-play-modal" class="modal-overlay hidden">
+            <div class="modal-content large"> <!-- largeクラスで横幅を広めにします -->
+                <span class="close-btn">&times;</span>
+                <h2>しょうぎのあそびかた</h2>
+                <div class="modal-body scrollable"> <!-- scrollableクラスで内容が多くなってもスクロールできるようにします -->
+                    <h3>しょうぎのもくひょう</h3>
+                    <p>
+                        しょうぎは、ふたりであそぶゲームです。<br>
+                        じぶんのこまをうごかして、あいての「おうさま（王将（おうしょう）・玉将（ぎょくしょう））」を王手（おうて）にしたほうがかちです！
+                    </p>
+
+                    <h3>こまのうごきかた</h3>
+                    <p>こまにはいろいろなしゅるいがあって、それぞれうごきかたがちがいます。</p>
+                    <!-- ここに各駒の動き方の説明などを追加していきます -->
+                    <ul>
+                        <li><strong>ふひょう（歩兵）</strong>：まえに1マスだけすすめるよ。</li>
+                        <li><strong>おうしょう（王将）</strong>：ぜんぶのほうこうに1マスすすめるよ。</li>
+                        <li>...など、ほかのこまのせつめいはゲームのなかでせつめいするよ。</li>
+                    </ul>
+
+                    <h3>こまをとる</h3>
+                    <p>
+                        あいてのこまがいるばしょにじぶんのこまをうごかすと、そのこまをとることができます。<br>
+                        とったこまは「もちごま」になって、じぶんのばんのときにすきなばしょにおいてつかえるよ！
+                    </p>
+
+                    <h3>なり</h3>
+                    <p>
+                        ほとんどのこまは、あいてのじんち（おくから3マス）にはいったり、そのなかでうごいたりすると、「なる」ことができます。<br>
+                        「なる」とパワーアップして、うごきかたがかわります！
+                    </p>
+                </div>
+                <button id="close-how-to-play-modal-btn" class="ok-btn" style="margin-top: 15px;">とじる</button>
             </div>
         </div>
 
@@ -122,7 +241,7 @@
             <div class="modal-content">
                 <h2 id="result-title"></h2>
                 <p id="result-message"></p>
-                <button id="play-again-btn">もういちど あそぶ</button>
+                <button id="play-again-btn">もういちどあそぶ</button>
                 <button id="view-board-btn">ばんめんをみる</button>
                 <button id="back-to-menu-from-result-btn">メニューにもどる</button>
             </div>
