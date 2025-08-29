@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('seVolume', newVolume);
         applyVolumeSettings(parseFloat(bgmVolumeSlider.value), parseFloat(newVolume));
         // 設定が反映されたか確認するために、テスト音を再生します
-        playSE('assets/sounds/seikai.mp3');
+        playSE('assets/sounds/seikai2.mp3');
     });
 
     // --- Initialization ---

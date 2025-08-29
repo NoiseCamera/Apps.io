@@ -167,6 +167,7 @@
     z-index: 1000;
 }
 
+
 /* ホバー/アクティブ時の動き */
 #settings-btn:hover:not(:disabled) { top: 13px; box-shadow: 0 7px 0 #00000026; }
 #settings-btn:active:not(:disabled) { top: 18px; box-shadow: 0 2px 0 #00000026; }

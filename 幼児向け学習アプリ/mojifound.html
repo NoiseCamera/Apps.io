@@ -20,7 +20,7 @@
         </header>
 
         <main id="game-area">
-            <h2 id="question-display">「あ」は どこかな？</h2>
+            <div id="question-display">「あ」は どこかな？</div>
             <div id="character-container">
                 <!-- ここにJavaScriptで文字が追加されます -->
             </div>
@@ -31,9 +31,9 @@
                 <h2>ひらがな・カタカナ さがしゲーム</h2>
                 <p>むずかしさを えらんでね！</p>
                 <div class="difficulty-selector">
-                    <button class="difficulty-btn" data-difficulty="easy">やさしい (5もじ)</button>
-                    <button class="difficulty-btn" data-difficulty="normal">ふつう (10もじ)</button>
-                    <button class="difficulty-btn" data-difficulty="hard">むずかしい (15もじ)</button>
+                    <button class="difficulty-btn btn-3d" data-difficulty="easy">やさしい (5もじ)</button>
+                    <button class="difficulty-btn btn-3d" data-difficulty="normal">ふつう (10もじ)</button>
+                    <button class="difficulty-btn btn-3d" data-difficulty="hard">むずかしい (15もじ)</button>
                 </div>
             </div>
         </div>
@@ -43,8 +43,10 @@
                 <h2>ゲームしゅうりょう！</h2>
                 <p id="final-score">あなたのスコアは 0 てんでした！</p>
                 <p class="points-feedback">★ ほしを <span id="earned-stars"></span>こ ゲット！ ★</p>
-                <button id="restart-button">もういちど あそぶ</button>
-                <button id="back-to-menu-button" style="margin-top: 10px; background-color: #6c757d;">メニューにもどる</button>
+                <div class="modal-buttons">
+                    <button id="restart-button" class="btn-3d btn-action">もういちど あそぶ</button>
+                    <button class="btn-3d btn-back">メニューにもどる</button>
+                </div>
             </div>
         </div>
     </div>

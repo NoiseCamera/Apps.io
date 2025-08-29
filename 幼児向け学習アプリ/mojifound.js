@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // スマホやタブレットでダブルタップによる拡大を無効にする
+    document.body.style.touchAction = 'manipulation';
+
     // DOM要素
     const characterContainer = document.getElementById('character-container');
     const questionDisplay = document.getElementById('question-display');
@@ -8,9 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultScreen = document.getElementById('result-screen');
     const restartButton = document.getElementById('restart-button');
     const finalScoreDisplay = document.getElementById('final-score');
-    const backToMenuButton = document.getElementById('back-to-menu-button');
+    // IDではなくクラス名でボタンを取得するように変更
+    const backToMenuButton = resultScreen.querySelector('.btn-back');
     const earnedStarsDisplay = document.getElementById('earned-stars');
     let characterContainerBuffer = null; // 問題を事前に読み込むための裏ステージ
+
+    // 問題文の要素を、スコアとタイマーの間に移動する
+    // ヘッダーの見た目はすべてCSSファイルで管理します
+    if (questionDisplay && timerDisplay && timerDisplay.parentNode) {
+        const parent = timerDisplay.parentNode;
+        // 問題文をスコアとタイマーの間に移動
+        parent.insertBefore(questionDisplay, timerDisplay);
+    }
 
     // BGM
     const bgm = new Audio('assets/sounds/bgm4.mp3');
@@ -26,6 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const KATAKANA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ'.split('');
     const ALL_CHARS = [...HIRAGANA, ...KATAKANA];
     const COLORS = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#be2edd', '#f368e0', '#00d2d3'];
+
+    // 効果音をあらかじめ読み込んでおく
+    const SOUNDS = {
+        correct: new Audio('assets/sounds/seikai2.mp3'),
+        incorrect: new Audio('assets/sounds/fuseikai.mp3')
+    };
 
     // ゲーム状態
     let score = 0;
@@ -89,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // play()はPromiseを返すので、エラーハンドリングをしておくと親切
         bgm.play().catch(e => console.error("BGMの再生に失敗しました:", e));
 
+        // タイマーの警告スタイルをリセット
+        timerDisplay.classList.remove('is-warning');
+
         score = 0;
         timer = GAME_TIME;
         isPlaying = true;
@@ -126,6 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame() {
         clearInterval(timerId);
         isPlaying = false;
+        // ゲーム終了時にタイマーの色を元に戻す
+        timerDisplay.classList.remove('is-warning');
+
         finalScoreDisplay.textContent = `あなたのスコアは ${score} てんでした！`;
 
         // スコアに応じて獲得する星の数を計算
@@ -171,7 +195,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 問題文と現在の正解を更新
         currentQuestion = nextQuestionAnswer;
-        questionDisplay.textContent = `「${currentQuestion}」は どこかな？`;
+        updateQuestionDisplay(currentQuestion);
+    }
+
+    /**
+     * 問題文の表示を更新する
+     * @param {string} char 表示する文字
+     */
+    function updateQuestionDisplay(char) {
+        // 「さがしてね！」というテキストと、探す文字を大きく表示するHTMLを生成
+        questionDisplay.innerHTML = `さがしてね！<span class="question-char">${char}</span>`;
     }
 
     function setupNewQuestion(targetContainer, isPreload = false) {
@@ -187,20 +220,18 @@ document.addEventListener('DOMContentLoaded', () => {
             nextQuestionAnswer = answer; // 事前読み込みの場合は、次の答えとして保存
         } else {
             currentQuestion = answer; // 通常表示の場合は、現在の答えとして設定
-            questionDisplay.textContent = `「${answer}」は どこかな？`;
+            updateQuestionDisplay(answer);
         }
 
         // コンテナの寸法を一度取得
         const containerRect = characterContainer.getBoundingClientRect();
 
         // はみ出し防止のため、コンテナ内に安全な領域（セーフエリア）を設定
-        const SAFE_AREA_PADDING = 30; // 左右と下に30pxの余白
+        const SAFE_AREA_PADDING = 30; // 上下左右に30pxの余白
 
-        // 問題文の高さを考慮して、文字を配置するエリアを調整
-        const questionRect = questionDisplay.getBoundingClientRect();
-        const gridTopOffset = questionRect.height * 1.2; // 少し余白を持たせる
+        // 問題文はコンテナの外に移動したので、コンテナ全体を配置エリアとして使う
         const safeAreaWidth = containerRect.width - (SAFE_AREA_PADDING * 2);
-        const safeAreaHeight = containerRect.height - gridTopOffset - SAFE_AREA_PADDING;
+        const safeAreaHeight = containerRect.height - (SAFE_AREA_PADDING * 2);
 
         // グリッド設定
         let GRID_COLS, GRID_ROWS;
@@ -251,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 最終的な位置を決定
             const finalLeft = SAFE_AREA_PADDING + (gridCol * cellWidth) + randomXInCell;
-            const finalTop = gridTopOffset + (gridRow * cellHeight) + randomYInCell;
+            const finalTop = SAFE_AREA_PADDING + (gridRow * cellHeight) + randomYInCell;
 
             charElement.style.left = `${finalLeft}px`;
             charElement.style.top = `${finalTop}px`;
@@ -300,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
             score += POINTS_PER_CORRECT;
             updateScore();
             createStarburstEffect(e.target);
-            playSE('assets/sounds/seikai2.mp3');
+            playSE('correct');
 
             // 正解した文字を少し派手にする
             e.target.style.transition = 'all 0.3s';
@@ -320,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500); // 0.5秒後に次の問題へ
         } else {
             // 不正解
-            playSE('assets/sounds/fuseikai.mp3');
+            playSE('incorrect');
 
             // すでに震えている場合は処理しない
             if (e.target.classList.contains('is-shaking')) {
@@ -355,22 +386,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateScore() {
-        scoreDisplay.textContent = `スコア: ${score}`;
+        scoreDisplay.innerHTML = `スコア<br>${score}`;
     }
 
     function updateTimer() {
-        timerDisplay.textContent = `のこりじかん: ${timer}`;
+        timerDisplay.innerHTML = `のこりじかん<br>${timer}`;
+
+        // 残り10秒以下で警告スタイルを適用
+        if (timer <= 10 && timer > 0) {
+            timerDisplay.classList.add('is-warning');
+        } else {
+            // 10秒より多い、または0になったら警告を解除
+            timerDisplay.classList.remove('is-warning');
+        }
     }
 
     /**
      * 効果音を再生する
-     * @param {string} soundFile - 再生する音声ファイル名（パス）
+     * @param {('correct'|'incorrect')} soundName - 再生する音声の名前
      */
-    function playSE(soundFile) {
-        // HTMLファイルからの相対パスで音声ファイルを指定してください
-        // 例: 'sounds/seikai.mp3'
-        const audio = new Audio(soundFile);
-        audio.play().catch(e => console.error("Audio play failed:", e));
+    function playSE(soundName) {
+        const sound = SOUNDS[soundName];
+        if (sound) {
+            // 連続で再生される場合も最初から再生されるようにする
+            sound.currentTime = 0;
+            sound.play().catch(e => console.error(`Audio play failed for ${soundName}:`, e));
+        }
     }
 
     /**

@@ -1,8 +1,28 @@
+/* --- CSS変数定義 --- */
+:root {
+    /* カラーパレット */
+    --color-primary: #007bff;
+    --color-secondary: #4682B4;
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #d9534f;
+    --color-text-light: #fff;
+    --color-text-dark: #333;
+    --background-body: #f0f8ff;
+    --background-container: #fff;
+    --background-game-area: #e6f7ff;
+
+    /* 角丸 */
+    --radius-sm: 10px;
+    --radius-md: 15px;
+    --radius-lg: 20px;
+}
+
 /* 基本的なスタイル */
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: #f0f8ff;
-    color: #333;
+    background-color: var(--background-body);
+    color: var(--color-text-dark);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,42 +34,83 @@ body {
 .container {
     width: 90%;
     max-width: 800px;
-    background: #fff;
-    border-radius: 20px;
+    background: var(--background-container);
+    border-radius: var(--radius-lg);
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 20px;
     text-align: center;
 }
 
 #status-bar {
-    display: flex;
-    justify-content: space-between;
+    /* スコア・問題・タイマーを横並びにする設定 */
+    display: grid; /* Grid Layoutを使用。子要素の高さは自動で揃います */
+    gap: 15px; /* 要素間のすきま */
+    grid-template-columns: 1fr 1.5fr 1fr; /* 幅の比率を 1 : 1.5 : 1 に設定 */
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
+/* スコアとタイマーの共通スタイル */
+#score, #timer {
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-size: 1.2em; /* フォントサイズを大きくする */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* 中のテキストを上下左右中央に配置するための設定 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60px; /* 新しい問題文の高さに合わせて調整 */
+}
+
 #score {
-    color: #ff6347; /* あかるいオレンジいろ */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background-color: var(--color-success);
 }
 
 #timer {
-    color: #1e90ff; /* あかるいあおいろ */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background-color: var(--color-warning);
+}
+
+/* タイマーが10秒以下になった時の警告アニメーション */
+@keyframes blink-warning {
+    50% {
+        background-color: #ff8a80; /* 少し明るい赤 */
+    }
+}
+
+#timer.is-warning {
+    background-color: var(--color-danger); /* 背景を赤に */
+    animation: blink-warning 1s infinite;
 }
 
 #game-area {
     position: relative;
     width: 100%;
     height: 60vh; /* ゲームエリアの高さ */
-    background-color: #e6f7ff;
-    border-radius: 15px;
+    background-color: var(--background-game-area);
+    border-radius: var(--radius-md);
     border: 3px solid #b3e5fc;
 }
 
 #question-display {
-    color: #0277bd;
+    /* JavaScriptによって status-bar の中に移動されます */
+    /* スタイルをこのブロックに集約 */
+    background-color: #fff; /* 白い背景でカードのように見せる */
+    color: var(--color-text-dark); /* 基本の文字色を暗くする */
+    border: 4px solid var(--color-primary); /* テーマカラーの太い枠線 */
+    border-radius: var(--radius-sm);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 5px; /* パディングを少し調整 */
+    min-height: 60px; /* 高さを他の要素と合わせる */
+    font-size: 1.2em; /* 問題文全体のフォントサイズを上げる */
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column; /* 中の要素を縦に並べる */
+    justify-content: center;
+    align-items: center;
 }
 
 #character-container {
@@ -58,6 +119,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+/* 問題文の中で、探す文字を大きく表示するためのスタイル */
+.question-char {
+    font-size: 2.2em; /* 文字を大きくする */
+    font-weight: 900; /* 文字をとても太くする */
+    color: var(--color-primary); /* テーマカラーで目立たせる */
+    display: block; /* 独立した行に表示 */
+    line-height: 1; /* 行の高さを調整 */
 }
 
 .character {
@@ -141,7 +211,7 @@ body {
 .modal {
     background: white;
     padding: 30px 40px;
-    border-radius: 15px;
+    border-radius: var(--radius-md);
     text-align: center;
 }
 
@@ -158,7 +228,7 @@ body {
 /* モーダル内の説明テキスト */
 .modal p {
     font-size: 1.3em;
-    color: #007bff; /* あかるい あおいろ */
+    color: var(--color-primary);
     margin: 20px 0;
 }
 
@@ -171,66 +241,71 @@ body {
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    background-color: #ffc107;
-    color: #333;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-button:hover {
-    background-color: #ffca28;
-}
-
-/* --- 難易度選択ボタン --- */
-.difficulty-selector {
+/* モーダル内のボタンをまとめるコンテナ */
+.modal-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* ボタンを縦に並べる */
     gap: 15px; /* ボタン間のすきま */
     margin-top: 25px;
 }
 
-.difficulty-btn {
+/* --- ボタンのスタイル --- */
+
+/* 汎用ボタン（スタートボタン、もう一度遊ぶ など） */
+/* このスタイルは、より詳細なセレクタによって上書きされます */
+
+/* 難易度選択ボタン */
+.difficulty-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* --- 立体的なボタンの共通スタイル --- */
+/* この .btn-3d クラスを、立体的にしたい全てのボタンに適用します */
+.btn-3d {
+    display: inline-block;
     padding: 12px 20px;
     font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
     cursor: pointer;
     border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    color: white;
+    border-radius: var(--radius-sm);
+    border-bottom: 4px solid transparent; /* 下線のためのスペース */
+    color: var(--color-text-light);
+    text-decoration: none;
     transition: all 0.2s ease;
-    border-bottom: 4px solid transparent;
 }
 
-.difficulty-btn[data-difficulty="easy"] {
-    background-color: #5cb85c; /* みどり */
-    border-bottom-color: #449d44;
-}
+/* --- 立体ボタンの色設定 --- */
+.difficulty-btn[data-difficulty="easy"] { background-color: #5cb85c; border-bottom-color: #449d44; }
 .difficulty-btn[data-difficulty="easy"]:hover { background-color: #6cd26c; }
-
-.difficulty-btn[data-difficulty="normal"] {
-    background-color: #f0ad4e; /* オレンジ */
-    border-bottom-color: #ec971f;
-}
+.difficulty-btn[data-difficulty="normal"] { background-color: #f0ad4e; border-bottom-color: #ec971f; }
 .difficulty-btn[data-difficulty="normal"]:hover { background-color: #f3bc71; }
+.difficulty-btn[data-difficulty="hard"] { background-color: var(--color-danger); border-bottom-color: #c9302c; }
+.difficulty-btn[data-difficulty="hard"]:hover { background-color: #e0625e; }
 
-.difficulty-btn[data-difficulty="hard"] {
-    background-color: #d9534f; /* あか */
-    border-bottom-color: #c9302c;
+/* 「もういちど あそぶ」など、主要なアクションボタン用の色 */
+/* HTML側で <button class="btn-3d btn-action"> のようにクラスを追加して使います */
+.btn-action {
+    background-color: var(--color-success); /* ポジティブな印象の緑色に変更 */
+    border-bottom-color: #218838; /* var(--color-success) の少し暗い色 */
+    color: var(--color-text-light);
+}
+.btn-action:hover {
+    background-color: #2ebf4f;
 }
 
-/* 「メニューにもどる」ボタンのスタイル */
-#back-to-menu-button {
-    background-color: #4682B4; /* すこし くらめの あおいろ (スチールブルー) */
-    color: white;
-    margin-top: 10px;
+/* 「メニューにもどる」ボタンや、その他の「もどる」ボタン用の色 */
+/* HTML側で <button class="btn-3d btn-back"> のようにクラスを追加して使います */
+.btn-back {
+    background-color: var(--color-secondary); /* 落ち着いた青色に変更 */
+    border-bottom-color: #3a709b; /* var(--color-secondary) の少し暗い色 */
 }
-#back-to-menu-button:hover {
-    background-color: #5a9bd8;
+.btn-back:hover {
+    background-color: #5a9bd8; /* 少し明るい青 */
 }
 /* 正解時のスターエフェクト */
 .star {
