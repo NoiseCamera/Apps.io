@@ -1,0 +1,381 @@
+/* --- CSS変数定義 (colorfound.cssから引用・調整) --- */
+:root {
+    --color-primary: #007bff;
+    --color-secondary: #4682B4;
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #d9534f;
+    --color-text-light: #fff;
+    --color-text-dark: #333;
+    --background-body: #f0f8ff;
+    --background-container: #fff;
+    --radius-sm: 10px;
+    --radius-md: 15px;
+    --radius-lg: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- 基本的なスタイル (colorfound.cssから引用) --- */
+/* box-sizingを追加してレイアウト計算を容易にする */
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: var(--background-body);
+    touch-action: manipulation; /* ダブルタップによる拡大を防止 */
+    color: var(--color-text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 10px;
+}
+
+.container {
+    width: 90%;
+    max-width: 750px;
+    background: var(--background-container);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    position: relative; /* フィードバック表示の基準点 */
+}
+
+/* --- ゲームタイトル (colorfound.cssから引用) --- */
+.game-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 2.8em;
+    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
+}
+
+/* --- ステータスバー --- */
+#status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+/* --- ゲームエリア --- */
+#game-area {
+    background-color: #e6f7ff;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+/* ヒントエリア */
+#hint-area {
+    margin-bottom: 20px;
+}
+
+#hint-text {
+    font-size: 1.5em;
+    margin: 0 0 15px 0;
+    font-weight: bold;
+}
+
+#hint-image {
+    max-width: 80%;
+    max-height: 160px;
+    height: auto;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background-color: #fff;
+}
+
+/* 答えを入力するエリア */
+#answer-area {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    min-height: 80px;
+    flex-wrap: wrap;
+    transition: transform 0.1s; /* 揺れアニメーションのため */
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.answer-box {
+    width: 70px;
+    height: 70px;
+    background-color: #fff;
+    border: 2px dashed var(--color-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.6em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 移動後の答えのマスに適用するスタイル */
+.answer-box.filled {
+    background-color: var(--color-warning);
+    border: none;
+    color: var(--color-text-dark);
+    box-shadow: 0 4px #ec971f;
+}
+
+/* 文字の選択肢エリア */
+#choices-area {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.choice-char {
+    width: 70px;
+    height: 70px;
+    background-color: var(--color-warning);
+    color: var(--color-text-dark);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.6em;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px #ec971f;
+}
+.choice-char:active {
+    transform: translateY(1px) scale(0.95);
+    box-shadow: 0 2px #ec971f;
+}
+
+.choice-char:hover {
+    background-color: #f3bc71;
+    transform: translateY(-2px);
+    box-shadow: 0 6px #ec9C1f;
+}
+
+.choice-char.used {
+    background-color: #ccc;
+    cursor: not-allowed;
+    box-shadow: 0 4px #aaa;
+    opacity: 0.6;
+}
+
+/* --- ボタン (colorfound.cssから引用・調整) --- */
+.btn-3d {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    width: 80%;
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.btn-action { background-color: var(--color-success); box-shadow: 0 4px #218838; }
+.btn-action:hover { background-color: #2ebf4f; transform: translateY(-2px); box-shadow: 0 6px #218838; }
+.btn-action:active { transform: translateY(1px); box-shadow: 0 2px #218838; }
+
+.btn-back { background-color: var(--color-secondary); box-shadow: 0 4px #3a709b; }
+.btn-back:hover { background-color: #5a9bd8; transform: translateY(-2px); box-shadow: 0 6px #3a709b; }
+.btn-back:active { transform: translateY(1px); box-shadow: 0 2px #3a709b; }
+
+.action-buttons {
+    position: relative;
+    margin-top: 15px;
+    padding-bottom: 50px; /* 右下のボタンのためのスペース確保 */
+}
+.action-buttons .btn-action {
+    width: 80%;
+    max-width: 350px;
+    margin: 0 auto;
+}
+.action-buttons .btn-pause {
+    position: absolute;
+    right: 0;
+    
+
+    /*
+     * --- 「いちじ ていし」ボタンの大きさ調整 ---
+     * ここの数値を変更すると、ボタンの大きさを調整できます。
+    */
+    padding: 6px 12px;   /* ボタンの上下と左右の余白。高さと幅に影響します。 */
+    font-size: 1.1em;    /* 文字の大きさ。ボタン全体の大きさに影響します。 */
+    /* --- ここまで --- */
+
+    /* 他のボタンのスタイルを上書きして、右下に配置しやすくします */
+    width: auto;         /* 幅を文字の長さに合わせます */
+    margin: 0;           /* 周りの余白をなくします */
+
+    /* ボタンの色と影 */
+    background-color: var(--color-secondary);
+    box-shadow: 0 4px #3a709b;
+}
+.action-buttons .btn-pause:hover { background-color: #5a9bd8; transform: translateY(-2px); box-shadow: 0 6px #3a709b; }
+.action-buttons .btn-pause:active { transform: translateY(1px); box-shadow: 0 2px #3a709b; }
+
+/* --- 難易度選択画面 --- */
+#difficulty-selection-area {
+    padding: 20px 0;
+}
+
+.section-title {
+    font-size: 2em;
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: var(--color-primary);
+}
+
+.difficulty-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.btn-difficulty {
+    width: 80%;
+    max-width: 400px;
+    background-color: var(--color-primary);
+    box-shadow: 0 4px #0056b3;
+}
+.btn-difficulty:hover { background-color: #0088ff; transform: translateY(-2px); box-shadow: 0 6px #0056b3; }
+.btn-difficulty:active { transform: translateY(1px); box-shadow: 0 2px #0056b3; }
+.btn-difficulty[data-difficulty="all"] {
+    background-color: var(--color-success);
+    box-shadow: 0 4px #218838;
+}
+.btn-difficulty[data-difficulty="all"]:hover { background-color: #2ebf4f; transform: translateY(-2px); box-shadow: 0 6px #218838; }
+.btn-difficulty[data-difficulty="all"]:active { transform: translateY(1px); box-shadow: 0 2px #218838; }
+#question-number, #total-time-container { font-size: 1.4em; }
+
+/* --- 文字移動アニメーション用 --- */
+.flying-char {
+    position: absolute;
+    /* .choice-char と同じスタイル */
+    width: 70px;
+    height: 70px;
+    background-color: var(--color-warning);
+    color: var(--color-text-dark);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.6em;
+    font-weight: bold;
+    z-index: 300;
+    pointer-events: none; /* クリックを透過させる */
+    /* アニメーション設定 */
+    transition: transform 0.4s ease-in-out;
+}
+
+/* --- 正解・不正解フィードバック --- */
+#feedback-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s, visibility 0.2s;
+    border-radius: var(--radius-lg);
+}
+#feedback-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+#feedback-icon {
+    font-size: 18em;
+    font-weight: bold;
+    transform: scale(0.5);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.2s;
+}
+#feedback-overlay.visible #feedback-icon { transform: scale(1); opacity: 1; }
+.feedback-icon.correct { color: #d9534f; } /* 赤色の丸 */
+.feedback-icon.incorrect { color: #007bff; } /* 青色のバツ */
+
+/* --- モーダル (colorfound.cssから引用) --- */
+.points-feedback {
+    font-weight: bold;
+    color: var(--color-warning);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+#final-time, #earned-stars {
+    font-size: 1.2em; color: var(--color-danger);
+}
+
+.modal-buttons .btn-action {
+    font-size: 1.1em; /* 結果モーダルのボタンフォントを小さく */
+}
+
+.modal-buttons .btn-back {
+    font-size: 1.1em; /* 結果モーダルのボタンフォントを小さく */
+}
+
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center;
+    align-items: center; z-index: 100; opacity: 0; visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.modal-overlay.visible { opacity: 1; visibility: visible; }
+
+.modal {
+    background: white; padding: 30px 40px; border-radius: var(--radius-md);
+    text-align: center; width: 80%; max-width: 480px;
+}
+
+.modal h2 {
+    margin-top: 0; font-size: 2.3em;
+    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
+}
+
+.modal p { font-size: 1.4em; margin: 20px 0; }
+.final-score { font-size: 1.5em; font-weight: bold; color: var(--color-danger); }
+
+.modal-buttons {
+    display: flex; flex-direction: column; gap: 15px; margin-top: 25px;
+}

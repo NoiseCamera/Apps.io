@@ -102,10 +102,6 @@ header p {
     background-color: #e0f7fa; /* 薄いシアン */
     border-color: #00bcd4; /* シアン */
 }
-.app-link[href="movies.html"] {
-    background-color: #ffebee; /* 薄い赤 */
-    border-color: #e53935; /* 赤 */
-}
 .app-link[href="drawing-board.html"] {
     background-color: #e1f5fe; /* Light Cyan */
     border-color: #29b6f6; /* Light Blue */
@@ -127,10 +123,6 @@ header p {
 .app-link[href="collection.html"] {
     background-color: #efebe9; /* 薄いブラウン */
     border-color: #8d6e63; /* ブラウン */
-}
-.app-link[href="keyboard.html"] {
-    background-color: #fce4ec; /* 薄いピンク */
-    border-color: #ec407a; /* ピンク */
 }
 .app-link[href="typing.html"] {
     background-color: #eceff1; /* ブルーグレー */
@@ -159,6 +151,20 @@ header p {
 .app-link[href="mojifound.html"] {
     background-color: #ede7f6; /* 薄いディープパープル */
     border-color: #673ab7; /* ディープパープル */
+}
+.app-link[href="colorfound.html"] {
+    background-color: #e3f2fd; /* 薄い青 */
+    border-color: #2196f3; /* はっきりした青 */
+}
+.app-link[href="kotoba_puzzle.html"] {
+    background-color: #ffebee; /* 薄い赤 */
+    border-color: #ef5350; /* 明るい赤 */
+}
+/* 新しい「おんがく」カテゴリの配色 */
+.app-link[href="keyboard.html"],
+.app-link[href="movies.html"] {
+    background-color: #f3e5f5; /* 薄い紫 */
+    border-color: #ba68c8; /* 紫 */
 }
 
 .app-link:hover {
@@ -199,9 +205,6 @@ header p {
 .app-link[href="katakana-stroke.html"] h3 {
     color: #26a69a;
 }
-.app-link[href="movies.html"] h3 {
-    color: #e53935;
-}
 .app-link[href="drawing-board.html"] h3 {
     color: #039be5; /* Blue */
 }
@@ -217,9 +220,6 @@ header p {
 }
 .app-link[href="collection.html"] h3 {
     color: #5d4037;
-}
-.app-link[href="keyboard.html"] h3 {
-    color: #ec407a;
 }
 .app-link[href="typing.html"] h3 {
     color: #546e7a;
@@ -241,6 +241,17 @@ header p {
 }
 .app-link[href="mojifound.html"] h3 {
     color: #673ab7;
+}
+.app-link[href="colorfound.html"] h3 {
+    color: #2196f3;
+}
+.app-link[href="kotoba_puzzle.html"] h3 {
+    color: #ef5350;
+}
+/* 新しい「おんがく」カテゴリのタイトル色 */
+.app-link[href="keyboard.html"] h3,
+.app-link[href="movies.html"] h3 {
+    color: #ba68c8;
 }
 
 .app-link p {

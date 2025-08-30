@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ことばパズル</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="kotoba_puzzle.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="game-title">ことばパズル</h1>
+        
+        <!-- 難易度選択画面 -->
+        <div id="difficulty-selection-area">
+            <h2 class="section-title">なんいどを えらんでね</h2>
+            <div class="difficulty-buttons">
+                <button class="btn-3d btn-difficulty" data-difficulty="easy">かんたん (2～3もじ)</button>
+                <button class="btn-3d btn-difficulty" data-difficulty="normal">ふつう (3～4もじ)</button>
+                <button class="btn-3d btn-difficulty" data-difficulty="hard">むずかしい (4もじ～)</button>
+                <button class="btn-3d btn-difficulty" data-difficulty="all">ぜんぶのもんだい</button>
+            </div>
+        </div>
+
+        <!-- メインゲーム画面 (最初は非表示) -->
+        <div id="main-game" class="hidden">
+            <div id="status-bar">
+                <div id="total-time-container">けいかじかん: <span id="total-time">0</span> びょう</div>
+                <div id="question-number">もんだい: <span id="current-q">1</span> / <span id="total-q">0</span></div>
+            </div>
+
+            <div id="game-area">
+                <div id="hint-area">
+                    <p id="hint-text"></p>
+                    <img id="hint-image" src="" alt="ヒントの画像">
+                </div>
+
+                <div id="answer-area">
+                    <!-- JSで答えのボックスが生成されます -->
+                </div>
+
+                <div id="choices-area">
+                    <!-- JSで選択肢の文字が生成されます -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="check-button" class="btn-3d btn-action">こたえあわせ</button>
+                <button id="pause-btn" class="btn-3d btn-pause">いちじ ていし</button>
+            </div>
+        </div>
+
+        <!-- 正解・不正解フィードバック用 -->
+        <div id="feedback-overlay">
+            <div id="feedback-icon"></div>
+        </div>
+    </div>
+
+    <!-- 結果表示モーダル -->
+    <div id="result-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">ゲームクリア！</h2>
+            <p id="modal-message">かかったじかんは <span id="final-time">0</span> びょうでした！</p>
+            <p id="reward-message" class="points-feedback hidden">★ ほしを <span id="earned-stars">0</span> こ ゲット！ ★</p>
+            <div class="modal-buttons">
+                <button id="next-question-btn" class="btn-3d btn-action"></button>
+                <button id="back-to-difficulty-btn" class="btn-3d btn-back hidden">なんいどをえらぶ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 一時停止モーダル -->
+    <div id="pause-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2>いちじ ていし</h2>
+            <div class="modal-buttons">
+                <button id="quit-to-difficulty-btn" class="btn-3d btn-back">なんいどせんたくにもどる</button>
+                <button id="resume-game-btn" class="btn-3d btn-action">とじる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="kotoba_puzzles_data.js"></script>
+    <script src="kotoba_puzzle.js"></script>
+</body>
+</html>

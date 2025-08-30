@@ -1,0 +1,315 @@
+/* --- CSS変数定義 --- */
+:root {
+    --color-primary: #007bff;
+    --color-secondary: #4682B4;
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #d9534f;
+    --color-text-light: #fff;
+    --color-text-dark: #333;
+    --background-body: #f0f8ff;
+    --background-container: #fff;
+    --background-game-area: #e6f7ff;
+    --radius-sm: 10px;
+    --radius-md: 15px;
+    --radius-lg: 20px;
+}
+
+/* 基本的なスタイル */
+body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: var(--background-body);
+    color: var(--color-text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background: var(--background-container);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+/* ゲームタイトル */
+.game-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 2.5em;
+}
+
+/* タイトルを静的なレインボーカラーにする */
+.game-title,
+.modal h2 {
+    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--color-primary); /* グラデーション非対応ブラウザ用のフォールバック */
+}
+
+/* --- ヘッダー (スコア・問題・タイマー) --- */
+#status-bar {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* スコアとタイマーの共通スタイル */
+#score, #timer {
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-size: 1.2em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+}
+
+#score {
+    background-color: var(--color-success);
+}
+
+#timer {
+    background-color: var(--color-warning);
+}
+
+@keyframes blink-warning {
+    50% { background-color: #ff8a80; }
+}
+
+#timer.is-warning {
+    background-color: var(--color-danger);
+    animation: blink-warning 1s infinite;
+}
+
+/* --- ゲームエリア --- */
+#game-area {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    background-color: var(--background-game-area);
+    border-radius: var(--radius-md);
+    border: 3px solid #b3e5fc;
+}
+
+#question-display {
+    background-color: #fff;
+    color: var(--color-text-dark);
+    border: 4px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    min-height: 60px;
+    font-size: 1.2em;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 色の図形が表示されるエリア */
+#shape-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 問題文の中で、探す色名を大きく表示するためのスタイル */
+.question-target {
+    font-size: 2.5em;
+    font-weight: 900;
+    line-height: 1;
+    margin-top: 5px; /* 「さがしてね！」テキストとの間に少しすきまを作る */
+}
+
+/* 色の図形（円）のスタイル */
+.color-shape {
+    position: absolute;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s, opacity 0.2s;
+}
+.color-shape:hover {
+    transform: scale(1.1);
+}
+
+/* 図形の形を定義 */
+.shape-circle {
+    border-radius: 50%;
+}
+.shape-square {
+    border-radius: 0;
+}
+.shape-triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.shape-star {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* 図形の動きのアニメーション */
+@keyframes anim-scale {
+    0%, 100% { transform: scale(1) rotate(var(--start-scale-rotate)); }
+    50% { transform: scale(var(--scale-factor, 1.1)) rotate(var(--end-scale-rotate)); }
+}
+.anim-scale {
+    animation-name: anim-scale;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes anim-rotate {
+    0% { transform: rotate(var(--start-sway-rotate)); }
+    50% { transform: rotate(var(--end-sway-rotate)); }
+    100% { transform: rotate(var(--start-sway-rotate)); }
+}
+.anim-rotate {
+    animation-name: anim-rotate;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes anim-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.anim-spin {
+    animation-name: anim-spin;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* --- モーダル共通 --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: white;
+    padding: 30px 40px;
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.modal h2 {
+    margin-top: 0;
+    font-size: 2em;
+}
+
+.modal p {
+    font-size: 1.3em;
+    color: var(--color-primary);
+    margin: 20px 0;
+}
+
+#final-score {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+.points-feedback {
+    font-size: 1.4em !important;
+    font-weight: bold;
+    color: #ff9800 !important;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* --- ボタンのスタイル --- */
+.difficulty-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-3d {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--radius-sm);
+    border-bottom: 4px solid transparent;
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.difficulty-btn[data-difficulty="easy"] { background-color: #5cb85c; border-bottom-color: #449d44; }
+.difficulty-btn[data-difficulty="easy"]:hover { background-color: #6cd26c; }
+.difficulty-btn[data-difficulty="normal"] { background-color: #f0ad4e; border-bottom-color: #ec971f; }
+.difficulty-btn[data-difficulty="normal"]:hover { background-color: #f3bc71; }
+.difficulty-btn[data-difficulty="hard"] { background-color: var(--color-danger); border-bottom-color: #c9302c; }
+.difficulty-btn[data-difficulty="hard"]:hover { background-color: #e0625e; }
+
+.btn-action {
+    background-color: var(--color-success);
+    border-bottom-color: #218838;
+    color: var(--color-text-light);
+}
+.btn-action:hover {
+    background-color: #2ebf4f;
+}
+
+.btn-back {
+    background-color: var(--color-secondary);
+    border-bottom-color: #3a709b;
+}
+.btn-back:hover {
+    background-color: #5a9bd8;
+}
+
+/* 正解時のスターエフェクト */
+.star {
+    position: fixed; /* 画面全体を基準に配置 */
+    width: 15px;
+    height: 15px;
+    /* 背景色はJavaScriptで設定されます */
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    pointer-events: none; /* 星をクリックできないようにする */
+    z-index: 200; /* 他の要素より手前に表示 */
+}

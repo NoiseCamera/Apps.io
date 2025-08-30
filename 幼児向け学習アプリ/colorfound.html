@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いろさがしゲーム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="colorfound.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="game-title">いろ さがしゲーム</h1>
+        <header id="status-bar">
+            <div id="score">スコア<br>0</div>
+            <div id="question-display"></div>
+            <div id="timer">のこりじかん<br>60</div>
+        </header>
+
+        <main id="game-area">
+            <div id="shape-container">
+                <!-- ここにJavaScriptで色の図形が追加されます -->
+            </div>
+        </main>
+
+        <!-- スタート画面モーダル -->
+        <div id="start-screen" class="modal-overlay visible">
+            <div class="modal">
+                <h2>いろ さがしゲーム</h2>
+                <p>むずかしさを えらんでね！</p>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn btn-3d" data-difficulty="easy">やさしい (4しょく)</button>
+                    <button class="difficulty-btn btn-3d" data-difficulty="normal">ふつう (8しょく)</button>
+                    <button class="difficulty-btn btn-3d" data-difficulty="hard">むずかしい (12しょく)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果画面モーダル -->
+        <div id="result-screen" class="modal-overlay">
+            <div class="modal">
+                <h2>ゲームしゅうりょう！</h2>
+                <p id="final-score">あなたのスコアは 0 てんでした！</p>
+                <p class="points-feedback">★ ほしを <span id="earned-stars"></span>こ ゲット！ ★</p>
+                <div class="modal-buttons">
+                    <button id="restart-button" class="btn-3d btn-action">もういちど あそぶ</button>
+                    <button class="btn-3d btn-back">メニューにもどる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="colorfound.js" defer></script>
+</body>
+</html>

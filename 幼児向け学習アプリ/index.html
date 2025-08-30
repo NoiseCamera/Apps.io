@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ようこそ！</title>
+    <title>たのしいがくしゅうアプリ</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,125 +18,154 @@
     <audio id="bgm" src="assets/sounds/title.mp3" loop></audio>
 
     <header>
-        <h1>どれで あそぶ？</h1>
+        <h1>たのしいがくしゅうアプリ</h1>
+        <p>すきなアプリをえらんであそんでね！</p>
     </header>
 
-    <main>
+    <main id="app-selector">
         <div class="category-group">
-            <h2 class="category-title">もじの れんしゅう</h2>
+            <h2 class="category-title">📝 もじの れんしゅう</h2>
             <div class="app-grid">
                 <a href="hiragana.html" class="app-link">
-                    <h3>あ ひらがな<br>れんしゅう</h3>
-                    <p>いろんな ひらがなを<br>よんでみよう！</p>
-                </a>
-                <a href="hiragana-stroke.html" class="app-link">
-                    <h3>✍️ ひらがな<br>かきじゅん</h3>
-                    <p>ただしい じゅんばんで<br>かいてみよう！</p>
+                    <h3>ひらがな</h3>
+                    <p>もじの かたちを<br>おぼえよう！</p>
                 </a>
                 <a href="katakana.html" class="app-link">
-                    <h3>ア カタカナ<br>れんしゅう</h3>
-                    <p>カタカナも<br>おぼえちゃおう！</p>
+                    <h3>カタカナ</h3>
+                    <p>もじの かたちを<br>おぼえよう！</p>
+                </a>
+                <a href="hiragana-stroke.html" class="app-link">
+                    <h3>ひらがな<br>かきじゅん</h3>
+                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
                 </a>
                 <a href="katakana-stroke.html" class="app-link">
-                    <h3>✍️ カタカナ<br>かきじゅん</h3>
-                    <p>カタカナも ただしく<br>かけるかな？</p>
+                    <h3>カタカナ<br>かきじゅん</h3>
+                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
+                </a>
+                <a href="typing.html" class="app-link">
+                    <h3>⌨️ タイピング</h3>
+                    <p>キーボードで もじを<br>うつ れんしゅう！</p>
                 </a>
                 <a href="mojifound.html" class="app-link">
                     <h3>🔎 もじさがし<br>ゲーム</h3>
                     <p>もじを みつけて<br>スコアを きそおう！</p>
                 </a>
+                <a href="kotoba_puzzle.html" class="app-link">
+                    <h3>🧩 ことば<br>パズル</h3>
+                    <p>もじを ならべて<br>ことばを つくろう！</p>
+                </a>
             </div>
         </div>
 
         <div class="category-group">
-            <h2 class="category-title">すうじと パズル</h2>
+            <h2 class="category-title">🔢 すうじと パズル</h2>
             <div class="app-grid">
                 <a href="calculation.html" class="app-link">
-                    <h3>🧮 すうじの<br>けいさん</h3>
-                    <p>たしざんや ひきざんを<br>れんしゅうしよう！</p>
-                </a>
-                <a href="clock.html" class="app-link">
-                    <h3>⏰ とけいを<br>おぼえよう</h3>
-                    <p>とけいの よみかたを<br>れんしゅうしよう！</p>
+                    <h3>➕ けいさん</h3>
+                    <p>たしざん ひきざんの<br>れんしゅう！</p>
                 </a>
                 <a href="slide-puzzle.html" class="app-link">
-                    <h3>🧩 どうぶつ<br>スライドパズル</h3>
-                    <p>どうぶつさんの え を<br>そろえよう！</p>
+                    <h3>🧩 スライドパズル</h3>
+                    <p>パネルを うごかして<br>えを そろえよう！</p>
                 </a>
                 <a href="jigsaw-puzzle.html" class="app-link">
-                    <h3>🖼️ どうぶつ<br>ジグソーパズル</h3>
-                    <p>ばらばらのピースを<br>くみあわせよう！</p>
+                    <h3>🧩 ジグソーパズル</h3>
+                    <p>ピースを くみあわせて<br>えを かんせいさせよう！</p>
                 </a>
                 <a href="shape-matching.html" class="app-link">
-                    <h3>🎨 かたちあわせ</h3>
-                    <p>いろんな かたちを<br>あててみよう！</p>
+                    <h3>かたちあわせ</h3>
+                    <p>おなじ かたちを<br>みつけて あわせよう！</p>
                 </a>
                 <a href="memory-game.html" class="app-link">
-                    <h3>🧠 えあわせゲーム</h3>
-                    <p>おなじ え を さがして<br>きおくりょくを きたえよう！</p>
+                    <h3>しんけいすいじゃく</h3>
+                    <p>カードを めくって<br>ペアを さがそう！</p>
                 </a>
                 <a href="maze-game.html" class="app-link">
-                    <h3>🗺️ めいろゲーム</h3>
-                    <p>ゴールをめざして<br>すすめ！</p>
-                </a>
-                <a href="programming-game.html" class="app-link">
-                    <h3>🤖 プログラミング<br>あそび</h3>
-                    <p>ブロックをならべて<br>めいろをすすめ！</p>
+                    <h3>めいろゲーム</h3>
+                    <p>ゴールを めざして<br>めいろを すすもう！</p>
                 </a>
                 <a href="othello.html" class="app-link">
-                    <h3>⚪⚫ オセロ<br>ゲーム</h3>
-                    <p>くろ と しろ で<br>はさみっこ！</p>
+                    <h3>オセロ</h3>
+                    <p>あいての いしを<br>ひっくりかえそう！</p>
                 </a>
                 <a href="shogi.html" class="app-link">
-                    <h3>☗ わくわく<br>しょうぎ</h3>
-                    <p>にほんの でんとうてきな<br>ボードゲーム！</p>
+                    <h3>しょうぎ</h3>
+                    <p>こまを うごかして<br>あいての おうをとろう！</p>
+                </a>
+                <a href="colorfound.html" class="app-link">
+                    <h3>いろさがしゲーム</h3>
+                    <p>おなじ いろを<br>みつけて タッチ！</p>
                 </a>
             </div>
         </div>
 
         <div class="category-group">
-            <h2 class="category-title">せいかつ ルール</h2>
+            <h2 class="category-title">🏠 せいかつと ルール</h2>
             <div class="app-grid">
+                <a href="clock.html" class="app-link">
+                    <h3>🕒 とけい</h3>
+                    <p>とけいの よみかたを<br>おぼえよう！</p>
+                </a>
                 <a href="traffic-signal.html" class="app-link">
-                    <h3>🚦 しんごうを<br>わたろう</h3>
-                    <p>こうつうルールを まもって<br>あんぜんに わたろう！</p>
+                    <h3>🚦 しんごうき</h3>
+                    <p>こうつうルールを<br>たのしく まなぼう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🎵 おんがく</h2>
+            <div class="app-grid">
+                <a href="keyboard.html" class="app-link">
+                    <h3>🎹 けんばんあそび</h3>
+                    <p>ピアノを ひいて<br>おとを たのしもう！</p>
                 </a>
                 <a href="movies.html" class="app-link">
                     <h3>🎬 うたのどうが</h3>
-                    <p>たのしい うたを<br>みてみよう！</p>
+                    <p>たのしい うたを<br>みて きいてみよう！</p>
                 </a>
             </div>
         </div>
 
         <div class="category-group">
-            <h2 class="category-title">おたのしみ</h2>
+            <h2 class="category-title">🎨 おえかきと こうさく</h2>
             <div class="app-grid">
                 <a href="drawing-board.html" class="app-link">
-                    <h3>🎨 おえかき</h3>
+                    <h3>おえかき</h3>
                     <p>じゆうに えを<br>かいてみよう！</p>
                 </a>
                 <a href="coloring-select.html" class="app-link">
-                    <h3>🎨 ぬりえ</h3>
-                    <p>すきな いろで<br>ぬってみよう！</p>
-                </a>
-                <a href="keyboard.html" class="app-link">
-                    <h3>🎹 けんばんあそび</h3>
-                    <p>いろんな おとを<br>ならしてみよう！</p>
-                </a>
-                <a href="typing.html" class="app-link">
-                    <h3>⌨️ タイピング<br>れんしゅう</h3>
-                    <p>キーボードで もじを<br>うってみよう！</p>
-                </a>
-                <a href="gacha.html" class="app-link">
-                    <h3>🎁 ごほうび<br>ゲット！</h3>
-                    <p>あつめた ほしで<br>ごほうびをもらおう！</p>
-                </a>
-                <a href="collection.html" class="app-link">
-                    <h3>👑 コレクション</h3>
-                    <p>あつめた ごほうびを<br>みてみよう！</p>
+                    <h3>ぬりえ</h3>
+                    <p>すきな えを<br>えらんで ぬろう！</p>
                 </a>
             </div>
         </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🤖 プログラミング</h2>
+            <div class="app-grid">
+                <a href="programming-game.html" class="app-link">
+                    <h3>プログラミング</h3>
+                    <p>めいれいを ならべて<br>うごかしてみよう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🎁 おたのしみ</h2>
+            <div class="app-grid">
+                <a href="gacha.html" class="app-link">
+                    <h3>がちゃ</h3>
+                    <p>ほしを つかって<br>がちゃを まわそう！</p>
+                </a>
+                <a href="collection.html" class="app-link">
+                    <h3>コレクション</h3>
+                    <p>あつめた アイテムを<br>みてみよう！</p>
+                </a>
+            </div>
+        </div>
+
+        
     </main>
     <script src="settings.js"></script>
     <script>
