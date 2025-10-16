@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invader Tetris</title>
+    <!-- 404エラーを防ぐためのダミーファビコン -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👾</text></svg>">
+    <!-- 外部CSSファイルを読み込む -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="game-wrapper">
+        <!-- 背景ビジュアライザー用のキャンバス -->
+        <canvas id="visualizer-canvas"></canvas>
+        <div id="game-container"></div>
+        <div id="ui-layer" class="ui-container">
+            <!-- タイトル画面UI -->
+            <div id="title-screen">
+                <h1>INVADER TETRIS</h1>
+                <div id="tetris-button" class="button">Play as TETRIS</div>
+                <div id="invader-button" class="button">Play as INVADER</div>
+                <div id="pvp-button" class="button">Player vs Player</div>
+                <div id="spectator-button" class="button">Watch AI vs AI</div>
+                <div id="how-to-play-button" class="button">How to Play</div>
+                <div id="se-test-button" class="button">SE Test</div>
+                <div id="bgm-jukebox-button" class="button">BGM Jukebox</div>
+            </div>
+            <!-- 遊び方説明画面 -->
+            <div id="how-to-play-screen" class="hidden">
+                <h2>遊び方</h2>
+                <div class="instructions-content">
+                    <h3>ゲームの目的</h3>
+                    <p>テトリスとシューティングが融合した対戦ゲームです。相手のフィールドをプレイ不可能な状態にすれば勝利です！</p>
+                    
+                    <h3>テトリス側</h3>
+                    <p>ラインを消してインベーダー側に敵を送り込みます。4ライン同時消し（テトリス）で強力なボスが出現します！</p>
+                    
+                    <h3>インベーダー側</h3>
+                    <p>出現する敵を倒してテトリス側におじゃまブロックを送り込みます。ボスを倒すと大量のおじゃま攻撃が発動します！</p>
+                </div>
+                <div id="how-to-play-back-button" class="button">戻る</div>
+            </div>
+            <!-- ゲーム画面UI -->
+            <div id="game-ui" class="hidden">
+                <div id="tetris-title" class="ui-title">TETRIS</div>
+                <div id="invader-title" class="ui-title">INVADER</div>
+                <!-- Pause Button -->
+                <div id="pause-button" class="game-button">PAUSE</div>
+                <!-- Tetris Controls -->
+                <div id="tetris-controls" class="controls-box">
+                    <h3>Controls</h3>
+                    <p><span>A, D</span> :Move</p>
+                    <p><span>S</span> :Soft<br> Drop</p>
+                    <p><span>W</span> :Rotate</p>
+                    <p><span>Q</span> :Rotate<br> CCW</p>
+                    <p><span>E</span> :Hold</p>
+                    <p><span>SPACE</span> :Hard<br> Drop</p>
+                </div>
+                <!-- Invader Controls -->
+                <div id="invader-controls" class="controls-box">
+                    <h3>Controls</h3>
+                    <p><span>&larr;&rarr;</span> :Move</p>
+                    <p><span>&uarr;</span> :Shoot</p>
+                    <p><span>R-SHIFT</span> :Slow<br> Motion</p>
+                </div>
+                <!-- BGMコントロールUI -->
+                <div id="bgm-controls">
+                    <div id="track-info-container">
+                        <span id="track-info-text"></span>
+                    </div>
+                    <div id="time-display">
+                        <span id="current-time">0:00</span> / <span id="total-duration">0:00</span>
+                    </div>
+                    <input type="range" id="progress-bar" min="0" max="100" value="0">
+                    <button id="prev-track-button">&lt;&lt;</button>
+                    <button id="play-pause-button">PAUSE</button>
+                    <button id="next-track-button">&gt;&gt;</button>
+                    <label for="bgm-volume">BGM VOL</label>
+                    <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="1">
+                    <label for="se-volume">SE VOL</label>
+                    <input type="range" id="se-volume" min="0" max="1" step="0.01" value="1">
+                </div>
+            </div>
+    </div>
+    <!-- BGM再生用の非表示オーディオ要素 -->
+    <!-- srcはJavaScriptで動的に設定するため空にしておく -->
+    <audio id="bgm-player" loop></audio>
+    <!-- ES Moduleとしてmain.jsを読み込む -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
