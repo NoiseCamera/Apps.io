@@ -1,0 +1,479 @@
+@charset "UTF-8";
+
+/* --- ベース設定：元気で明るい雰囲気 --- */
+body {
+    background-color: #fffbeb;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    /* 背景パターン（ドットとチェック） */
+    background-image:
+        radial-gradient(#ffd54f 15%, transparent 15%),
+        radial-gradient(#4fc3f7 15%, transparent 15%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+
+/* --- 背景のアニメーション装飾 --- */
+.bg-decorations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.floating-item {
+    position: absolute;
+    font-size: 4rem;
+    opacity: 0.6;
+    animation: floatUp 15s linear infinite;
+}
+
+.balloon-1 {
+    left: 10%;
+    animation-duration: 12s;
+}
+
+.balloon-2 {
+    right: 15%;
+    animation-duration: 18s;
+    animation-delay: 2s;
+}
+
+.cloud-1 {
+    top: 20%;
+    left: -10%;
+    font-size: 8rem;
+    animation: drift 25s linear infinite;
+    opacity: 0.4;
+}
+
+.star-1 {
+    bottom: 10%;
+    left: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(110vh) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(-10vh) rotate(20deg);
+    }
+}
+
+@keyframes drift {
+    0% {
+        left: -20%;
+    }
+
+    100% {
+        left: 120%;
+    }
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* --- ヘッダー：看板のようなデザイン --- */
+.main-header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    margin: 0 auto 40px;
+}
+
+.title-board {
+    background: #ffffff;
+    border: 6px solid #8d6e63;
+    /* 木の枠風 */
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 0 #5d4037, 0 20px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform: rotate(-2deg);
+    background-image: linear-gradient(to bottom, #fff, #fff8e1);
+}
+
+.main-header h1 {
+    color: #ff6f00;
+    font-size: 3rem;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ffca28;
+    letter-spacing: 0.05em;
+}
+
+.ribbon {
+    background: #f06292;
+    color: #fff;
+    display: inline-block;
+    padding: 5px 30px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 15px;
+    position: relative;
+    box-shadow: 0 4px 0 #ad1457;
+}
+
+.ribbon::before,
+.ribbon::after {
+    content: '★';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #ffd54f;
+}
+
+.ribbon::before {
+    left: 10px;
+}
+
+.ribbon::after {
+    right: 10px;
+}
+
+/* ヘッダー周りのキャラ */
+.header-decorations {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.char-img {
+    width: 100px;
+    height: auto;
+    position: absolute;
+    filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.2));
+    z-index: 20;
+}
+
+.char-left {
+    bottom: 10px;
+    left: -30px;
+    transform: rotate(-15deg);
+}
+
+.char-right {
+    bottom: 10px;
+    right: -30px;
+    transform: rotate(15deg);
+}
+
+.deco-emoji {
+    position: absolute;
+    font-size: 3rem;
+    animation: bounce 2s infinite;
+}
+
+.emoji-tl {
+    top: 0;
+    left: 10px;
+}
+
+.emoji-tr {
+    top: 0;
+    right: 10px;
+    animation-delay: 0.5s;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* --- カテゴリエリア：色分けされた「島」 --- */
+.category-section {
+    background: #fff;
+    border-radius: 30px;
+    margin: 0 20px 50px;
+    padding: 30px 20px;
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.05);
+    position: relative;
+    border: 4px dashed;
+}
+
+/* エリアごとのテーマカラー */
+.area-pink {
+    background-color: #fff0f5;
+    border-color: #f48fb1;
+}
+
+.area-blue {
+    background-color: #e3f2fd;
+    border-color: #64b5f6;
+}
+
+.area-green {
+    background-color: #e8f5e9;
+    border-color: #81c784;
+}
+
+.area-purple {
+    background-color: #f3e5f5;
+    border-color: #ba68c8;
+}
+
+.area-orange {
+    background-color: #fff3e0;
+    border-color: #ffb74d;
+}
+
+.area-gray {
+    background-color: #eceff1;
+    border-color: #90a4ae;
+}
+
+.area-yellow {
+    background-color: #fffde7;
+    border-color: #ffd54f;
+}
+
+/* カテゴリヘッダー：キャラが吹き出しで喋ってる風 */
+.category-header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.char-bubble {
+    width: 90px;
+    height: 90px;
+    background: #fff;
+    border-radius: 50%;
+    border: 4px solid currentColor;
+    /* 親の色を継承させたいが個別指定が必要 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: -20px;
+    /* タイトルに重ねる */
+    z-index: 2;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.char-bubble img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+.category-title {
+    background: #fff;
+    padding: 15px 40px 15px 40px;
+    border-radius: 50px;
+    font-size: 1.8rem;
+    color: #444;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+
+/* エリアごとの装飾（下部のミニアイコン） */
+.section-decorations {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 20px;
+    opacity: 0.6;
+    letter-spacing: 20px;
+}
+
+/* --- アプリグリッド --- */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* --- アプリカード：積み木・ステッカー風 --- */
+.app-card {
+    display: block;
+    text-decoration: none;
+    color: #444;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.card-inner {
+    background: #ffffff;
+    border-radius: 25px;
+    padding: 20px 10px;
+    text-align: center;
+    height: 100%;
+    box-sizing: border-box;
+    border: 3px solid #eee;
+    box-shadow: 0 8px 0 #ddd, 0 15px 10px rgba(0, 0, 0, 0.1);
+    /* 厚み */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.app-card:hover .card-inner {
+    transform: translateY(-5px);
+    box-shadow: 0 13px 0 #ccc, 0 20px 15px rgba(0, 0, 0, 0.15);
+    background-color: #fffff0;
+}
+
+.app-card:active .card-inner {
+    transform: translateY(5px);
+    box-shadow: 0 3px 0 #ccc;
+}
+
+.app-icon {
+    font-size: 3.5rem;
+    line-height: 1;
+    display: block;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s;
+}
+
+.app-card:hover .app-icon {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.app-card h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 800;
+    color: #5d4037;
+}
+
+/* カードの色味をエリアに合わせて微調整 */
+.area-pink .app-card .card-inner {
+    border-color: #f8bbd0;
+    box-shadow: 0 8px 0 #f48fb1, 0 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+.area-pink .app-card:hover .card-inner {
+    box-shadow: 0 13px 0 #f48fb1, 0 15px 15px rgba(0, 0, 0, 0.1);
+}
+
+.area-blue .app-card .card-inner {
+    border-color: #bbdefb;
+    box-shadow: 0 8px 0 #90caf9, 0 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+.area-blue .app-card:hover .card-inner {
+    box-shadow: 0 13px 0 #90caf9, 0 15px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 他のエリアも同様に定義可能ですが、長くなるのでデフォルトスタイルでカバーしつつ、重要な部分のみ */
+
+/* --- フッター：動物のパレード --- */
+footer {
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 50px;
+    background: linear-gradient(to bottom, transparent, #81c784 20%);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-parade {
+    font-size: 3rem;
+    white-space: nowrap;
+    animation: parade 20s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes parade {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+footer p {
+    color: #1b5e20;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+}
+
+/* --- スマホレスポンシブ --- */
+@media (max-width: 600px) {
+    .main-header h1 {
+        font-size: 2rem;
+    }
+
+    .char-img {
+        width: 70px;
+    }
+
+    .char-left {
+        left: -10px;
+    }
+
+    .char-right {
+        right: -10px;
+    }
+
+    .category-header-wrapper {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .char-bubble {
+        margin-right: 0;
+        margin-bottom: -25px;
+        /* タイトルに乗っける */
+    }
+
+    .category-title {
+        padding-top: 30px;
+        /* キャラが乗る分あける */
+        font-size: 1.4rem;
+        width: 90%;
+        text-align: center;
+    }
+
+    .app-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* スマホは2列固定で見やすく */
+    }
+}

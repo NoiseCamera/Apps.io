@@ -16,10 +16,20 @@
     </header>
 
     <div id="game-options-container">
-        <div id="mode-selector">
-            <button class="mode-btn selected" id="mode-mixed">まぜこぜ</button>
-            <button class="mode-btn" id="mode-addition">たしざん</button>
-            <button class="mode-btn" id="mode-subtraction">ひきざん</button>
+        <div class="setting-group">
+            <div id="mode-selector">
+                <button class="mode-btn selected" id="mode-mixed">まぜこぜ</button>
+                <button class="mode-btn" id="mode-addition">たしざん</button>
+                <button class="mode-btn" id="mode-subtraction">ひきざん</button>
+            </div>
+            <!-- ▼ トグルスイッチをここに追加 ▼ -->
+            <div class="toggle-switch-container">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="carry-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>くりあがり・くりさがり</span>
+            </div>
         </div>
         <div id="difficulty-selector">
             <button class="difficulty-btn selected" id="difficulty-mixed">いろんな けた</button>

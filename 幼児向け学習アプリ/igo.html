@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>囲碁 (いご)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="buttons.css">
+  <link rel="stylesheet" href="igo.css"> <!-- 新しいCSS -->
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm_igo.mp3" loop></audio> <!-- 囲碁用のBGM -->
+  <audio id="place-stone-sound" src="assets/sounds/igo_stone.mp3"></audio>
+  <audio id="capture-sound" src="assets/sounds/igo_capture.mp3"></audio>
+  <audio id="win-sound" src="assets/sounds/win.mp3"></audio>
+  <audio id="lose-sound" src="assets/sounds/lose.mp3"></audio>
+
+  <header>
+    <h1>囲碁 (いご)</h1>
+  </header>
+
+  <main id="game-container" class="hidden">
+    <div id="info-panel">
+      <p id="turn-indicator">あなたの番です (黒石)</p>
+      <p>くろのアゲハマ: <span id="black-captures">0</span></p>
+      <p>しろのアゲハマ: <span id="white-captures">0</span></p>
+    </div>
+    <div id="board-wrapper">
+      <div id="board-container">
+        <canvas id="igo-canvas"></canvas>
+        <!-- AI思考中モーダル (盤面の上に表示) -->
+        <div id="ai-thinking-modal" class="overlay hidden">
+          <div class="modal-content">
+            <h2 id="ai-thinking-title">AIが かんがえています...</h2>
+            <div class="loader"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 観戦モード用コントロール（盤面下） -->
+      <div id="board-bottom-controls">
+        <div id="watch-controls" class="control-group hidden">
+          <p>かんせんスピード</p>
+          <div class="speed-btn-container">
+            <button class="speed-btn" data-speed="fast">はやい</button>
+            <button class="speed-btn selected" data-speed="normal">ふつう</button>
+            <button class="speed-btn" data-speed="slow">おそい</button>
+          </div>
+        </div>
+        <button id="pause-btn" class="button-style hidden">いちじていし</button>
+      </div>
+      <!-- 盤面下のメインコントロール -->
+      <div id="game-controls">
+        <div class="game-actions">
+          <button id="hint-btn" class="button-style hidden">ヒント</button>
+          <button id="pass-btn" class="button-style">パス</button>
+          <button id="resign-btn" class="button-style">まけました</button>
+        </div>
+      </div>
+    </div>
+    <aside id="igo-guide">
+      <h3>いごのルール</h3>
+      <div id="guide-buttons">
+          <button class="guide-btn" data-topic="capture"><ruby>石<rt>いし</rt></ruby>の<ruby>取<rt>と</rt></ruby>り<ruby>方<rt>かた</rt></ruby></button>
+          <button class="guide-btn" data-topic="atari">アタリ</button>
+          <button class="guide-btn" data-topic="dame">ダメ</button>
+          <button class="guide-btn" data-topic="ko">コウ</button>
+          <button class="guide-btn" data-topic="ji"><ruby>陣地<rt>じんち</rt></ruby></button>
+          <button class="guide-btn" data-topic="eye"><ruby>眼<rt>め</rt></ruby></button>
+          <button class="guide-btn" data-topic="seki">セキ</button>
+          <button class="guide-btn" data-topic="damezumari"><ruby>ダメヅマリ<rt>だめづまり</rt></ruby></button>
+          <button class="guide-btn" data-topic="suicide"><ruby>うてない<rt>うてない</rt></ruby>ばしょ</button>
+          <button class="guide-btn" data-topic="ending"><ruby>おわりかた<rt>おわりかた</rt></ruby></button>
+          <button class="guide-btn" data-topic="scoring"><ruby>かちまけ<rt>かちまけ</rt></ruby>の<ruby>きめかた<rt>きめかた</rt></ruby></button>
+          <button class="guide-btn" data-topic="shicho"><ruby>シチョウ<rt>しちょう</rt></ruby></button>
+          <button class="guide-btn" data-topic="geta"><ruby>ゲタ<rt>げた</rt></ruby></button>
+      </div>
+      <p id="guide-text">ボタンをおして ルールを みてみよう！</p>
+    </aside>
+  </main>
+
+  <!-- モード選択モーダル -->
+  <div id="mode-selection-modal" class="overlay">
+    <div class="modal-content">
+      <h2>あそびかたを えらんでね</h2>
+      <div class="modal-buttons vertical">
+        <button class="mode-btn" data-mode="vsAI">ひとりで あそぶ (VS AI)</button>
+        <button class="mode-btn" data-mode="vsHuman">ふたりで あそぶ</button>
+        <button class="mode-btn" data-mode="aiWatch">AIを みる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI難易度選択モーダル (新規追加) -->
+  <div id="difficulty-selection-modal" class="overlay hidden">
+    <div class="modal-content">
+        <h2>つよさを えらんでね</h2>
+        <div id="difficulty-selector" class="control-group">
+          <p>つよさ</p>
+          <button class="difficulty-btn selected" data-level="easy">かんたん</button>
+          <button class="difficulty-btn" data-level="normal">ふつう</button>
+          <button class="difficulty-btn" data-level="hard">むずかしい</button>
+        </div>
+        <div id="board-size-selector-ai" class="control-group modal-control-group">
+          <p>ばんのサイズ</p>
+          <button class="board-size-btn selected" data-size="9">9ろばん</button>
+          <button class="board-size-btn" data-size="13">13ろばん</button>
+          <button class="board-size-btn" data-size="19">19ろばん</button>
+        </div>
+        <div class="modal-buttons">
+            <button id="start-ai-game-btn" class="button-style">ゲームかいし</button>
+            <button id="back-to-mode-from-difficulty-btn" class="button-style">もどる</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- 対戦者選択モーダル (将棋アプリ参考) -->
+  <div id="player-selection-modal" class="overlay hidden">
+    <div class="modal-content">
+        <h2>たいせんする ひとを えらんでね</h2>
+        <div class="player-selection-container">
+            <div class="player-side">
+                <h3>くろいし (さき)</h3>
+                <input type="text" id="sente-name" class="player-name-input" value="プレイヤー1">
+            </div>
+            <div class="player-side">
+                <h3>しろいし (あと)</h3>
+                <input type="text" id="gote-name" class="player-name-input" value="プレイヤー2">
+            </div>
+        </div>
+        <div id="board-size-selector-human" class="control-group modal-control-group">
+          <p>ばんのサイズ</p>
+          <button class="board-size-btn selected" data-size="9">9ろばん</button>
+          <button class="board-size-btn" data-size="13">13ろばん</button>
+          <button class="board-size-btn" data-size="19">19ろばん</button>
+        </div>
+        <div class="modal-buttons">
+            <button id="start-human-game-btn" class="button-style">たいせんかいし！</button>
+            <button id="back-to-mode-btn" class="button-style">もどる</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- ルールガイドモーダル (新規追加) -->
+  <div id="rule-guide-modal" class="overlay hidden">
+    <div class="modal-content">
+      <h2 id="rule-guide-modal-title"></h2>
+      <div id="rule-guide-canvas-container">
+        <canvas id="rule-guide-canvas"></canvas>
+      </div>
+      <div id="rule-guide-animation-text"></div>
+      <p id="rule-guide-modal-text"></p>
+      <button id="close-rule-guide-modal-btn" class="colorful-btn">とじる</button>
+    </div>
+  </div>
+
+
+  <div id="game-over-modal" class="overlay hidden">
+    <div class="modal-content">
+        <h2 id="modal-title"></h2>
+        <div id="score-details">
+          <p>【けっか】</p>
+          <p>くろ： <span id="black-territory">0</span> (じ) + <span id="black-final-captures">0</span> (アゲハマ) = <span id="black-total-score">0</span></p>
+          <p>しろ： <span id="white-territory">0</span> (じ) + <span id="white-final-captures">0</span> (アゲハマ) + 6.5 (コミ) = <span id="white-total-score">0</span></p>
+        </div>
+        <p id="modal-message" class="result-summary"></p>
+        <div class="win-buttons">
+          <button id="play-again-btn" class="colorful-btn">もういちど あそぶ</button>
+        </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+  <script src="igo-ai.js"></script>
+  <script src="igo.js"></script>
+</body>
+</html>

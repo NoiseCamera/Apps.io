@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>にほんちずパズル</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="buttons.css">
+  <link rel="stylesheet" href="japan-puzzle.css"> <!-- 新しいCSS -->
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
+  <audio id="snap-sound" src="assets/sounds/kachi.mp3"></audio>
+  <audio id="region-complete-sound" src="assets/sounds/seikai.mp3"></audio>
+  <audio id="win-sound" src="assets/sounds/kirakira.mp3"></audio>
+
+  <header>
+    <h1>にほんちずパズル</h1>
+  </header>
+
+  <main id="game-area">
+    <div id="puzzle-wrapper">
+      <div id="puzzle-board">
+        <canvas id="puzzle-canvas"></canvas>
+        <!-- 県ピースがここに絶対配置される -->
+      </div>
+      <div id="side-panel">
+        <div id="region-selector-container">
+            <p>ちほうを えらんでね</p>
+            <div id="region-selector">
+              <!-- 地方選択ボタンがJSで生成される -->
+            </div>
+        </div>
+        <div id="pieces-container">
+            <!-- 選択した地方のピースがここに表示される -->
+        </div>
+        <div id="info-panel">
+            <p id="info-text">ピースをちずのうえにおいてね</p>
+        </div>
+        <button id="hint-btn" class="button-style">ヒント</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="win-modal" class="overlay hidden">
+    <div class="modal-content">
+        <h2 id="win-title">ぜんぶクリア！</h2>
+        <p>にほんちずを かんせいさせたね！すごい！</p>
+        <div class="win-buttons">
+          <button id="play-again-btn">もういちど あそぶ</button>
+          <a href="index.html" class="button-style">えらぶがめんへ</a>
+        </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+  <script src="japan-puzzle-data.js"></script> <!-- 県データファイルを分離 -->
+  <script src="japan-puzzle.js"></script>
+</body>
+</html>

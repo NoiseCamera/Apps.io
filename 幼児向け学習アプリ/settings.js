@@ -435,4 +435,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     loadAndApplySettings();
+
+    // --- Design Injection ---
+    // 1. Inject Google Fonts (M PLUS Rounded 1c) if not present
+    if (!document.querySelector('link[href*="M+PLUS+Rounded+1c"]')) {
+        const fontLink = document.createElement('link');
+        fontLink.rel = 'stylesheet';
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap';
+        document.head.appendChild(fontLink);
+    }
+
+    // 2. Inject Background Decorations if not present
+    if (!document.querySelector('.bg-decorations')) {
+        const decorationsHTML = `
+            <div class="bg-decorations">
+                <div class="floating-item balloon-1">🎈</div>
+                <div class="floating-item balloon-2">🧸</div>
+                <div class="floating-item cloud-1">☁️</div>
+                <div class="floating-item star-1">⭐</div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('afterbegin', decorationsHTML);
+    }
 });

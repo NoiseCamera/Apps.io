@@ -1,0 +1,185 @@
+/* japan-puzzle.css */
+body {
+    background: linear-gradient(135deg, #e0f2f1 0%, #e3f2fd 100%);
+}
+
+#game-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 10px auto;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+#puzzle-board {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    border: 3px solid #888;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#puzzle-canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.prefecture-piece {
+    position: absolute;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+    pointer-events: auto;
+    filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.4));
+    -webkit-tap-highlight-color: transparent; /* スマホでのタップハイライトを消す */
+    user-select: none; /* テキスト選択を防ぐ */
+}
+
+.prefecture-piece.dragging {
+    cursor: grabbing;
+    transform: scale(1.1);
+    z-index: 100;
+    filter: drop-shadow(8px 8px 8px rgba(0,0,0,0.3));
+}
+
+.prefecture-piece.placed {
+    pointer-events: none;
+    filter: none;
+    animation: piece-snap 0.3s ease-out;
+    z-index: 1;
+}
+
+@keyframes piece-snap {
+    0% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+#side-panel {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+#region-selector-container p {
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: #333;
+}
+
+#region-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.region-btn {
+    padding: 10px 5px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    box-shadow: 0 4px #81c784;
+    transition: all 0.1s;
+}
+
+.region-btn.selected {
+    background-color: #66bb6a;
+    color: white;
+    transform: translateY(2px);
+    box-shadow: 0 2px #81c784;
+}
+
+.region-btn.completed {
+    background-color: #a5d6a7;
+    color: #e8f5e9;
+    text-decoration: line-through;
+    cursor: default;
+    box-shadow: 0 2px #66bb6a;
+    transform: translateY(2px);
+}
+
+.region-btn:not(.selected):not(.completed):hover {
+    background-color: #81c784;
+}
+
+#pieces-container {
+    position: relative;
+    min-height: 200px;
+    background-color: #e3f2fd;
+    border: 2px dashed #90caf9;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+#info-panel {
+    background-color: #fffde7;
+    border: 2px solid #fbc02d;
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 50px;
+    text-align: center;
+    font-weight: bold;
+    color: #5d4037;
+}
+
+#hint-btn {
+    background-color: #ffb74d;
+    box-shadow: 0 5px #f57c00;
+}
+
+/* Win Modal (jigsaw-puzzle.cssから流用) */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-content {
+    background: linear-gradient(145deg, #ffffff, #e6e9f0);
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.modal-content h2 { font-size: 2.5rem; color: #4caf50; }
+.win-buttons { display: flex; gap: 20px; margin-top: 20px; }
+
+@media (max-width: 1150px) {
+    #puzzle-board {
+        width: 640px; /* 80% */
+        height: 480px;
+    }
+}
+
+@media (max-width: 980px) {
+    #game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+}

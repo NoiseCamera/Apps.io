@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>にほんちずパズル</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="japan-map-puzzle.css">
+    <!-- D3.js and TopoJSON -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+</head>
+
+<body>
+    <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
+
+    <div id="app-container">
+        <header>
+            <h1>にほんちずパズル</h1>
+            <p>形をあわせて 都道府県を覚えよう！</p>
+        </header>
+
+        <main id="game-area">
+            <div id="controls-area">
+                <div id="region-selector">
+                    <button class="region-btn selected" data-region="all">ぜんぶ</button>
+                    <button class="region-btn" data-region="hokkaido_tohoku">ほっかいどう・とうほく</button>
+                    <button class="region-btn" data-region="kanto">かんとう</button>
+                    <button class="region-btn" data-region="chubu">ちゅうぶ</button>
+                    <button class="region-btn" data-region="kinki">きんき</button>
+                    <button class="region-btn" data-region="chugoku_shikoku">ちゅうごく・しこく</button>
+                    <button class="region-btn" data-region="kyushu_okinawa">きゅうしゅう・おきなわ</button>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">のこり:</span>
+                    <span id="remaining-count">47</span>
+                </div>
+            </div>
+
+            <div id="puzzle-container">
+                <!-- Map will be rendered here -->
+                <svg id="map-svg"></svg>
+            </div>
+
+            <div id="pieces-container">
+                <!-- Draggable pieces will appear here -->
+            </div>
+        </main>
+
+        <!-- Win Modal -->
+        <div id="win-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>かんせい！</h2>
+                <p>すごい！ にほんちずが できたね！</p>
+                <p class="points-feedback">★ ほしを <span id="win-points">10</span>こ ゲット！ ★</p>
+                <button id="play-again-btn" class="button-style">もういっかい あそぶ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared scripts -->
+    <script src="settings.js"></script>
+    <script src="japan-puzzle-data.js"></script>
+    <!-- Game specific script -->
+    <script src="japan-map-puzzle.js"></script>
+</body>
+
+</html>
