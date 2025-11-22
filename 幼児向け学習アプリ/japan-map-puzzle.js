@@ -46,7 +46,7 @@ function waitForData(callback) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     // PREFECTURES_DATAが読み込まれるのを待ってからゲームの初期化を開始
     waitForData(initializeGame);
 });

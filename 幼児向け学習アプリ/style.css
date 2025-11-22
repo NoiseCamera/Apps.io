@@ -450,19 +450,23 @@ nav {
 
 /* 計算アプリのレイアウト */
 .calculation-layout {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* ボタンとコンテナを中央揃え */
-    gap: 20px;
-    /* 各要素間のスペースを少し広げる */
+    display: flex; /* Flexboxを有効にする */
+    justify-content: center; /* 中央揃え */
+    align-items: flex-start; /* 上端揃えに変更 */
+    gap: 20px; /* 各要素間のスペース */
     position: relative;
     /* 青虫の位置決めの基準にする */
     flex-wrap: wrap;
     /* 画面が狭い時に折り返す */
     padding: 0 20px;
     /* 画面幅が狭いときのための余白 */
+
 }
+
+/* calculation-layout内の子要素の表示順を制御 */
+.calculation-layout > #left-items { order: 1 !important; } /* 1番目に表示 */
+.calculation-layout > #calculation-container { order: 2 !important; } /* 2番目に表示 */
+.calculation-layout > #right-items { order: 3 !important; } /* 3番目に表示 */
 
 #calculation-container {
     background-color: #fff;
@@ -471,8 +475,8 @@ nav {
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 400px;
+    width: 330px; /* 固定幅を調整 */
+    max-width: 90%; /* 画面幅が狭い場合に縮小する */
 }
 
 /* リンゴ表示用のコンテナ */
@@ -1647,7 +1651,6 @@ input:checked+.slider:before {
 
 /* --- ゲームコンテナのカード風デザイン --- */
 #app-container,
-#calculation-container,
 .clock-game-layout {
     background: #ffffff;
     border-radius: 30px;
