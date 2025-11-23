@@ -1,5 +1,4 @@
 
-
 export enum ToolMode {
   NONE = 'NONE',
   AI_EDIT = 'AI_EDIT',
@@ -11,7 +10,10 @@ export enum ToolMode {
   BEAUTY = 'BEAUTY',
   MAKEUP = 'MAKEUP',
   MEISHI = 'MEISHI',
-  CAMERA = 'CAMERA'
+  CAMERA = 'CAMERA',
+  TEXT = 'TEXT',
+  DECORATION = 'DECORATION',
+  MOVE = 'MOVE'
 }
 
 export interface ImageState {
@@ -22,6 +24,23 @@ export interface ImageState {
   activeLayerId: string;   // Currently selected layer
   history: Layer[][];      // History now tracks the state of all layers
   historyIndex: number;
+}
+
+export interface TextConfig {
+  text: string;
+  fontFamily: string;
+  color: string;
+  isVertical: boolean;
+  shadow: boolean;
+  stroke: boolean;
+  align: 'left' | 'center' | 'right';
+}
+
+export interface LayerTransform {
+  x: number;
+  y: number;
+  scale: number;
+  rotate: number;
 }
 
 export interface Layer {
@@ -35,6 +54,8 @@ export interface Layer {
   opacity: number;
   blendMode: GlobalCompositeOperation;
   filterState: FilterState;
+  textConfig?: TextConfig; // Stores text settings for re-editing
+  transform?: LayerTransform; // Stores position, scale, rotation
 }
 
 export interface AICaptionResult {
@@ -138,6 +159,8 @@ export type FrameStyle = 'none' | 'simple' | 'thick' | 'double' | 'corners' | 'b
 
 export type QRStyle = 'normal' | 'dots' | 'rounded';
 
+export type MeishiPattern = 'none' | 'dots' | 'stripes' | 'checkers' | 'grid' | 'seigaiha' | 'yagasuri' | 'noise';
+
 export interface MeishiState {
   // Content
   name: string;
@@ -165,6 +188,11 @@ export interface MeishiState {
   
   // Frame
   frameStyle: FrameStyle;
+  
+  // Pattern
+  backgroundPattern: MeishiPattern;
+  backgroundPatternColor: string;
+  backgroundPatternOpacity: number;
   
   // QR
   qrStyle: QRStyle;

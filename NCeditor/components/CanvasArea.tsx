@@ -1,12 +1,16 @@
 
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { FilterState, Point, Layer } from '../types';
+import { FilterState, Point, Layer, ToolMode, LayerTransform, HSLShift } from '../types';
 import { processSelectiveAdjustments } from '../utils/imageProcessing';
 
 interface CanvasAreaProps {
   layers: Layer[];
   activeLayerId: string;
   activeFilters: FilterState; // The filters of the currently selected layer (live)
+  isComparing?: boolean; // New prop for Before/After
+  activeMode?: ToolMode;
+  onLayerTransform?: (transform: LayerTransform) => void;
+  onDoubleTap?: (layerId?: string) => boolean; // Return true if handled, false to reset zoom
 }
 
 // Calculates spline interpolated values for SVG feFunc tableValues (0..1 range)
@@ -79,10 +83,116 @@ function getSplineTableValues(points: Point[], steps: number = 64): string {
     return values.join(' ');
 }
 
+// Memoized Layer Component to prevent re-rendering of background/other layers when moving active layer
+const MemoizedLayer = React.memo(({ 
+    layer, 
+    isActive, 
+    isBackground, 
+    activeMode, 
+    previewSrc, 
+    cssFilterString, 
+    tempColor, 
+    tintColor, 
+    fadeStyle, 
+    vignetteStyle 
+}: {
+    layer: Layer,
+    isActive: boolean,
+    isBackground: boolean,
+    activeMode: ToolMode,
+    previewSrc: string | null,
+    cssFilterString: string,
+    tempColor: string,
+    tintColor: string,
+    fadeStyle: React.CSSProperties,
+    vignetteStyle: React.CSSProperties
+}) => {
+    const displayImage = isActive && previewSrc ? previewSrc : (isActive ? layer.image : layer.preview);
+    
+    // Layer Transform
+    const lTransform = layer.transform || { x: 0, y: 0, scale: 1, rotate: 0 };
+
+    // Improved Layer Placement Logic
+    const layerStyle: React.CSSProperties = {
+        zIndex: isBackground ? 10 : 20, // Simple z-index for now, assumes background is first
+        position: isBackground ? 'relative' : 'absolute',
+        ...(isBackground ? {} : { left: '50%', top: '50%' }),
+        width: 'auto',
+        height: 'auto',
+        // For non-background, we center it first (-50%, -50%), then apply user transforms
+        transform: `${!isBackground ? 'translate(-50%, -50%)' : ''} translate(${lTransform.x}px, ${lTransform.y}px) rotate(${lTransform.rotate}deg) scale(${lTransform.scale})`,
+        transformOrigin: 'center center',
+        opacity: layer.opacity,
+        mixBlendMode: (layer.blendMode === 'source-over' ? 'normal' : layer.blendMode) as any,
+        pointerEvents: 'auto', // Allow picking
+        willChange: isActive && activeMode === ToolMode.MOVE ? 'transform' : 'auto', // Hint browser for performance
+    };
+
+    return (
+        <div 
+            data-layer-id={layer.id}
+            className="flex justify-center items-center select-none touch-none"
+            style={layerStyle}
+        >
+            {/* Container for Masking & Image */}
+            <div style={{
+                position: 'relative',
+                maskImage: layer.mask ? `url(${layer.mask})` : 'none',
+                WebkitMaskImage: layer.mask ? `url(${layer.mask})` : 'none',
+                maskMode: 'alpha',
+                maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
+                maskSize: '100% 100%',
+                WebkitMaskSize: '100% 100%',
+                ...({ WebkitMaskMode: 'alpha' } as any)
+            }}>
+                <img 
+                    src={displayImage}
+                    alt={layer.name}
+                    className="block select-none pointer-events-none touch-none" 
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    style={{
+                        // Background should fit viewport, others are intrinsic size
+                        maxWidth: isBackground ? '100vw' : 'none',
+                        maxHeight: isBackground ? '100vh' : 'none',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        filter: isActive ? cssFilterString : 'none' 
+                    }}
+                />
+                {isActive && (
+                    <>
+                        <div className="absolute inset-0 z-20 pointer-events-none mix-blend-mode-soft-light" style={{ backgroundColor: tempColor }}></div>
+                        <div className="absolute inset-0 z-20 pointer-events-none mix-blend-mode-soft-light" style={{ backgroundColor: tintColor }}></div>
+                        <div className="absolute inset-0 z-20 pointer-events-none" style={fadeStyle}></div>
+                        <div className="absolute inset-0 z-30 pointer-events-none" style={vignetteStyle}></div>
+                    </>
+                )}
+            </div>
+
+            {/* Bounding Box for Active Move - Now correctly wraps image content */}
+            {isActive && activeMode === ToolMode.MOVE && (
+                <div className="absolute -inset-2 border-2 border-cos-accent border-dashed z-50 pointer-events-none">
+                    <div className="absolute -top-2 -left-2 w-4 h-4 bg-cos-accent rounded-full shadow-lg"></div>
+                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-cos-accent rounded-full shadow-lg"></div>
+                    <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-cos-accent rounded-full shadow-lg"></div>
+                    <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-cos-accent rounded-full shadow-lg"></div>
+                </div>
+            )}
+        </div>
+    );
+});
+
 export const CanvasArea: React.FC<CanvasAreaProps> = ({ 
   layers,
   activeLayerId,
-  activeFilters
+  activeFilters,
+  isComparing = false,
+  activeMode = ToolMode.NONE,
+  onLayerTransform,
+  onDoubleTap
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
@@ -91,12 +201,23 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
   const baseImageRef = useRef<HTMLImageElement | null>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Zoom & Pan State
+  // Zoom & Pan State (Viewport)
   const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
   const wrapperRef = useRef<HTMLDivElement>(null);
+  
+  // Interaction State
   const pointersRef = useRef<Map<number, { x: number, y: number }>>(new Map());
   const lastPinchDist = useRef<number>(0);
+  const lastAngle = useRef<number>(0);
   const isInteracting = useRef(false); 
+  
+  // Direct Manipulation State (To bypass React render cycle during move)
+  const activeLayerElementRef = useRef<HTMLElement | null>(null);
+  const tempLayerTransform = useRef<LayerTransform>({ x: 0, y: 0, scale: 1, rotate: 0 });
+  const rafRef = useRef<number | null>(null);
+
+  const lastTapTime = useRef<number>(0);
+  const clickedLayerIdRef = useRef<string | null>(null);
 
   // Initialize Base Image for Selective Color on Active Layer
   useEffect(() => {
@@ -108,6 +229,9 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
       
       // Reset zoom on new project (checking layers length or id)
       if (layers.length === 0) setTransform({ x: 0, y: 0, scale: 1 });
+
+      // Initialize temp transform for move tool
+      tempLayerTransform.current = activeLayer.transform || { x: 0, y: 0, scale: 1, rotate: 0 };
 
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -142,7 +266,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
       if (!offscreenCanvasRef.current || !activeFilters) return;
       
       const selective = activeFilters.selective;
-      const hasAdjustments = Object.values(selective).some(v => v.hue !== 0 || v.saturation !== 0 || v.lightness !== 0);
+      const hasAdjustments = Object.values(selective).some((v: HSLShift) => v.hue !== 0 || v.saturation !== 0 || v.lightness !== 0);
       
       if (!hasAdjustments) {
           if (previewSrc !== offscreenCanvasRef.current.toDataURL()) {
@@ -183,13 +307,37 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
   // --- Gesture Handlers ---
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault(); // Prevent native browser actions like scrolling
     e.currentTarget.setPointerCapture(e.pointerId);
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     lastPinchDist.current = 0;
+    lastAngle.current = 0;
     isInteracting.current = true;
+
+    // Identify which layer was clicked
+    const target = e.target as HTMLElement;
+    const layerDiv = target.closest('[data-layer-id]') as HTMLElement;
+    clickedLayerIdRef.current = layerDiv ? layerDiv.getAttribute('data-layer-id') : null;
+
+    if (activeMode === ToolMode.MOVE && activeLayer) {
+        // Capture current transform for this session
+        tempLayerTransform.current = { ...activeLayer.transform || { x: 0, y: 0, scale: 1, rotate: 0 } };
+        
+        // If the clicked layer is the active one, we capture the element for direct manipulation
+        if (layerDiv && clickedLayerIdRef.current === activeLayerId) {
+            activeLayerElementRef.current = layerDiv;
+        } else {
+            activeLayerElementRef.current = null;
+        }
+    }
   };
 
+  const getAngle = (p1: {x:number, y:number}, p2: {x:number, y:number}) => {
+      return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+  }
+
   const handlePointerMove = (e: React.PointerEvent) => {
+    e.preventDefault(); // Prevent native interactions
     if (!pointersRef.current.has(e.pointerId)) return;
     
     const prevPtr = pointersRef.current.get(e.pointerId)!;
@@ -198,49 +346,133 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     
-    const pts = Array.from(pointersRef.current.values());
+    const pts = Array.from(pointersRef.current.values()) as { x: number, y: number }[];
 
     if (pts.length === 2) {
+        // Two fingers: Pinch Zoom / Rotate
         const p1 = pts[0];
         const p2 = pts[1];
         const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const angle = getAngle(p1, p2);
 
-        if (lastPinchDist.current > 0 && wrapperRef.current) {
+        if (lastPinchDist.current > 0) {
             const zoomFactor = dist / lastPinchDist.current;
-            setTransform(prev => {
-                let newScale = prev.scale * zoomFactor;
-                newScale = Math.min(Math.max(0.5, newScale), 8); 
-                return {
-                    ...prev,
-                    scale: newScale
-                };
-            });
+            const angleDelta = angle - lastAngle.current;
+
+            if (activeMode === ToolMode.MOVE && activeLayer) {
+                // Direct Manipulation for Performance
+                const current = tempLayerTransform.current;
+                current.scale = Math.max(0.1, current.scale * zoomFactor);
+                current.rotate += angleDelta;
+                
+                if (activeLayerElementRef.current) {
+                    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                    rafRef.current = requestAnimationFrame(() => {
+                        if (!activeLayerElementRef.current) return;
+                        const lt = tempLayerTransform.current;
+                        const isBg = layers[0].id === activeLayerId;
+                        // Reconstruct transform string (must match MemoizedLayer logic)
+                        const str = `${!isBg ? 'translate(-50%, -50%)' : ''} translate(${lt.x}px, ${lt.y}px) rotate(${lt.rotate}deg) scale(${lt.scale})`;
+                        activeLayerElementRef.current!.style.transform = str;
+                    });
+                }
+            } else {
+                // Transform Viewport (React State Update is fine here as it moves the whole wrapper)
+                setTransform(prev => {
+                    let newScale = prev.scale * zoomFactor;
+                    newScale = Math.min(Math.max(0.5, newScale), 8); 
+                    return { ...prev, scale: newScale };
+                });
+            }
         }
         lastPinchDist.current = dist;
+        lastAngle.current = angle;
 
     } else if (pts.length === 1) {
+        // Single finger: Pan
         const dx = e.clientX - prevX;
         const dy = e.clientY - prevY;
-        setTransform(prev => ({
-            ...prev,
-            x: prev.x + dx,
-            y: prev.y + dy
-        }));
+
+        if (activeMode === ToolMode.MOVE && activeLayer) {
+            // Move Active Layer - Accumulate to temp transform
+            // Divide by viewport scale to ensure 1:1 finger tracking
+            tempLayerTransform.current.x += (dx / transform.scale);
+            tempLayerTransform.current.y += (dy / transform.scale);
+
+            if (activeLayerElementRef.current) {
+                if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                rafRef.current = requestAnimationFrame(() => {
+                    if (!activeLayerElementRef.current) return;
+                    const lt = tempLayerTransform.current;
+                    const isBg = layers[0].id === activeLayerId;
+                    // Reconstruct transform string
+                    const str = `${!isBg ? 'translate(-50%, -50%)' : ''} translate(${lt.x}px, ${lt.y}px) rotate(${lt.rotate}deg) scale(${lt.scale})`;
+                    activeLayerElementRef.current!.style.transform = str;
+                });
+            }
+        } else {
+            // Pan Viewport
+            setTransform(prev => ({
+                ...prev,
+                x: prev.x + dx,
+                y: prev.y + dy
+            }));
+        }
     }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
     pointersRef.current.delete(e.pointerId);
+    
+    // Simple touch double tap detection
+    if (pointersRef.current.size === 0 && isInteracting.current) {
+        const now = Date.now();
+        if (now - lastTapTime.current < 300) {
+            // Double tap detected
+            let handled = false;
+            if (onDoubleTap) {
+                handled = onDoubleTap(clickedLayerIdRef.current || undefined);
+            }
+            if (!handled && activeMode !== ToolMode.MOVE) {
+                setTransform({ x: 0, y: 0, scale: 1 });
+            }
+        }
+        lastTapTime.current = now;
+    }
+
     if (pointersRef.current.size < 2) {
         lastPinchDist.current = 0;
+        lastAngle.current = 0;
     }
     if (pointersRef.current.size === 0) {
+        // Commit Move Changes to React State
+        if (activeMode === ToolMode.MOVE && activeLayer && onLayerTransform && isInteracting.current) {
+            onLayerTransform(tempLayerTransform.current);
+        }
+
         isInteracting.current = false;
+        clickedLayerIdRef.current = null;
+        activeLayerElementRef.current = null;
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
     }
   };
 
-  const handleDoubleTap = () => {
-      setTransform({ x: 0, y: 0, scale: 1 });
+  const handleDoubleTapEvent = (e: React.MouseEvent) => {
+      e.preventDefault();
+      let handled = false;
+      
+      // Try to identify layer from mouse event target
+      const target = e.target as HTMLElement;
+      const layerDiv = target.closest('[data-layer-id]');
+      const layerId = layerDiv ? layerDiv.getAttribute('data-layer-id') : undefined;
+
+      if (onDoubleTap) {
+          handled = onDoubleTap(layerId || undefined);
+      }
+      
+      if (!handled && activeMode !== ToolMode.MOVE) {
+          setTransform({ x: 0, y: 0, scale: 1 });
+      }
   };
 
   if (layers.length === 0) {
@@ -257,9 +489,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
   }
 
   // --- Calculate Active Layer Filters for SVG/CSS ---
-  // Only calculate these if there is an active layer selected
   const f = activeFilters;
-  const cssFilterString = f ? `
+  const cssFilterString = (f && !isComparing) ? `
     brightness(${Math.max(0, 100 + f.brightness + (f.exposure * 0.8))}%) 
     contrast(${Math.max(0, 100 + f.contrast)}%) 
     saturate(${Math.max(0, 100 + f.saturation + (f.vibrance * 0.6))}%) 
@@ -271,7 +502,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     url(#svg-filters) 
   ` : 'none';
 
-  const vignetteStyle: React.CSSProperties = f ? {
+  const vignetteStyle: React.CSSProperties = (f && !isComparing) ? {
     background: `radial-gradient(circle, transparent 50%, rgba(0,0,0,${f.vignette/100}) 140%)`,
     mixBlendMode: 'multiply',
   } : {};
@@ -284,7 +515,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
   if (f && f.tint > 0) tintColor = `rgba(255, 0, 255, ${f.tint / 200})`;
   else if (f && f.tint < 0) tintColor = `rgba(0, 255, 0, ${Math.abs(f.tint) / 200})`;
 
-  const fadeStyle: React.CSSProperties = f ? {
+  const fadeStyle: React.CSSProperties = (f && !isComparing) ? {
     backgroundColor: `rgba(20, 20, 30, ${f.fade / 100})`,
     mixBlendMode: 'lighten',
   } : {};
@@ -304,8 +535,16 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        onDoubleClick={handleDoubleTap}
+        onDoubleClick={handleDoubleTapEvent}
+        onContextMenu={(e) => e.preventDefault()}
     >
+      {/* Before Comparison Label */}
+      {isComparing && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-white/10 backdrop-blur px-3 py-1 rounded-full border border-white/20 text-xs font-bold text-white pointer-events-none animate-pulse">
+            オリジナル (Before)
+        </div>
+      )}
+
       {/* SVG Definition for Active Layer Filters */}
       {activeLayer && f && (
           <svg style={{ position: 'absolute', width: 0, height: 0 }}>
@@ -346,7 +585,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
           </svg>
       )}
 
-      {/* Background Blurring Effect (Based on active layer or base) */}
+      {/* Background Blurring Effect */}
       <div 
         className="absolute inset-0 opacity-20 blur-3xl scale-125 pointer-events-none transition-opacity duration-500"
         style={{
@@ -358,75 +597,45 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
       
       <div 
         ref={wrapperRef}
-        className="relative max-w-none max-h-none flex origin-center will-change-transform"
+        className="relative flex origin-center will-change-transform items-center justify-center w-full h-full"
         style={{ 
             transform: `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`,
             transition: pointersRef.current.size === 0 ? 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'
         }}
       >
-          {/* Render Layer Stack */}
-          {layers.map((layer, index) => {
-              if (!layer.isVisible) return null;
-              const isActive = layer.id === activeLayerId;
-              
-              // If active, we use the raw base 'image' + CSS filters (live preview)
-              // If inactive, we use the 'preview' (baked filters)
-              // Mask is applied to both via masking div or mask-image style
-              
-              const displayImage = isActive && previewSrc ? previewSrc : (isActive ? layer.image : layer.preview);
-
-              return (
-                  <div 
-                    key={layer.id} 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ 
-                        zIndex: index + 10,
-                        // NOTE: Positioning logic assumes all layers are same size/aligned
-                        // In a real app, layer might have x/y offsets.
-                        // Here we assume pixel-perfect alignment (masking workflow).
-                        position: index === 0 ? 'relative' : 'absolute', // First layer sets bounds
-                        width: 'auto',
-                        height: 'auto',
-                        opacity: layer.opacity,
-                        mixBlendMode: (layer.blendMode === 'source-over' ? 'normal' : layer.blendMode) as any
-                    }}
-                  >
-                      {/* Container for Masking */}
-                      <div style={{
-                          position: 'relative',
-                          width: '100%',
-                          height: '100%',
-                          maskImage: layer.mask ? `url(${layer.mask})` : 'none',
-                          WebkitMaskImage: layer.mask ? `url(${layer.mask})` : 'none',
-                          maskMode: 'alpha',
-                          maskRepeat: 'no-repeat',
-                          WebkitMaskRepeat: 'no-repeat',
-                          maskSize: '100% 100%',
-                          WebkitMaskSize: '100% 100%',
-                          ...({ WebkitMaskMode: 'alpha' } as any)
-                      }}>
-                          <img 
-                            src={displayImage}
-                            alt={layer.name}
-                            className="max-w-none max-h-none object-contain w-auto h-auto block"
-                            style={{
-                                maxWidth: '100vw',
-                                maxHeight: '100vh',
-                                filter: isActive ? cssFilterString : 'none' 
-                            }}
-                          />
-                          {isActive && (
-                              <>
-                                  <div className="absolute inset-0 z-20 pointer-events-none mix-blend-mode-soft-light" style={{ backgroundColor: tempColor }}></div>
-                                  <div className="absolute inset-0 z-20 pointer-events-none mix-blend-mode-soft-light" style={{ backgroundColor: tintColor }}></div>
-                                  <div className="absolute inset-0 z-20 pointer-events-none" style={fadeStyle}></div>
-                                  <div className="absolute inset-0 z-30 pointer-events-none" style={vignetteStyle}></div>
-                              </>
-                          )}
-                      </div>
-                  </div>
-              );
-          })}
+          {/* Comparison Mode: Render Original Only */}
+          {isComparing ? (
+              <img 
+                src={layers[0].image} 
+                alt="Original"
+                draggable={false} // Disable native drag
+                onDragStart={(e) => e.preventDefault()} // Disable native drag
+                className="max-w-none max-h-none object-contain w-auto h-auto block select-none touch-none"
+                style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                }}
+              />
+          ) : (
+            /* Normal Mode: Render Layer Stack using Memoized Layer */
+            layers.map((layer, index) => (
+                layer.isVisible && (
+                    <MemoizedLayer
+                        key={layer.id}
+                        layer={layer}
+                        isActive={layer.id === activeLayerId}
+                        isBackground={index === 0}
+                        activeMode={activeMode}
+                        previewSrc={previewSrc}
+                        cssFilterString={cssFilterString}
+                        tempColor={tempColor}
+                        tintColor={tintColor}
+                        fadeStyle={fadeStyle}
+                        vignetteStyle={vignetteStyle}
+                    />
+                )
+            ))
+          )}
       </div>
     </div>
   );

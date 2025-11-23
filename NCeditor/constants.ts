@@ -1,3 +1,4 @@
+
 import { FilterState, HSLShift, Point, MeishiState } from './types';
 
 export const DEFAULT_CURVE: Point[] = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -34,6 +35,9 @@ export const DEFAULT_MEISHI_STATE: MeishiState = {
     textShadow: false,
     textStroke: false,
     frameStyle: 'none',
+    backgroundPattern: 'none',
+    backgroundPatternColor: '#000000',
+    backgroundPatternOpacity: 10,
     qrStyle: 'normal',
     qrColor: '#000000',
     qrBgColor: 'transparent',

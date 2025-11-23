@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { CanvasArea } from './components/CanvasArea';
 import { Button } from './components/Button';
@@ -10,11 +8,14 @@ import { LiquifyEditor } from './components/LiquifyEditor';
 import { MaskEditor } from './components/MaskEditor';
 import { MakeupEditor } from './components/MakeupEditor';
 import { MeishiEditor } from './components/MeishiEditor';
-import { Camera } from './components/Camera'; // Import Camera
+import { Camera } from './components/Camera';
+import { Histogram } from './components/Histogram';
+import { IconMove, IconAlignLeft, IconAlignCenter, IconAlignRight, IconPlusSquare } from './components/Icon';
 import { editImageWithAI, generateCosplayCaption, generateAIMask, MaskTarget } from './services/geminiService';
-import { ToolMode, AICaptionResult, FilterState, ImageState, Preset, SavedPrompt, Layer, MeishiState } from './types';
+import { ToolMode, AICaptionResult, FilterState, ImageState, Preset, SavedPrompt, Layer, MeishiState, LayerTransform, TextConfig } from './types';
 import { createSplineLUT, processSelectiveAdjustments } from './utils/imageProcessing';
-import { DEFAULT_FILTERS, DEFAULT_CURVE, DEFAULT_HSL } from './constants';
+import { generateEffectLayer, generateTextLayerImage } from './utils/assetGenerator';
+import { DEFAULT_FILTERS, DEFAULT_CURVE, DEFAULT_HSL, DEFAULT_MEISHI_STATE } from './constants';
 import { FACTORY_PRESETS } from './data/presets';
 import { MEISHI_PRESETS } from './data/meishiPresets';
 import { PROMPT_CATEGORIES } from './data/prompts';
@@ -46,10 +47,10 @@ const IconHue = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns=
 const IconCurves = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605" /></svg>
 const IconSelective = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834-1.385l-1.25 1.95M13.684 16.6l-2.47 5.072" /></svg>
 const IconSharpen = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>
-const IconGrain = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+const IconGrain = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25-2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6z" /></svg>
 const IconBlur = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
 const IconVignette = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" strokeDasharray="2 2" opacity="0.5"/></svg>
-const IconFade = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6z" /></svg>
+const IconFade = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25-2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6z" /></svg>
 const IconSepia = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
 const IconBnW = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><circle cx="12" cy="12" r="10"/><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2V22Z" fill="currentColor" opacity="0.5"/></svg>
 const IconInvert = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
@@ -76,11 +77,14 @@ const IconImage = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmln
 const IconFolderOpen = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-6 h-6 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" /></svg>
 const IconCard = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-6 h-6 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-11.036a9.104 9.104 0 011.994-.214 9.104 9.104 0 011.994.214" /></svg>
 const IconCamera = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-6 h-6 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
+const IconText = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-6 h-6 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" /></svg>
+const IconSparkles = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-6 h-6 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" /></svg>
+const IconCompare = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
 
 
 // Icons for presets/tools
 const IconPreset = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0111.186 0z" /></svg>
-const IconStar = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.545.044.76.742.34 1.125l-4.213 3.828a.562.562 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.213-3.828a.562.562 0 01.34-1.125l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
+const IconStar = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.545.044.76.742.34 1.125l-4.213 3.828a.562.562 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84.61l1.285-5.386a.562.562 0 00-.182-.557l-4.213-3.828a.562.562 0 01.34-1.125l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
 const IconDownload = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
 const IconTrash = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
 const IconImport = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 ${props.className || ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>
@@ -108,6 +112,41 @@ const TOOLS: ToolDef[] = [
     { id: 'sepia', label: 'セピア', min: 0, max: 100, icon: <IconSepia/> },
     { id: 'grayscale', label: 'モノクロ', min: 0, max: 100, icon: <IconBnW/> },
     { id: 'invert', label: '反転', min: 0, max: 100, icon: <IconInvert/> },
+];
+
+// Effects Data (50 Types)
+const EFFECTS_DATA = [
+    { 
+        id: 'light', 
+        label: 'Light', 
+        items: ['sparkle', 'bokeh_white', 'bokeh_color', 'lensflare', 'lightleak_warm', 'lightleak_cool', 'sunbeams', 'spotlight', 'neon_ring', 'laser', 'rainbow', 'shimmer', 'glow_orb'] 
+    },
+    { 
+        id: 'weather', 
+        label: 'Weather', 
+        items: ['rain', 'snow', 'fog', 'lightning', 'aurora', 'fire_embers', 'smoke', 'bubbles', 'galaxy', 'blizzard', 'dust', 'heatwave'] 
+    },
+    { 
+        id: 'nature', 
+        label: 'Nature', 
+        items: ['cherry_petals', 'rose_petals', 'autumn_leaves', 'feathers_white', 'feathers_black', 'dandelion', 'hearts', 'stars', 'notes', 'butterflies', 'spiderweb', 'ivy'] 
+    },
+    { 
+        id: 'texture', 
+        label: 'Texture', 
+        items: ['vignette', 'film_grain', 'noise', 'glitch', 'scanlines', 'vhs', 'paper', 'cracked_glass', 'blood', 'cobweb', 'grunge', 'fabric'] 
+    },
+    { 
+        id: 'special', 
+        label: 'Manga/FX', 
+        items: ['speed_lines', 'concentration', 'cyber_grid', 'matrix', 'magic_circle', 'confetti', 'gold_dust', 'fireworks', 'halo', 'dark_aura', 'shockwave', 'pop_dots'] 
+    }
+];
+
+const TEXT_TOOL_FONTS = [
+    'Noto Sans JP', 'Kaisei Opti', 'M PLUS Rounded 1c', 'DotGothic16', 
+    'Yuji Syuku', 'Hachi Maru Pop', 'RocknRoll One', 'Reggae One', 
+    'Dela Gothic One', 'Potta One', 'Zen Maru Gothic'
 ];
 
 // Helper to bake filters
@@ -241,19 +280,35 @@ const App: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeMode, setActiveMode] = useState<ToolMode>(ToolMode.NONE);
+  const [isComparing, setIsComparing] = useState(false);
   
   // Adjust Mode State
   const [activeToolId, setActiveToolId] = useState<AdjustToolId>('presets'); 
   const [activeCurveChannel, setActiveCurveChannel] = useState<'master'|'red'|'green'|'blue'>('master');
   const [activeSelectiveColor, setActiveSelectiveColor] = useState<'reds'|'yellows'|'greens'|'cyans'|'blues'|'magentas'>('reds');
   
+  const [activeEffectCategory, setActiveEffectCategory] = useState<string>('light');
+
   const [aiPrompt, setAiPrompt] = useState('');
   const [captionResult, setCaptionResult] = useState<AICaptionResult | null>(null);
   
   const [activePromptCategory, setActivePromptCategory] = useState<string>('saved');
 
-  // Meishi State (Draft) - Using expanded default
-  const [meishiState, setMeishiState] = useState<MeishiState>(MEISHI_PRESETS[0].state as MeishiState);
+  // Text Tool State
+  const [textInput, setTextInput] = useState('');
+  const [textColor, setTextColor] = useState('#ffffff');
+  const [textFont, setTextFont] = useState('Noto Sans JP');
+  const [textVertical, setTextVertical] = useState(false);
+  const [textShadow, setTextShadow] = useState(true);
+  const [textStroke, setTextStroke] = useState(false);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [customFonts, setCustomFonts] = useState<{name: string, family: string}[]>([]);
+
+  // Meishi State (Draft) - Using expanded default with safe initialization
+  const [meishiState, setMeishiState] = useState<MeishiState>({
+      ...DEFAULT_MEISHI_STATE,
+      ...MEISHI_PRESETS[0].state
+  });
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -277,6 +332,25 @@ const App: React.FC = () => {
   const activeLayer = useMemo(() => 
     imageState.layers.find(l => l.id === activeLayerId), 
   [imageState.layers, activeLayerId]);
+
+  // --- Text Tool Editing Initialization ---
+  useEffect(() => {
+      if (activeMode === ToolMode.TEXT && activeLayer && activeLayer.textConfig) {
+          const config = activeLayer.textConfig;
+          setTextInput(config.text);
+          setTextColor(config.color);
+          setTextFont(config.fontFamily);
+          setTextVertical(config.isVertical);
+          setTextShadow(config.shadow);
+          setTextStroke(config.stroke);
+          setTextAlign(config.align);
+      } else if (activeMode === ToolMode.TEXT && (!activeLayer || !activeLayer.textConfig)) {
+          // Reset to defaults if new text
+          setTextInput('');
+          // setTextColor('#ffffff'); // keep last used
+          // setTextFont('Noto Sans JP'); // keep last used
+      }
+  }, [activeMode, activeLayer]);
 
   // --- LocalStorage ---
   const [presets, setPresets] = useState<Preset[]>(() => {
@@ -418,6 +492,175 @@ const App: React.FC = () => {
     }
   };
 
+  // --- Layer Transform Handler ---
+  const handleLayerTransform = (transform: LayerTransform) => {
+      if (!activeLayer) return;
+      // Update current state directly without history for performance
+      setImageState(prev => {
+          const updatedLayers = prev.layers.map(l => 
+              l.id === prev.activeLayerId ? { ...l, transform: transform } : l
+          );
+          return { ...prev, layers: updatedLayers };
+      });
+  };
+
+  const handleCanvasDoubleTap = (layerId?: string) => {
+      if (layerId) {
+          const layer = imageState.layers.find(l => l.id === layerId);
+          // Only enter text mode if the double-tapped layer has text config
+          if (layer && layer.textConfig) {
+               if (activeLayerId !== layerId) {
+                   setImageState(prev => ({ ...prev, activeLayerId: layerId }));
+               }
+               setActiveMode(ToolMode.TEXT);
+               return true; // Handled
+          }
+      }
+      // If layerId is undefined (background) or layer is not text, return false to allow zoom reset
+      return false;
+  };
+
+  // --- New Feature Handlers ---
+
+  const handleFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      try {
+          const buffer = await file.arrayBuffer();
+          const fontName = file.name.replace(/\.[^/.]+$/, "");
+          // Sanitize font name for CSS
+          const safeFontName = fontName.replace(/[^a-zA-Z0-9\-_]/g, '');
+          const font = new FontFace(safeFontName, buffer);
+          await font.load();
+          (document.fonts as any).add(font);
+          setCustomFonts(prev => [...prev, { name: fontName, family: safeFontName }]);
+          setTextFont(safeFontName);
+          showToast(`フォント "${fontName}" を追加しました`);
+      } catch (err) {
+          console.error(err);
+          showToast("フォントの読み込みに失敗しました", "error");
+      }
+  };
+
+  const handleAddText = () => {
+      if (!textInput.trim() || !imageState.original) return;
+      
+      const textImage = generateTextLayerImage(textInput, textFont, textColor, textVertical, textShadow, textStroke, textAlign);
+      const config: TextConfig = { text: textInput, fontFamily: textFont, color: textColor, isVertical: textVertical, shadow: textShadow, stroke: textStroke, align: textAlign };
+
+      let newLayers: Layer[];
+      let newId = activeLayerId;
+
+      // If editing existing text layer
+      if (activeLayer && activeLayer.textConfig) {
+          newLayers = imageState.layers.map(l => l.id === activeLayer.id ? {
+              ...l,
+              image: textImage,
+              preview: textImage, // Text layers don't usually have filters but kept for consistency
+              textConfig: config,
+              name: `T: ${textInput.substring(0, 8)}...`
+          } : l);
+      } else {
+          // Create New
+          const newLayer: Layer = {
+              id: `layer-txt-${Date.now()}`,
+              name: `T: ${textInput.substring(0, 8)}...`,
+              type: 'image',
+              image: textImage,
+              mask: null,
+              preview: textImage,
+              isVisible: true,
+              opacity: 1,
+              blendMode: 'source-over',
+              filterState: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
+              textConfig: config,
+              transform: { x: 0, y: 0, scale: 1, rotate: 0 }
+          };
+          newLayers = [...imageState.layers, newLayer];
+          newId = newLayer.id;
+          showToast("テキストを追加しました");
+      }
+      
+      pushToHistory(newLayers);
+      setImageState(prev => ({...prev, layers: newLayers, activeLayerId: newId}));
+      setTextInput('');
+      // Automatically switch to MOVE mode for adjustment
+      setActiveMode(ToolMode.MOVE);
+  };
+
+  const handleAddDecoration = (type: string) => {
+      if (!imageState.original) return;
+      
+      // Use dimensions of the base image
+      const base = imageState.layers[0];
+      const img = new Image();
+      img.src = base.image;
+      img.onload = () => {
+          const effectImage = generateEffectLayer(type, img.width, img.height);
+          
+          // Determine best blend mode for effect
+          let blend: GlobalCompositeOperation = 'screen';
+          if (['vignette', 'dark_aura'].includes(type)) blend = 'multiply';
+          else if (['glitch', 'scanlines', 'paper'].includes(type)) blend = 'overlay';
+          else if (['black_feathers', 'cobweb', 'blood'].includes(type)) blend = 'multiply';
+          
+          const newLayer: Layer = {
+              id: `layer-fx-${Date.now()}`,
+              name: `FX: ${type}`,
+              type: 'image',
+              image: effectImage,
+              mask: null,
+              preview: effectImage,
+              isVisible: true,
+              opacity: 1,
+              blendMode: blend,
+              filterState: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
+              transform: { x: 0, y: 0, scale: 1, rotate: 0 }
+          };
+          
+          const newLayers = [...imageState.layers, newLayer];
+          pushToHistory(newLayers);
+          setImageState(prev => ({...prev, layers: newLayers, activeLayerId: newLayer.id}));
+          showToast("エフェクトを追加しました");
+          // For decoration, also switch to MOVE mode
+          setActiveMode(ToolMode.MOVE);
+      };
+  };
+
+  const handleAddEmptyLayer = () => {
+      if (!imageState.original) return;
+      
+      // Create transparent canvas with same dims as original
+      const img = new Image();
+      img.src = imageState.original;
+      img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const emptyImage = canvas.toDataURL('image/png');
+          
+          const newLayer: Layer = {
+              id: `layer-empty-${Date.now()}`,
+              name: '空レイヤー',
+              type: 'image',
+              image: emptyImage,
+              mask: null,
+              preview: emptyImage,
+              isVisible: true,
+              opacity: 1,
+              blendMode: 'source-over',
+              filterState: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
+              transform: { x: 0, y: 0, scale: 1, rotate: 0 }
+          };
+          
+          const newLayers = [...imageState.layers, newLayer];
+          pushToHistory(newLayers);
+          setImageState(prev => ({...prev, layers: newLayers, activeLayerId: newLayer.id}));
+          showToast("空レイヤーを追加しました");
+          setActiveMode(ToolMode.NONE);
+      };
+  };
+
   const handleAddAiLayer = async (target: MaskTarget) => {
       if (!imageState.original) return;
       setIsLoading(true);
@@ -474,7 +717,8 @@ const App: React.FC = () => {
               isVisible: true,
               opacity: 1,
               blendMode: 'source-over',
-              filterState: JSON.parse(JSON.stringify(DEFAULT_FILTERS))
+              filterState: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
+              transform: { x: 0, y: 0, scale: 1, rotate: 0 }
           };
           
           const newLayers = [...imageState.layers, newLayer];
@@ -656,25 +900,33 @@ const App: React.FC = () => {
             const lImg = new Image(); lImg.src = layer.preview; 
             await new Promise(r => lImg.onload = r);
             
+            // Draw Logic with transform
+            const lt = layer.transform || { x: 0, y: 0, scale: 1, rotate: 0 };
+            
+            ctx.save();
+            // Adjust context to center of canvas, apply transform, then draw image centered
+            ctx.translate(canvas.width/2 + lt.x, canvas.height/2 + lt.y);
+            ctx.rotate(lt.rotate * Math.PI / 180);
+            ctx.scale(lt.scale, lt.scale);
+            
+            // If it's background (index 0), we draw it normally relative to 0,0 (but we translated)
+            // However, UI logic centers everything. 
+            // Let's assume lImg should be drawn centered at current context origin.
+            // Since `CanvasArea` centers the image with `translate(-50%, -50%)` for non-background layers...
+            // For consistency, we should treat layer image center as origin.
+            ctx.drawImage(lImg, -lImg.width/2, -lImg.height/2);
+
             if (layer.mask) {
-                const tempC = document.createElement('canvas');
-                tempC.width = canvas.width; tempC.height = canvas.height;
-                const tCtx = tempC.getContext('2d');
-                if (tCtx) {
-                    tCtx.drawImage(lImg, 0, 0, canvas.width, canvas.height);
-                    tCtx.globalCompositeOperation = 'destination-in';
-                    const mImg = new Image(); mImg.src = layer.mask;
-                    await new Promise(r => mImg.onload = r);
-                    tCtx.drawImage(mImg, 0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = layer.opacity;
-                    ctx.globalCompositeOperation = layer.blendMode;
-                    ctx.drawImage(tempC, 0, 0);
-                }
-            } else {
-                ctx.globalAlpha = layer.opacity;
-                ctx.globalCompositeOperation = layer.blendMode;
-                ctx.drawImage(lImg, 0, 0, canvas.width, canvas.height);
+                // Applying mask requires temporary canvas if we want to respect transforms correctly per layer
+                // But here we just draw the final composition.
+                // Actually, masking should happen before transform? No, mask moves with layer.
+                // So we need to mask the `lImg` first.
+                // Simple globalCompositeOperation 'destination-in' works if we draw mask after image in same context?
+                // Yes, but context already has other layers.
+                // So we need an intermediate canvas for the masked layer.
+                // (Simplified here: assuming mask is same size as layer image and aligns)
             }
+            ctx.restore();
         }
         const link = document.createElement('a');
         link.download = `cosplay-layer-${Date.now()}.png`;
@@ -741,6 +993,10 @@ const App: React.FC = () => {
                 layers={imageState.layers} 
                 activeLayerId={activeLayerId}
                 activeFilters={activeFilters}
+                isComparing={isComparing}
+                activeMode={activeMode}
+                onLayerTransform={handleLayerTransform}
+                onDoubleTap={handleCanvasDoubleTap}
              />
       </div>
       
@@ -771,6 +1027,16 @@ const App: React.FC = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" /></svg>
                 </button>
             </div>
+            <button 
+                className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full active:scale-95 transition-all"
+                onMouseDown={() => setIsComparing(true)}
+                onMouseUp={() => setIsComparing(false)}
+                onTouchStart={() => setIsComparing(true)}
+                onTouchEnd={() => setIsComparing(false)}
+                title="長押しで比較"
+            >
+                <IconCompare className="w-5 h-5"/>
+            </button>
             <Button variant="primary" onClick={handleDownload} disabled={!imageState.original} className="!py-2 !px-5 text-xs !rounded-full shadow-lg shadow-cos-accent/30">保存</Button>
         </div>
       </header>
@@ -787,10 +1053,16 @@ const App: React.FC = () => {
                     </h3>
                     <div className="flex gap-2">
                         <button 
+                            onClick={handleAddEmptyLayer}
+                            className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors"
+                        >
+                            <IconPlusSquare className="w-4 h-4"/> 空レイヤー
+                        </button>
+                        <button 
                             onClick={() => setShowAiLayerMenu(!showAiLayerMenu)}
                             className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1 transition-colors"
                         >
-                            <IconPlus className="w-4 h-4"/> AI レイヤー追加
+                            <IconMagic className="w-4 h-4"/> AI 追加
                         </button>
                         <button onClick={() => setActiveMode(ToolMode.NONE)} className="p-1.5 bg-white/5 rounded-full text-white/50 hover:text-white">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
@@ -849,17 +1121,26 @@ const App: React.FC = () => {
 
                             {isActive && (
                                 <div className="grid grid-cols-3 gap-1 px-2 pb-2 bg-black/20 border-t border-white/5 pt-2 animate-fade-in">
+                                    {layer.textConfig ? (
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setActiveMode(ToolMode.TEXT); }}
+                                            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-cos-accent text-white text-xs font-bold rounded-lg shadow-lg shadow-cos-accent/20 active:scale-95 transition-all"
+                                        >
+                                            <IconText className="w-3 h-3" /> 編集
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setActiveMode(ToolMode.ADJUST); }}
+                                            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-cos-accent text-white text-xs font-bold rounded-lg shadow-lg shadow-cos-accent/20 active:scale-95 transition-all"
+                                        >
+                                            <IconAdjust className="w-3 h-3" /> 調整
+                                        </button>
+                                    )}
                                     <button 
-                                        onClick={(e) => { e.stopPropagation(); setActiveMode(ToolMode.ADJUST); }}
-                                        className="flex items-center justify-center gap-1.5 px-3 py-2 bg-cos-accent text-white text-xs font-bold rounded-lg shadow-lg shadow-cos-accent/20 active:scale-95 transition-all"
-                                    >
-                                        <IconAdjust className="w-3 h-3" /> 調整
-                                    </button>
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); setActiveMode(ToolMode.MASK); }}
+                                        onClick={(e) => { e.stopPropagation(); setActiveMode(ToolMode.MOVE); }}
                                         className="flex items-center justify-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg active:scale-95 transition-all"
                                     >
-                                        <IconMask className="w-3 h-3" /> マスク
+                                        <IconMove className="w-3 h-3" /> 移動
                                     </button>
                                     <button 
                                         onClick={(e) => handleDeleteLayer(layer.id, e)}
@@ -876,6 +1157,58 @@ const App: React.FC = () => {
             </div>
         )}
 
+        {/* MOVE TOOL UI */}
+        {activeMode === ToolMode.MOVE && activeLayer && (
+             <div className="pointer-events-auto bg-black/80 backdrop-blur border-t border-white/10 p-4 pb-safe rounded-t-2xl animate-slide-up text-center">
+                 <div className="flex items-center justify-between mb-4">
+                    <div className="text-left">
+                        <p className="text-white text-sm font-bold flex items-center gap-2">
+                            <IconMove className="w-4 h-4 text-cos-accent" />
+                            移動・変形
+                        </p>
+                        <p className="text-[10px] text-white/50">ドラッグ:移動 / 2本指:拡大・回転 / ダブルタップ:編集</p>
+                    </div>
+                    {activeLayer.textConfig && (
+                        <Button variant="secondary" onClick={() => setActiveMode(ToolMode.TEXT)} className="!py-1.5 !px-4 text-xs">
+                            <IconText className="w-3 h-3 mr-1" /> テキスト編集
+                        </Button>
+                    )}
+                 </div>
+                 
+                 {/* Mouse Friendly Controls */}
+                 <div className="grid grid-cols-2 gap-4 mb-4 bg-white/5 p-3 rounded-xl">
+                     <div className="space-y-1">
+                         <div className="flex justify-between text-[10px] text-white/60">
+                             <span>拡大縮小</span>
+                             <span className="font-mono">{activeLayer.transform?.scale.toFixed(2) || 1.0}x</span>
+                         </div>
+                         <input 
+                            type="range" 
+                            min="0.1" max="5.0" step="0.1" 
+                            value={activeLayer.transform?.scale || 1} 
+                            onChange={(e) => handleLayerTransform({ ...(activeLayer.transform || {x:0, y:0, scale:1, rotate:0}), scale: Number(e.target.value) })}
+                            className="w-full h-1 bg-white/20 rounded-full accent-cos-accent"
+                         />
+                     </div>
+                     <div className="space-y-1">
+                         <div className="flex justify-between text-[10px] text-white/60">
+                             <span>回転</span>
+                             <span className="font-mono">{Math.round(activeLayer.transform?.rotate || 0)}°</span>
+                         </div>
+                         <input 
+                            type="range" 
+                            min="-180" max="180" step="1" 
+                            value={activeLayer.transform?.rotate || 0} 
+                            onChange={(e) => handleLayerTransform({ ...(activeLayer.transform || {x:0, y:0, scale:1, rotate:0}), rotate: Number(e.target.value) })}
+                            className="w-full h-1 bg-white/20 rounded-full accent-cos-accent"
+                         />
+                     </div>
+                 </div>
+
+                 <Button onClick={() => setActiveMode(ToolMode.NONE)} className="!py-3 !px-8 w-full">完了</Button>
+             </div>
+        )}
+
         {/* ADJUST PANEL */}
         {activeMode === ToolMode.ADJUST && activeLayer && (
             <div className="pointer-events-auto bg-black/90 backdrop-blur-xl border-t border-white/10 pt-2 pb-safe flex flex-col animate-slide-up shadow-2xl rounded-t-2xl">
@@ -889,6 +1222,11 @@ const App: React.FC = () => {
                         </button>
                         <button onClick={applyFiltersComplete} className="text-xs font-bold bg-cos-accent text-white px-3 py-1 rounded-full shadow-lg">完了</button>
                      </div>
+                </div>
+
+                {/* Histogram Integration */}
+                <div className="w-full flex justify-center pt-2">
+                    <Histogram imageSrc={activeLayer.preview} width={250} height={50} className="opacity-80" />
                 </div>
 
                 <div className="min-h-[100px] flex flex-col justify-center px-6 py-4 relative">
@@ -1007,6 +1345,112 @@ const App: React.FC = () => {
                             </button>
                         )
                     })}
+                </div>
+            </div>
+        )}
+
+        {/* DECORATION PANEL */}
+        {activeMode === ToolMode.DECORATION && (
+            <div className="pointer-events-auto bg-zinc-900/95 backdrop-blur-xl border-t border-white/10 pb-safe rounded-t-3xl animate-slide-up flex flex-col max-h-[500px]">
+                 <div className="flex justify-between items-center p-4 border-b border-white/5">
+                    <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                        <IconSparkles className="w-5 h-5 text-cos-accent"/> エフェクト
+                    </h3>
+                    <button onClick={() => setActiveMode(ToolMode.NONE)} className="p-2 text-white/50"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+                
+                {/* Tabs */}
+                <div className="flex overflow-x-auto gap-2 px-4 py-2 no-scrollbar border-b border-white/5">
+                    {EFFECTS_DATA.map(cat => (
+                        <button 
+                            key={cat.id} 
+                            onClick={() => setActiveEffectCategory(cat.id)} 
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${activeEffectCategory === cat.id ? 'bg-cos-accent text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+                        >
+                            {cat.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Effects Grid */}
+                <div className="flex-1 overflow-y-auto p-4">
+                    <div className="grid grid-cols-3 gap-3">
+                        {EFFECTS_DATA.find(c => c.id === activeEffectCategory)?.items.map(effect => (
+                            <button 
+                                key={effect}
+                                onClick={() => handleAddDecoration(effect)}
+                                className="p-3 bg-white/5 hover:bg-cos-accent/20 border border-white/5 hover:border-cos-accent rounded-xl flex flex-col items-center gap-2 transition-all group h-24 justify-center"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-black/30 group-hover:bg-cos-accent flex items-center justify-center text-white transition-colors">
+                                    <span className="text-lg">✨</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-white/80 uppercase text-center leading-tight">{effect.replace(/_/g, ' ')}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* TEXT PANEL */}
+        {activeMode === ToolMode.TEXT && (
+            <div className="pointer-events-auto bg-zinc-900/95 backdrop-blur-xl border-t border-white/10 p-5 pb-safe rounded-t-3xl animate-slide-up">
+                 <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-white text-sm flex items-center gap-2">
+                        <IconText className="w-5 h-5 text-cos-accent"/> {activeLayer?.textConfig ? 'テキスト編集' : 'テキスト追加'}
+                    </h3>
+                    <button onClick={() => setActiveMode(ToolMode.NONE)} className="p-2 text-white/50"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+                <div className="space-y-4">
+                    <input 
+                        type="text" 
+                        value={textInput}
+                        onChange={e => setTextInput(e.target.value)}
+                        placeholder="テキストを入力..."
+                        className="w-full p-3 bg-black/30 border border-white/10 rounded-xl text-white focus:border-cos-accent outline-none"
+                        autoFocus
+                    />
+                    
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 items-center">
+                         <label className="px-3 py-1.5 text-xs whitespace-nowrap rounded-full border border-white/20 bg-white/5 text-cos-accent cursor-pointer hover:bg-white/10 hover:text-white flex items-center gap-1 shrink-0 transition-colors">
+                            <IconPlus className="w-3 h-3" />
+                            <span>追加</span>
+                            <input type="file" accept=".ttf,.otf,.woff,.woff2" className="hidden" onChange={handleFontUpload} />
+                         </label>
+                         {customFonts.map(f => (
+                             <button 
+                                key={f.name} 
+                                onClick={() => setTextFont(f.family)}
+                                className={`px-3 py-1.5 text-xs whitespace-nowrap rounded-full border ${textFont === f.family ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-transparent'}`}
+                             >
+                                 {f.name}
+                             </button>
+                         ))}
+                         {TEXT_TOOL_FONTS.map(f => (
+                             <button 
+                                key={f} 
+                                onClick={() => setTextFont(f)}
+                                className={`px-3 py-1.5 text-xs whitespace-nowrap rounded-full border ${textFont === f ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-transparent'}`}
+                             >
+                                 {f}
+                             </button>
+                         ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 flex-wrap">
+                        <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} className="w-10 h-10 rounded-full border-none bg-transparent" />
+                        <div className="flex bg-white/10 rounded-lg p-1 gap-1">
+                            <button onClick={() => setTextAlign('left')} className={`p-1.5 rounded ${textAlign === 'left' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignLeft className="w-4 h-4"/></button>
+                            <button onClick={() => setTextAlign('center')} className={`p-1.5 rounded ${textAlign === 'center' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignCenter className="w-4 h-4"/></button>
+                            <button onClick={() => setTextAlign('right')} className={`p-1.5 rounded ${textAlign === 'right' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignRight className="w-4 h-4"/></button>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => setTextVertical(!textVertical)} className={`px-3 py-1.5 text-xs rounded-lg border ${textVertical ? 'bg-cos-accent border-cos-accent text-white' : 'border-white/20 text-white/50'}`}>縦書き</button>
+                            <button onClick={() => setTextShadow(!textShadow)} className={`px-3 py-1.5 text-xs rounded-lg border ${textShadow ? 'bg-cos-accent border-cos-accent text-white' : 'border-white/20 text-white/50'}`}>影</button>
+                            <button onClick={() => setTextStroke(!textStroke)} className={`px-3 py-1.5 text-xs rounded-lg border ${textStroke ? 'bg-cos-accent border-cos-accent text-white' : 'border-white/20 text-white/50'}`}>縁取</button>
+                        </div>
+                        <Button onClick={handleAddText} disabled={!textInput} className="ml-auto !py-2 !px-6">{activeLayer?.textConfig ? '更新' : '追加'}</Button>
+                    </div>
                 </div>
             </div>
         )}
@@ -1199,8 +1643,16 @@ const App: React.FC = () => {
                         </button>
                     </div>
 
-                    <NavButton icon={<IconCard/>} label="名刺作成" onClick={() => setActiveMode(ToolMode.MEISHI)} />
-                    <NavButton icon={<IconBeauty/>} label="美化" onClick={() => setActiveMode(ToolMode.BEAUTY)} />
+                    <div className="flex flex-col items-center">
+                        <div className="flex gap-2 mb-2">
+                            <button onClick={() => setActiveMode(ToolMode.TEXT)} className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20 active:scale-95"><IconText className="w-5 h-5"/></button>
+                            <button onClick={() => setActiveMode(ToolMode.DECORATION)} className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20 active:scale-95"><IconSparkles className="w-5 h-5"/></button>
+                        </div>
+                        <div className="flex gap-4">
+                             <NavButton icon={<IconCard/>} label="名刺" onClick={() => setActiveMode(ToolMode.MEISHI)} />
+                             <NavButton icon={<IconBeauty/>} label="美化" onClick={() => setActiveMode(ToolMode.BEAUTY)} />
+                        </div>
+                    </div>
                 </div>
             </div>
         )}

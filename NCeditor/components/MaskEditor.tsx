@@ -163,7 +163,7 @@ export const MaskEditor: React.FC<MaskEditorProps> = ({ imageSrc, initialMask, o
       // Update pointer position
       pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
       
-      const pts = Array.from(pointersRef.current.values());
+      const pts = Array.from(pointersRef.current.values()) as { x: number, y: number }[];
 
       // Case: Pinch/Zoom (2+ fingers)
       if (pts.length >= 2) {

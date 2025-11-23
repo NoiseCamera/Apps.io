@@ -1,10 +1,11 @@
 
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Button } from './Button';
 import { Spinner } from './Spinner';
-import { MeishiState, ElementPos, FrameStyle, QRStyle } from '../types';
+import { MeishiState, ElementPos, FrameStyle, QRStyle, MeishiPattern } from '../types';
 import { MEISHI_PRESETS } from '../data/meishiPresets';
+import { DEFAULT_MEISHI_STATE } from '../constants';
+import { IconAlignLeft, IconAlignCenter, IconAlignRight, IconEye, IconDownload, IconX } from './Icon';
 
 interface MeishiEditorProps {
   imageSrc: string;
@@ -46,15 +47,13 @@ const AVAILABLE_FONTS = [
     { name: 'Kaisei Decol', family: "'Kaisei Decol', serif" },
 ];
 
-// Icons
-const IconAlignLeft = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>;
-const IconAlignCenter = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>;
-const IconAlignRight = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>;
-
 export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialState, onChange, onClose, onEditImage }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeTab, setActiveTab] = useState<EditorTab>('templates');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingType, setProcessingType] = useState<'card' | 'a4'>('card');
+  const [a4PreviewSrc, setA4PreviewSrc] = useState<string | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   
   // Drag State
   const [dragTarget, setDragTarget] = useState<DragTarget>('none');
@@ -88,10 +87,10 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      draw(ctx, loadedImg);
+      draw(ctx, loadedImg, isPreviewMode); // Don't show guides/handles in preview mode
       
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadedImg, initialState, width, height, dragTarget, customFonts]);
+  }, [loadedImg, initialState, width, height, dragTarget, customFonts, isPreviewMode]);
 
   const generateQR = (data: string): boolean[][] | null => {
       if (typeof window.qrcode !== 'function') return null;
@@ -117,13 +116,87 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
       return null;
   };
 
-  const draw = (ctx: CanvasRenderingContext2D, img: HTMLImageElement) => {
+  const drawPattern = (ctx: CanvasRenderingContext2D, w: number, h: number, type: MeishiPattern, color: string, opacity: number) => {
+      if (type === 'none' || opacity <= 0) return;
+
+      // Ensure color is valid to prevent slice errors
+      const safeColor = (color && color.startsWith('#')) ? color : '#000000';
+
+      ctx.save();
+      ctx.globalAlpha = opacity / 100;
+      ctx.fillStyle = safeColor;
+      ctx.strokeStyle = safeColor;
+
+      if (type === 'dots') {
+          const size = 15;
+          const spacing = 40;
+          for(let y=0; y<h; y+=spacing) {
+              for(let x=0; x<w; x+=spacing) {
+                  ctx.beginPath(); ctx.arc(x + (y%(spacing*2)===0?0:spacing/2), y, size/2, 0, Math.PI*2); ctx.fill();
+              }
+          }
+      } else if (type === 'grid') {
+          const spacing = 50;
+          ctx.lineWidth = 2;
+          for(let x=0; x<w; x+=spacing) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+          for(let y=0; y<h; y+=spacing) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      } else if (type === 'stripes') {
+          const spacing = 30;
+          ctx.lineWidth = 10;
+          // Diagonal stripes
+          for(let i = -h; i < w; i+=spacing) {
+              ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i+h, h); ctx.stroke();
+          }
+      } else if (type === 'checkers') {
+          const size = 60;
+          for(let y=0; y<h; y+=size) {
+              for(let x=0; x<w; x+=size) {
+                  if ((x/size + y/size) % 2 === 0) ctx.fillRect(x, y, size, size);
+              }
+          }
+      } else if (type === 'seigaiha') {
+          ctx.lineWidth = 3;
+          const r = 40;
+          for(let y=0; y<h+r; y+=r*0.8) {
+              for(let x=0; x<w+r; x+=r*2) {
+                  const cx = x + (Math.round(y/(r*0.8))%2===0 ? 0 : r);
+                  ctx.beginPath(); ctx.arc(cx, y, r, Math.PI, 0); ctx.stroke();
+                  ctx.beginPath(); ctx.arc(cx, y, r*0.7, Math.PI, 0); ctx.stroke();
+                  ctx.beginPath(); ctx.arc(cx, y, r*0.4, Math.PI, 0); ctx.stroke();
+              }
+          }
+      } else if (type === 'yagasuri') {
+          const size = 40;
+          for(let y=0; y<h; y+=size*2) {
+              for(let x=0; x<w; x+=size) {
+                  // Simplified Yagasuri representation
+                  ctx.beginPath();
+                  ctx.moveTo(x, y); ctx.lineTo(x+size/2, y+size); ctx.lineTo(x, y+size*2);
+                  ctx.moveTo(x+size/2, y); ctx.lineTo(x, y+size); ctx.lineTo(x+size/2, y+size*2);
+                  ctx.stroke();
+              }
+          }
+      } else if (type === 'noise') {
+          // Simple noise simulation compatible with color tinting
+          // Fallback to simple random rects for performance in React canvas draw
+          for(let i=0; i<2000; i++) ctx.fillRect(Math.random()*w, Math.random()*h, 2, 2);
+      }
+
+      ctx.restore();
+  }
+
+  const draw = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, exportMode: boolean = false) => {
       ctx.clearRect(0, 0, width, height);
-      elementBounds.current.clear();
+      if (!exportMode) elementBounds.current.clear();
       
       // 1. Background
       ctx.fillStyle = initialState.backgroundColor;
       ctx.fillRect(0, 0, width, height);
+
+      // Pattern
+      if (initialState.backgroundPattern !== 'none') {
+          drawPattern(ctx, width, height, initialState.backgroundPattern, initialState.backgroundPatternColor, initialState.backgroundPatternOpacity);
+      }
 
       // 2. Photo
       if (initialState.photoPos.visible) {
@@ -156,9 +229,9 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
           ctx.drawImage(img, -drawW/2, -drawH/2, drawW, drawH);
           
           // Store bounds
-          elementBounds.current.set('photo', { x: cx, y: cy, w: drawW, h: drawH, angle: photoPos.rotate || 0 });
+          if (!exportMode) elementBounds.current.set('photo', { x: cx, y: cy, w: drawW, h: drawH, angle: photoPos.rotate || 0 });
 
-          if (dragTarget === 'photo') {
+          if (!exportMode && dragTarget === 'photo') {
               drawSelection(ctx, 0, 0, drawW, drawH);
               drawResizeHandle(ctx, drawW/2, drawH/2);
           }
@@ -218,12 +291,12 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
           if (ctx.textAlign === 'right') bx = -boundW/2;
 
           // Draw UI if selected
-          if (dragTarget === 'name') {
+          if (!exportMode && dragTarget === 'name') {
               drawSelection(ctx, bx, 0, boundW + 20, boundH + 20);
               drawResizeHandle(ctx, bx + (boundW+20)/2, (boundH+20)/2);
           }
           
-          elementBounds.current.set('name', { x: tx, y: ty, w: boundW, h: boundH, angle: namePos.rotate || 0 });
+          if (!exportMode) elementBounds.current.set('name', { x: tx, y: ty, w: boundW, h: boundH, angle: namePos.rotate || 0 });
           ctx.restore();
       }
 
@@ -281,12 +354,12 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
           if (ctx.textAlign === 'left') bx = maxW/2;
           if (ctx.textAlign === 'right') bx = -maxW/2;
 
-          if (dragTarget === 'details') {
+          if (!exportMode && dragTarget === 'details') {
               drawSelection(ctx, bx, 0, maxW + 20, totalH + 10);
               drawResizeHandle(ctx, bx + (maxW+20)/2, (totalH+10)/2);
           }
           
-          elementBounds.current.set('details', { x: tx, y: ty, w: maxW, h: totalH, angle: detailsPos.rotate || 0 });
+          if (!exportMode) elementBounds.current.set('details', { x: tx, y: ty, w: maxW, h: totalH, angle: detailsPos.rotate || 0 });
           ctx.restore();
       }
 
@@ -341,12 +414,12 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
               }
           }
           
-          if (dragTarget === 'qr') {
+          if (!exportMode && dragTarget === 'qr') {
               drawSelection(ctx, 0, 0, size+20, size+20);
               drawResizeHandle(ctx, size/2 + 10, size/2 + 10);
           }
           
-          elementBounds.current.set('qr', { x: qx, y: qy, w: size, h: size, angle: qrPos.rotate || 0 });
+          if (!exportMode) elementBounds.current.set('qr', { x: qx, y: qy, w: size, h: size, angle: qrPos.rotate || 0 });
           ctx.restore();
       }
   };
@@ -477,6 +550,7 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
   }
 
   const handlePointerDown = (e: React.PointerEvent) => {
+      if (isPreviewMode) return; // Disable interaction in preview mode
       e.currentTarget.setPointerCapture(e.pointerId);
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -517,7 +591,7 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-      if (!pointerStart.current || !initialElPos.current || dragTarget === 'none') return;
+      if (!pointerStart.current || !initialElPos.current || dragTarget === 'none' || isPreviewMode) return;
       
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -562,18 +636,81 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
       }
   };
 
-  const handleSave = () => {
+  const handleSave = (asA4: boolean = false) => {
       setIsProcessing(true);
+      setProcessingType(asA4 ? 'a4' : 'card');
+      
+      // Small delay to allow spinner render
       setTimeout(() => {
-          const link = document.createElement('a');
-          link.download = `cos-meishi-${Date.now()}.png`;
-          link.href = canvasRef.current!.toDataURL('image/png', 1.0);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          if (asA4) {
+              // A4 Export Logic
+              const a4Canvas = document.createElement('canvas');
+              // 300 DPI A4
+              a4Canvas.width = 2480;
+              a4Canvas.height = 3508;
+              const ctx = a4Canvas.getContext('2d');
+              if (ctx && loadedImg) {
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(0, 0, a4Canvas.width, a4Canvas.height);
+                  
+                  // Create single card canvas first
+                  const cardCvs = document.createElement('canvas');
+                  cardCvs.width = width;
+                  cardCvs.height = height;
+                  const cardCtx = cardCvs.getContext('2d');
+                  if (cardCtx) draw(cardCtx, loadedImg, true);
+
+                  // Layout params (approx for A4 standard business card sheets like A-one 51002)
+                  const cardW = width;
+                  const cardH = height;
+                  const startX = (a4Canvas.width - (cardW * 2)) / 2;
+                  const startY = (a4Canvas.height - (cardH * 5)) / 2;
+                  
+                  for(let row=0; row<5; row++) {
+                      for(let col=0; col<2; col++) {
+                          ctx.drawImage(cardCvs, startX + col * cardW, startY + row * cardH);
+                          // Draw cut lines (light gray)
+                          ctx.strokeStyle = '#cccccc';
+                          ctx.lineWidth = 1;
+                          ctx.strokeRect(startX + col * cardW, startY + row * cardH, cardW, cardH);
+                      }
+                  }
+                  
+                  // Instead of downloading, show preview
+                  const dataUrl = a4Canvas.toDataURL('image/png', 0.8);
+                  setA4PreviewSrc(dataUrl);
+              }
+          } else {
+              // Single Card Export
+              const exportCanvas = document.createElement('canvas');
+              exportCanvas.width = width;
+              exportCanvas.height = height;
+              const ctx = exportCanvas.getContext('2d');
+              if (ctx && loadedImg) {
+                  draw(ctx, loadedImg, true);
+                  const link = document.createElement('a');
+                  link.download = `cos-meishi-${Date.now()}.png`;
+                  link.href = exportCanvas.toDataURL('image/png', 1.0);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+              }
+          }
+          
           setIsProcessing(false);
-          onClose();
+          if (!asA4) onClose(); // Only close on single save
       }, 100);
+  };
+
+  const downloadA4 = () => {
+      if (!a4PreviewSrc) return;
+      const link = document.createElement('a');
+      link.download = `cos-meishi-a4-${Date.now()}.png`;
+      link.href = a4PreviewSrc;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setA4PreviewSrc(null); 
   };
 
   const handleFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -599,20 +736,75 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
 
   return (
     <div className="fixed inset-0 z-[60] bg-zinc-900 flex flex-col animate-fade-in">
+        {/* A4 Preview Modal */}
+        {a4PreviewSrc && (
+            <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-zinc-900 border border-white/10 rounded-2xl flex flex-col max-w-lg w-full h-[80vh] shadow-2xl overflow-hidden animate-slide-up">
+                    <div className="flex justify-between items-center p-4 border-b border-white/10 bg-zinc-800">
+                        <h3 className="text-white font-bold flex items-center gap-2">
+                            <span className="text-xl">🖨️</span> A4印刷プレビュー
+                        </h3>
+                        <button onClick={() => setA4PreviewSrc(null)} className="text-white/50 hover:text-white"><IconX className="w-6 h-6"/></button>
+                    </div>
+                    <div className="flex-1 overflow-auto p-4 bg-zinc-950 flex justify-center">
+                        <img src={a4PreviewSrc} alt="A4 Preview" className="max-w-full h-auto object-contain shadow-lg" />
+                    </div>
+                    <div className="p-4 border-t border-white/10 bg-zinc-800 flex gap-3 justify-end">
+                        <Button variant="secondary" onClick={() => setA4PreviewSrc(null)}>キャンセル</Button>
+                        <Button variant="primary" onClick={downloadA4} className="flex items-center gap-2">
+                            <IconDownload className="w-5 h-5"/> 保存する
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        )}
+
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b border-white/10 bg-black/50 shrink-0">
             <h2 className="font-bold text-white flex items-center gap-2">
                 <span className="text-xl">📇</span> 名刺メーカー
             </h2>
-            <div className="flex gap-2">
-                <button onClick={onClose} className="px-4 py-1 text-white/60 text-xs hover:text-white">閉じる</button>
-                <Button variant="primary" onClick={handleSave} className="!py-1 !px-4">{isProcessing ? <Spinner/> : '保存'}</Button>
+            <div className="flex gap-2 items-center">
+                {isPreviewMode ? (
+                    <button 
+                        onClick={() => setIsPreviewMode(false)}
+                        className="px-4 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all"
+                    >
+                        編集に戻る
+                    </button>
+                ) : (
+                    <>
+                        <button onClick={() => setIsPreviewMode(true)} className="p-2 text-white/60 hover:text-white" title="プレビュー">
+                            <IconEye className="w-5 h-5"/>
+                        </button>
+                        <button onClick={onClose} className="px-3 py-1 text-white/60 text-xs hover:text-white">閉じる</button>
+                        <button 
+                            onClick={() => handleSave(true)}
+                            disabled={isProcessing}
+                            className="px-4 py-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all disabled:opacity-50"
+                        >
+                            {isProcessing && processingType === 'a4' ? <Spinner/> : 'A4印刷用'}
+                        </button>
+                        <Button variant="primary" onClick={() => handleSave(false)} className="!py-1 !px-4">
+                            {isProcessing && processingType === 'card' ? <Spinner/> : '保存'}
+                        </Button>
+                    </>
+                )}
             </div>
         </div>
 
         {/* Canvas Container */}
-        <div className="flex-1 bg-zinc-950 relative overflow-hidden flex items-center justify-center p-8 touch-none select-none">
-            <div className="relative shadow-2xl transition-all duration-300" style={{ aspectRatio: `${width}/${height}`, maxHeight: '50vh', maxWidth: '90%', height: 'auto', width: 'auto' }}>
+        <div className="flex-1 bg-zinc-950 relative overflow-hidden flex items-center justify-center p-4 touch-none select-none">
+            <div 
+                className="relative shadow-2xl transition-all duration-300" 
+                style={{ 
+                    aspectRatio: `${width}/${height}`, 
+                    maxHeight: isPreviewMode ? '85vh' : '50vh', 
+                    maxWidth: isPreviewMode ? '95%' : '90%', 
+                    height: 'auto', 
+                    width: 'auto' 
+                }}
+            >
                  <canvas 
                     ref={canvasRef}
                     width={width}
@@ -623,262 +815,298 @@ export const MeishiEditor: React.FC<MeishiEditorProps> = ({ imageSrc, initialSta
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
                  />
-                 <div className="absolute bottom-2 left-2 pointer-events-none bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur opacity-50">
-                    要素をタップ選択・ドラッグで移動・右下ハンドルで拡大縮小
-                 </div>
+                 {!isPreviewMode && (
+                     <div className="absolute bottom-2 left-2 pointer-events-none bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur opacity-50">
+                        要素をタップ選択・ドラッグで移動・右下ハンドルで拡大縮小
+                     </div>
+                 )}
             </div>
         </div>
 
         {/* Controls */}
-        <div className="bg-zinc-900 border-t border-white/10 h-[45vh] max-h-[450px] flex flex-col shrink-0 pb-safe">
-            <div className="flex border-b border-white/10 bg-black/20">
-                {[
-                    {id:'templates', label:'プリセット'},
-                    {id:'content', label:'文字・情報'},
-                    {id:'style', label:'デザイン'},
-                    {id:'arrange', label:'配置・写真'}
-                ].map(t => (
-                    <button 
-                        key={t.id} 
-                        onClick={() => setActiveTab(t.id as EditorTab)} 
-                        className={`flex-1 py-3 text-xs font-bold border-b-2 transition-colors ${activeTab === t.id ? 'text-cos-accent border-cos-accent bg-white/5' : 'text-white/50 border-transparent'}`}
-                    >
-                        {t.label}
-                    </button>
-                ))}
-            </div>
+        {!isPreviewMode && (
+            <div className="bg-zinc-900 border-t border-white/10 h-[45vh] max-h-[450px] flex flex-col shrink-0 pb-safe">
+                <div className="flex border-b border-white/10 bg-black/20">
+                    {[
+                        {id:'templates', label:'プリセット'},
+                        {id:'content', label:'文字・情報'},
+                        {id:'style', label:'デザイン'},
+                        {id:'arrange', label:'配置・写真'}
+                    ].map(t => (
+                        <button 
+                            key={t.id} 
+                            onClick={() => setActiveTab(t.id as EditorTab)} 
+                            className={`flex-1 py-3 text-xs font-bold border-b-2 transition-colors ${activeTab === t.id ? 'text-cos-accent border-cos-accent bg-white/5' : 'text-white/50 border-transparent'}`}
+                        >
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {/* --- TEMPLATES --- */}
-                {activeTab === 'templates' && (
-                    <div className="grid grid-cols-2 gap-3">
-                        {MEISHI_PRESETS.map(p => (
-                            <button 
-                                key={p.id} 
-                                onClick={() => applyPreset(p.id)}
-                                className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cos-accent text-left transition-all group"
-                            >
-                                <div className="text-sm font-bold text-white group-hover:text-cos-accent">{p.label}</div>
-                                <div className="text-[10px] text-white/40 mt-1">
-                                    {p.state.isVertical ? '縦型' : '横型'} / {p.state.frameStyle !== 'none' ? '枠あり' : '枠なし'}
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                )}
-
-                {/* --- CONTENT --- */}
-                {activeTab === 'content' && (
-                    <div className="space-y-4 max-w-lg mx-auto">
-                        <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-[10px] text-white/50 uppercase">名前</label>
-                                <div className="flex items-center gap-2">
-                                    <input type="color" value={initialState.nameColor || initialState.textColor} onChange={e => onChange({...initialState, nameColor: e.target.value})} className="w-6 h-6 rounded border-none bg-transparent"/>
-                                    <div className="flex bg-black/30 rounded-lg p-0.5">
-                                        <button onClick={() => updateAlign('name', 'left')} className={`p-1.5 rounded ${initialState.namePos.align === 'left' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignLeft/></button>
-                                        <button onClick={() => updateAlign('name', 'center')} className={`p-1.5 rounded ${initialState.namePos.align === 'center' || !initialState.namePos.align ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignCenter/></button>
-                                        <button onClick={() => updateAlign('name', 'right')} className={`p-1.5 rounded ${initialState.namePos.align === 'right' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignRight/></button>
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {/* --- TEMPLATES --- */}
+                    {activeTab === 'templates' && (
+                        <div className="grid grid-cols-2 gap-3">
+                            {MEISHI_PRESETS.map(p => (
+                                <button 
+                                    key={p.id} 
+                                    onClick={() => applyPreset(p.id)}
+                                    className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cos-accent text-left transition-all group"
+                                >
+                                    <div className="text-sm font-bold text-white group-hover:text-cos-accent">{p.label}</div>
+                                    <div className="text-[10px] text-white/40 mt-1">
+                                        {p.state.isVertical ? '縦型' : '横型'} / {p.state.frameStyle !== 'none' ? '枠あり' : '枠なし'}
                                     </div>
-                                </div>
-                            </div>
-                            <input type="text" value={initialState.name} onChange={e => onChange({...initialState, name: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white mb-2" />
-                            <input type="range" min="0.5" max="5.0" step="0.1" value={initialState.namePos.scale} onChange={e => onChange({...initialState, namePos: {...initialState.namePos, scale: Number(e.target.value)}})} className="w-full h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
+                                </button>
+                            ))}
                         </div>
-                        
-                        <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-[10px] text-white/50 uppercase">詳細情報 (ID/フリー)</label>
-                                <div className="flex items-center gap-2">
-                                    <input type="color" value={initialState.detailsColor || initialState.textColor} onChange={e => onChange({...initialState, detailsColor: e.target.value})} className="w-6 h-6 rounded border-none bg-transparent"/>
-                                    <div className="flex bg-black/30 rounded-lg p-0.5">
-                                        <button onClick={() => updateAlign('details', 'left')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'left' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignLeft/></button>
-                                        <button onClick={() => updateAlign('details', 'center')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'center' || !initialState.detailsPos.align ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignCenter/></button>
-                                        <button onClick={() => updateAlign('details', 'right')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'right' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignRight/></button>
+                    )}
+
+                    {/* --- CONTENT --- */}
+                    {activeTab === 'content' && (
+                        <div className="space-y-4 max-w-lg mx-auto">
+                            <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-[10px] text-white/50 uppercase">名前</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={initialState.nameColor || initialState.textColor} onChange={e => onChange({...initialState, nameColor: e.target.value})} className="w-6 h-6 rounded border-none bg-transparent"/>
+                                        <div className="flex bg-black/30 rounded-lg p-0.5">
+                                            <button onClick={() => updateAlign('name', 'left')} className={`p-1.5 rounded ${initialState.namePos.align === 'left' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignLeft className="w-4 h-4"/></button>
+                                            <button onClick={() => updateAlign('name', 'center')} className={`p-1.5 rounded ${initialState.namePos.align === 'center' || !initialState.namePos.align ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignCenter className="w-4 h-4"/></button>
+                                            <button onClick={() => updateAlign('name', 'right')} className={`p-1.5 rounded ${initialState.namePos.align === 'right' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignRight className="w-4 h-4"/></button>
+                                        </div>
                                     </div>
                                 </div>
+                                <input type="text" value={initialState.name} onChange={e => onChange({...initialState, name: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white mb-2" />
+                                <input type="range" min="0.5" max="5.0" step="0.1" value={initialState.namePos.scale} onChange={e => onChange({...initialState, namePos: {...initialState.namePos, scale: Number(e.target.value)}})} className="w-full h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
                             </div>
-                            <div className="grid grid-cols-2 gap-2 mb-2">
-                                <input type="text" value={initialState.twitterId} onChange={e => onChange({...initialState, twitterId: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs" placeholder="X ID (@なし)" />
-                                <input type="text" value={initialState.instagramId} onChange={e => onChange({...initialState, instagramId: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs" placeholder="IG ID" />
-                            </div>
-                            <textarea rows={2} value={initialState.freeText} onChange={e => onChange({...initialState, freeText: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs mb-3" placeholder="フリーテキスト" />
                             
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xs w-16 text-white/50">サイズ</span>
-                                    <input type="range" min="0.5" max="4.0" step="0.1" value={initialState.detailsPos.scale} onChange={e => onChange({...initialState, detailsPos: {...initialState.detailsPos, scale: Number(e.target.value)}})} className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
+                            <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-[10px] text-white/50 uppercase">詳細情報 (ID/フリー)</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={initialState.detailsColor || initialState.textColor} onChange={e => onChange({...initialState, detailsColor: e.target.value})} className="w-6 h-6 rounded border-none bg-transparent"/>
+                                        <div className="flex bg-black/30 rounded-lg p-0.5">
+                                            <button onClick={() => updateAlign('details', 'left')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'left' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignLeft className="w-4 h-4"/></button>
+                                            <button onClick={() => updateAlign('details', 'center')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'center' || !initialState.detailsPos.align ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignCenter className="w-4 h-4"/></button>
+                                            <button onClick={() => updateAlign('details', 'right')} className={`p-1.5 rounded ${initialState.detailsPos.align === 'right' ? 'bg-white/20 text-white' : 'text-white/30'}`}><IconAlignRight className="w-4 h-4"/></button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xs w-16 text-white/50">行間</span>
-                                    <input type="range" min="1.0" max="3.0" step="0.1" value={initialState.detailsLineHeight || 1.5} onChange={e => onChange({...initialState, detailsLineHeight: Number(e.target.value)})} className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
+                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                    <input type="text" value={initialState.twitterId} onChange={e => onChange({...initialState, twitterId: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs" placeholder="X ID (@なし)" />
+                                    <input type="text" value={initialState.instagramId} onChange={e => onChange({...initialState, instagramId: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs" placeholder="IG ID" />
+                                </div>
+                                <textarea rows={2} value={initialState.freeText} onChange={e => onChange({...initialState, freeText: e.target.value})} className="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white text-xs mb-3" placeholder="フリーテキスト" />
+                                
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs w-16 text-white/50">サイズ</span>
+                                        <input type="range" min="0.5" max="4.0" step="0.1" value={initialState.detailsPos.scale} onChange={e => onChange({...initialState, detailsPos: {...initialState.detailsPos, scale: Number(e.target.value)}})} className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs w-16 text-white/50">行間</span>
+                                        <input type="range" min="1.0" max="3.0" step="0.1" value={initialState.detailsLineHeight || 1.5} onChange={e => onChange({...initialState, detailsLineHeight: Number(e.target.value)})} className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* --- STYLE --- */}
-                {activeTab === 'style' && (
-                    <div className="space-y-5 max-w-lg mx-auto">
-                        <div>
-                            <div className="flex justify-between items-end mb-2">
-                                <label className="text-[10px] text-white/50 uppercase">フォント</label>
-                                <label className="text-[10px] text-cos-accent cursor-pointer hover:text-white flex items-center gap-1">
-                                    <span>+ カスタムフォント</span>
-                                    <input type="file" accept=".ttf,.otf,.woff,.woff2" className="hidden" onChange={handleFontUpload} />
-                                </label>
-                            </div>
-                            <select 
-                                value={initialState.fontFamily} 
-                                onChange={e => onChange({...initialState, fontFamily: e.target.value})}
-                                className="w-full bg-black/30 border border-white/20 rounded-lg p-2 text-white text-sm"
-                            >
-                                <optgroup label="標準フォント">
-                                    {AVAILABLE_FONTS.map(f => (
-                                        <option key={f.name} value={f.name}>{f.name}</option>
-                                    ))}
-                                </optgroup>
-                                {customFonts.length > 0 && (
-                                    <optgroup label="カスタム">
-                                        {customFonts.map(f => (
+                    {/* --- STYLE --- */}
+                    {activeTab === 'style' && (
+                        <div className="space-y-5 max-w-lg mx-auto">
+                            <div>
+                                <div className="flex justify-between items-end mb-2">
+                                    <label className="text-[10px] text-white/50 uppercase">フォント</label>
+                                    <label className="text-[10px] text-cos-accent cursor-pointer hover:text-white flex items-center gap-1">
+                                        <span>+ カスタムフォント</span>
+                                        <input type="file" accept=".ttf,.otf,.woff,.woff2" className="hidden" onChange={handleFontUpload} />
+                                    </label>
+                                </div>
+                                <select 
+                                    value={initialState.fontFamily} 
+                                    onChange={e => onChange({...initialState, fontFamily: e.target.value})}
+                                    className="w-full bg-black/30 border border-white/20 rounded-lg p-2 text-white text-sm"
+                                >
+                                    <optgroup label="標準フォント">
+                                        {AVAILABLE_FONTS.map(f => (
                                             <option key={f.name} value={f.name}>{f.name}</option>
                                         ))}
                                     </optgroup>
-                                )}
-                            </select>
-                        </div>
+                                    {customFonts.length > 0 && (
+                                        <optgroup label="カスタム">
+                                            {customFonts.map(f => (
+                                                <option key={f.name} value={f.name}>{f.name}</option>
+                                            ))}
+                                        </optgroup>
+                                    )}
+                                </select>
+                            </div>
 
-                        <div>
-                            <label className="text-[10px] text-white/50 uppercase mb-2 block">文字の太さ ({initialState.fontWeight || 700})</label>
-                            <input 
-                                type="range" min="100" max="900" step="100"
-                                value={initialState.fontWeight || 700} 
-                                onChange={e => onChange({...initialState, fontWeight: Number(e.target.value)})}
-                                className="w-full h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" 
-                            />
-                        </div>
+                            <div>
+                                <label className="text-[10px] text-white/50 uppercase mb-2 block">文字の太さ ({initialState.fontWeight || 700})</label>
+                                <input 
+                                    type="range" min="100" max="900" step="100"
+                                    value={initialState.fontWeight || 700} 
+                                    onChange={e => onChange({...initialState, fontWeight: Number(e.target.value)})}
+                                    className="w-full h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" 
+                                />
+                            </div>
 
-                        <div>
-                            <label className="text-[10px] text-white/50 uppercase mb-2 block">背景色</label>
-                             <input type="color" value={initialState.backgroundColor} onChange={e => onChange({...initialState, backgroundColor: e.target.value})} className="w-full h-8 bg-transparent rounded border border-white/20" />
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-[10px] text-white/50 uppercase">フレーム (枠線)</label>
-                                <div className="flex gap-2">
-                                    <input type="color" value={initialState.themeColor} onChange={e => onChange({...initialState, themeColor: e.target.value})} className="w-6 h-6 rounded bg-transparent border border-white/20" title="メインカラー"/>
-                                    <input type="color" value={initialState.subColor} onChange={e => onChange({...initialState, subColor: e.target.value})} className="w-6 h-6 rounded bg-transparent border border-white/20" title="サブカラー"/>
+                            <div className="p-3 bg-white/5 rounded-xl space-y-3">
+                                <label className="text-[10px] text-white/50 uppercase block">背景デザイン</label>
+                                <div className="flex items-center gap-3">
+                                    <input type="color" value={initialState.backgroundColor} onChange={e => onChange({...initialState, backgroundColor: e.target.value})} className="w-10 h-8 bg-transparent rounded border border-white/20" />
+                                    <span className="text-xs text-white">ベース色</span>
+                                </div>
+                                
+                                <div className="space-y-2 pt-2 border-t border-white/5">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-white/70">パターン</span>
+                                        <input type="color" value={initialState.backgroundPatternColor || '#000000'} onChange={e => onChange({...initialState, backgroundPatternColor: e.target.value})} className="w-6 h-6 bg-transparent rounded border border-white/20" />
+                                    </div>
+                                    <div className="flex overflow-x-auto gap-2 no-scrollbar pb-1">
+                                        {(['none', 'dots', 'stripes', 'checkers', 'grid', 'seigaiha', 'yagasuri', 'noise'] as const).map(p => (
+                                            <button 
+                                                key={p} 
+                                                onClick={() => onChange({...initialState, backgroundPattern: p})} 
+                                                className={`px-3 py-1.5 text-[10px] whitespace-nowrap rounded-full border ${initialState.backgroundPattern === p ? 'border-cos-accent bg-cos-accent text-white' : 'border-white/20 text-white/50'}`}
+                                            >
+                                                {p === 'seigaiha' ? '青海波' : p === 'yagasuri' ? '矢絣' : p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {initialState.backgroundPattern !== 'none' && (
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[10px] text-white/50 w-8">不透明</span>
+                                            <input 
+                                                type="range" min="0" max="100" 
+                                                value={initialState.backgroundPatternOpacity || 10} 
+                                                onChange={e => onChange({...initialState, backgroundPatternOpacity: Number(e.target.value)})}
+                                                className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" 
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className="flex overflow-x-auto gap-2 no-scrollbar pb-1">
-                                {(['none', 'simple', 'thick', 'double', 'corners', 'bracket', 'cyber', 'modern', 'top-bottom'] as const).map(s => (
-                                    <button key={s} onClick={() => onChange({...initialState, frameStyle: s})} className={`px-3 py-1.5 text-xs whitespace-nowrap rounded-full border ${initialState.frameStyle === s ? 'border-cos-accent bg-cos-accent text-white' : 'border-white/20 text-white/50'}`}>{s}</button>
-                                ))}
-                            </div>
-                        </div>
 
-                        <div>
-                            <label className="text-[10px] text-white/50 uppercase mb-2 block">QRコード</label>
-                            <div className="flex gap-3 items-center">
-                                <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
-                                    {(['normal', 'dots', 'rounded'] as const).map(s => (
-                                        <button key={s} onClick={() => onChange({...initialState, qrStyle: s})} className={`px-3 py-1 text-xs rounded ${initialState.qrStyle === s ? 'bg-white/20 text-white' : 'text-white/50'}`}>{s}</button>
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-[10px] text-white/50 uppercase">フレーム (枠線)</label>
+                                    <div className="flex gap-2">
+                                        <input type="color" value={initialState.themeColor} onChange={e => onChange({...initialState, themeColor: e.target.value})} className="w-6 h-6 rounded bg-transparent border border-white/20" title="メインカラー"/>
+                                        <input type="color" value={initialState.subColor} onChange={e => onChange({...initialState, subColor: e.target.value})} className="w-6 h-6 rounded bg-transparent border border-white/20" title="サブカラー"/>
+                                    </div>
+                                </div>
+                                <div className="flex overflow-x-auto gap-2 no-scrollbar pb-1">
+                                    {(['none', 'simple', 'thick', 'double', 'corners', 'bracket', 'cyber', 'modern', 'top-bottom'] as const).map(s => (
+                                        <button key={s} onClick={() => onChange({...initialState, frameStyle: s})} className={`px-3 py-1.5 text-xs whitespace-nowrap rounded-full border ${initialState.frameStyle === s ? 'border-cos-accent bg-cos-accent text-white' : 'border-white/20 text-white/50'}`}>{s}</button>
                                     ))}
                                 </div>
-                                <input type="color" value={initialState.qrColor} onChange={e => onChange({...initialState, qrColor: e.target.value})} className="w-8 h-8 rounded bg-transparent border border-white/20" title="QR Color"/>
-                                <div className="flex items-center gap-2 ml-auto">
-                                    <span className="text-[10px] text-white/50">背景</span>
-                                    <input type="checkbox" checked={initialState.qrBgColor !== 'transparent'} onChange={e => onChange({...initialState, qrBgColor: e.target.checked ? '#ffffff' : 'transparent'})} className="accent-cos-accent"/>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] text-white/50 uppercase mb-2 block">QRコード</label>
+                                <div className="flex gap-3 items-center">
+                                    <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
+                                        {(['normal', 'dots', 'rounded'] as const).map(s => (
+                                            <button key={s} onClick={() => onChange({...initialState, qrStyle: s})} className={`px-3 py-1 text-xs rounded ${initialState.qrStyle === s ? 'bg-white/20 text-white' : 'text-white/50'}`}>{s}</button>
+                                        ))}
+                                    </div>
+                                    <input type="color" value={initialState.qrColor} onChange={e => onChange({...initialState, qrColor: e.target.value})} className="w-8 h-8 rounded bg-transparent border border-white/20" title="QR Color"/>
+                                    <div className="flex items-center gap-2 ml-auto">
+                                        <span className="text-[10px] text-white/50">背景</span>
+                                        <input type="checkbox" checked={initialState.qrBgColor !== 'transparent'} onChange={e => onChange({...initialState, qrBgColor: e.target.checked ? '#ffffff' : 'transparent'})} className="accent-cos-accent"/>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div className="flex gap-4 pt-2 border-t border-white/5">
-                             <label className="flex items-center gap-2 text-xs text-white/70 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.textShadow} onChange={e => onChange({...initialState, textShadow: e.target.checked})} className="accent-cos-accent" />
-                                 文字の影
-                             </label>
-                             <label className="flex items-center gap-2 text-xs text-white/70 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.textStroke} onChange={e => onChange({...initialState, textStroke: e.target.checked})} className="accent-cos-accent" />
-                                 文字の縁取り
-                             </label>
-                        </div>
-                    </div>
-                )}
-
-                {/* --- ARRANGE --- */}
-                {activeTab === 'arrange' && (
-                    <div className="space-y-6 max-w-lg mx-auto">
-                        <Button variant="secondary" fullWidth onClick={onEditImage}>写真の編集に戻る (美肌・フィルター)</Button>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <button onClick={() => onChange({...initialState, isVertical: !initialState.isVertical})} className="p-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm flex items-center justify-center gap-2">
-                                <span>🔄</span> {initialState.isVertical ? '横向きにする' : '縦向きにする'}
-                            </button>
-                             <div className="flex items-center justify-center text-xs text-white/40 text-center leading-tight">
-                                要素タップで選択<br/>右下ハンドルで拡大
+                            
+                            <div className="flex gap-4 pt-2 border-t border-white/5">
+                                 <label className="flex items-center gap-2 text-xs text-white/70 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.textShadow} onChange={e => onChange({...initialState, textShadow: e.target.checked})} className="accent-cos-accent" />
+                                     文字の影
+                                 </label>
+                                 <label className="flex items-center gap-2 text-xs text-white/70 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.textStroke} onChange={e => onChange({...initialState, textStroke: e.target.checked})} className="accent-cos-accent" />
+                                     文字の縁取り
+                                 </label>
                             </div>
                         </div>
+                    )}
 
-                        <div className="bg-white/5 p-3 rounded-xl space-y-3">
-                             <label className="text-[10px] text-white/50 uppercase block">写真調整</label>
-                             <div className="flex gap-2">
-                                <button 
-                                onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'contain', rotate: 0}})}
-                                className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'contain' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
-                                >
-                                    全体 (Contain)
+                    {/* --- ARRANGE --- */}
+                    {activeTab === 'arrange' && (
+                        <div className="space-y-6 max-w-lg mx-auto">
+                            <Button variant="secondary" fullWidth onClick={onEditImage}>写真の編集に戻る (美肌・フィルター)</Button>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <button onClick={() => onChange({...initialState, isVertical: !initialState.isVertical})} className="p-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm flex items-center justify-center gap-2">
+                                    <span>🔄</span> {initialState.isVertical ? '横向きにする' : '縦向きにする'}
                                 </button>
-                                <button 
-                                onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'cover', rotate: 0}})}
-                                className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'cover' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
-                                >
-                                    埋込 (Cover)
-                                </button>
-                                <button 
-                                onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'stretch', rotate: 0}})}
-                                className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'stretch' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
-                                >
-                                    変形 (Fill)
-                                </button>
-                             </div>
-                             
-                             <div className="flex items-center gap-3">
-                                <span className="text-xs w-8 text-white/60">回転</span>
-                                <input 
-                                    type="range" min="-180" max="180" step="1" 
-                                    value={initialState.photoPos.rotate || 0} 
-                                    onChange={e => onChange({...initialState, photoPos: {...initialState.photoPos, rotate: Number(e.target.value)}})} 
-                                    className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" 
-                                />
-                                <button onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, rotate: 0}})} className="text-xs text-white/40">R</button>
-                             </div>
+                                 <div className="flex items-center justify-center text-xs text-white/40 text-center leading-tight">
+                                    要素タップで選択<br/>右下ハンドルで拡大
+                                </div>
+                            </div>
+
+                            <div className="bg-white/5 p-3 rounded-xl space-y-3">
+                                 <label className="text-[10px] text-white/50 uppercase block">写真調整</label>
+                                 <div className="flex gap-2">
+                                    <button 
+                                    onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'contain', rotate: 0}})}
+                                    className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'contain' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
+                                    >
+                                        全体 (Contain)
+                                    </button>
+                                    <button 
+                                    onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'cover', rotate: 0}})}
+                                    className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'cover' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
+                                    >
+                                        埋込 (Cover)
+                                    </button>
+                                    <button 
+                                    onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, x: 0.5, y: 0.5, scale: 1.0, fit: 'stretch', rotate: 0}})}
+                                    className={`flex-1 py-2 text-[10px] rounded border ${initialState.photoPos.fit === 'stretch' ? 'bg-cos-accent border-cos-accent text-white' : 'bg-black/30 border-white/10 text-white/70'}`}
+                                    >
+                                        変形 (Fill)
+                                    </button>
+                                 </div>
+                                 
+                                 <div className="flex items-center gap-3">
+                                    <span className="text-xs w-8 text-white/60">回転</span>
+                                    <input 
+                                        type="range" min="-180" max="180" step="1" 
+                                        value={initialState.photoPos.rotate || 0} 
+                                        onChange={e => onChange({...initialState, photoPos: {...initialState.photoPos, rotate: Number(e.target.value)}})} 
+                                        className="flex-1 h-1 bg-white/20 rounded-lg appearance-none accent-cos-accent" 
+                                    />
+                                    <button onClick={() => onChange({...initialState, photoPos: {...initialState.photoPos, rotate: 0}})} className="text-xs text-white/40">R</button>
+                                 </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-4 gap-2 pt-2">
+                                 <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.photoPos.visible} onChange={e => onChange({...initialState, photoPos: {...initialState.photoPos, visible: e.target.checked}})} className="accent-cos-accent" />
+                                     写真
+                                 </label>
+                                 <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.namePos.visible} onChange={e => onChange({...initialState, namePos: {...initialState.namePos, visible: e.target.checked}})} className="accent-cos-accent" />
+                                     名前
+                                 </label>
+                                 <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.detailsPos.visible} onChange={e => onChange({...initialState, detailsPos: {...initialState.detailsPos, visible: e.target.checked}})} className="accent-cos-accent" />
+                                     詳細
+                                 </label>
+                                 <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
+                                     <input type="checkbox" checked={initialState.qrPos.visible} onChange={e => onChange({...initialState, qrPos: {...initialState.qrPos, visible: e.target.checked}})} className="accent-cos-accent" />
+                                     QR
+                                 </label>
+                            </div>
                         </div>
-                        
-                        <div className="grid grid-cols-4 gap-2 pt-2">
-                             <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.photoPos.visible} onChange={e => onChange({...initialState, photoPos: {...initialState.photoPos, visible: e.target.checked}})} className="accent-cos-accent" />
-                                 写真
-                             </label>
-                             <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.namePos.visible} onChange={e => onChange({...initialState, namePos: {...initialState.namePos, visible: e.target.checked}})} className="accent-cos-accent" />
-                                 名前
-                             </label>
-                             <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.detailsPos.visible} onChange={e => onChange({...initialState, detailsPos: {...initialState.detailsPos, visible: e.target.checked}})} className="accent-cos-accent" />
-                                 詳細
-                             </label>
-                             <label className="flex flex-col items-center gap-1 text-[10px] text-white/60 cursor-pointer">
-                                 <input type="checkbox" checked={initialState.qrPos.visible} onChange={e => onChange({...initialState, qrPos: {...initialState.qrPos, visible: e.target.checked}})} className="accent-cos-accent" />
-                                 QR
-                             </label>
-                        </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
+        )}
     </div>
   );
 };

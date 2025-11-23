@@ -267,7 +267,7 @@ export const MakeupEditor: React.FC<MakeupEditorProps> = ({ imageSrc, onApply, o
   const handlePointerMove = (e: React.PointerEvent) => {
       if (!pointersRef.current.has(e.pointerId)) return;
       pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      const pts = Array.from(pointersRef.current.values());
+      const pts = Array.from(pointersRef.current.values()) as { x: number, y: number }[];
 
       if (pts.length >= 2) {
            // Zoom/Pan
