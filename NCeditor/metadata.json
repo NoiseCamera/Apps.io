@@ -1,0 +1,7 @@
+{
+  "name": "NCeditor",
+  "description": "The ultimate photo editing companion for cosplayers. Enhance wigs, smooth skin, change backgrounds, and generate social media captions using AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
