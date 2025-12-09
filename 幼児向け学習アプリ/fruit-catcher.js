@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.querySelector('#score-display span');
     const livesDisplay = document.querySelector('#lives-display span');
     const basket = document.getElementById('basket');
+    const infoBar = document.getElementById('info-bar');
     const gameOverModal = document.getElementById('game-over-modal');
     const finalScore = document.getElementById('final-score');
     const restartBtn = document.getElementById('restart-btn');
@@ -44,8 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 video.srcObject = stream;
                 // canplayイベントは、ビデオが再生を開始できる状態になったときに発生します
-                video.oncanplay = () => {
-                    // ★★★ 追加: ビデオの準備ができてからCanvasのサイズを設定 ★★★
+                video.onloadedmetadata = () => {
+                    // ★★★ 変更: 全画面表示に対応 ★★★
+                    video.play();
+                    // 画面サイズに合わせてCanvasとVideoのサイズを設定
+                    setFullscreenLayout();
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     video.play();
@@ -55,6 +59,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 reject(err); // エラーが発生した場合はPromiseを失敗させる
             }
         });
+    }
+
+    /**
+     * ★★★ 追加: ゲーム画面を全画面にするためのレイアウト設定 ★★★
+     */
+    function setFullscreenLayout() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        gameArea.style.position = 'fixed';
+        gameArea.style.top = '0';
+        gameArea.style.left = '0';
+        gameArea.style.width = '100vw';
+        gameArea.style.height = '100vh';
+
+        infoBar.style.zIndex = '100';
     }
 
     /**
@@ -122,18 +142,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const predictions = await model.detect(video);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // ユーザーの手や顔など、大きな物体をバスケットの位置として使う
-        // ここでは単純に一番大きく検出された物体を使う
+        // ★★★ 変更: 'person'クラスに検出を限定し、その中で最大のものを探す ★★★
+        const personPredictions = predictions.filter(p => p.class === 'person');
+
         let largestObject = null;
         let maxArea = 0;
 
-        predictions.forEach(prediction => {
+        personPredictions.forEach(prediction => {
             const area = prediction.bbox[2] * prediction.bbox[3];
             if (area > maxArea) {
                 maxArea = area;
                 largestObject = prediction;
             }
         });
+        // ★★★ 変更ここまで ★★★
 
         if (largestObject) {
             // 検出されたオブジェクトの中心にバスケットを移動
@@ -204,6 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeEventListener('click', initializeAudio);
         document.body.removeEventListener('touchstart', initializeAudio);
     }
+
+    // ★★★ 追加: ウィンドウリサイズ時にレイアウトを再調整 ★★★
+    window.addEventListener('resize', () => {
+        if (!isGameOver) setFullscreenLayout();
+    });
 
     document.body.addEventListener('click', initializeAudio);
     document.body.addEventListener('touchstart', initializeAudio);
