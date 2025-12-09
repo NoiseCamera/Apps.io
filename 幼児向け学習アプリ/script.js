@@ -1,5 +1,5 @@
 // DOMの読み込みが完了したら処理を開始
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     // ダブルタップによるズームを防止
     document.body.style.touchAction = 'manipulation';
 

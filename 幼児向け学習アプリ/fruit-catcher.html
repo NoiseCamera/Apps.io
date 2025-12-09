@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>フルーツキャッチ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="fruit-catcher.css">
+    <!-- Local TensorFlow.js libraries -->
+    <script src="assets/libs/tf.min.js"></script>
+    <script src="assets/libs/coco-ssd.min.js"></script>
+</head>
+<body>
+    <audio id="bgm" src="assets/sounds/bgm_pop.mp3" loop></audio>
+
+    <header>
+        <h1>フルーツキャッチ</h1>
+        <p>カメラをつかって、おちてくるフルーツをキャッチしよう！</p>
+    </header>
+
+    <main id="game-container">
+        <div id="loading-message" class="hidden">
+            <p>カメラとモデルをじゅんびしています...</p>
+            <div class="loader"></div>
+        </div>
+
+        <div id="game-area" class="hidden">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <div id="basket"><img src="assets/images/basket.png" alt="かご"></div>
+        </div>
+
+        <div id="info-panel">
+            <div id="score-display">スコア: <span>0</span></div>
+            <div id="lives-display">いのち: <span>❤️❤️❤️</span></div>
+        </div>
+    </main>
+
+    <div id="camera-permission-modal" class="overlay">
+        <div class="modal-content">
+            <h2>カメラをつかうよ！</h2>
+            <p>このゲームでは、カメラにうつった<br>あなたの て や からだ をつかって<br>フルーツをキャッチします。</p>
+            <p>「カメラをつかってあそぶ」ボタンをおして、<br>カメラの しようを きょか してね。</p>
+            <button id="start-camera-btn" class="button-style">カメラをつかってあそぶ</button>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2>ゲームオーバー</h2>
+            <p>さいしゅうスコア: <span id="final-score">0</span></p>
+            <button id="restart-btn" class="button-style">もういちど あそぶ</button>
+        </div>
+    </div>
+
+    <!-- <script src="settings.js"></script> -->
+    <script src="fruit-catcher.js"></script>
+</body>
+</html>

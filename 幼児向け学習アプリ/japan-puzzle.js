@@ -6,15 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM要素
     const canvas = document.getElementById('puzzle-canvas');
     const ctx = canvas.getContext('2d');
+    const regionSelector = document.getElementById('region-selector');
     const piecesContainer = document.getElementById('pieces-container');
     const puzzleBoard = document.getElementById('puzzle-board');
     const infoText = document.getElementById('info-text');
     const hintBtn = document.getElementById('hint-btn');
     const winModal = document.getElementById('win-modal');
     const playAgainBtn = document.getElementById('play-again-btn');
-
-    // 地方選択ボタンは puzzle-board の子要素として扱う
-    const regionSelector = document.getElementById('region-selector');
 
     // 音声
     const snapSound = document.getElementById('snap-sound');
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAP_IMAGE_SRC = 'assets/images/tizu1.png'; // 背景地図
     const MAP_WIDTH = 800;
     const MAP_HEIGHT = 600;
-    const SNAP_DISTANCE = 25; // スナップ距離を少し厳しくする
+    const SNAP_DISTANCE = 35; // この距離以内ならスナップする
 
     // ゲーム状態
     let mapImage = new Image();
@@ -46,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
             drawMap();
             createAllPieces();
             setupRegionSelector();
+            // 最初の地方を選択
+            document.querySelector('.region-btn').click();
         };
         mapImage.src = MAP_IMAGE_SRC;
 
@@ -88,52 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const pieceEl = document.createElement('img');
             pieceEl.src = prefData.image;
             pieceEl.classList.add('prefecture-piece');
-            pieceEl.classList.add('unplaced'); // 未配置クラスを追加
             pieceEl.dataset.id = prefData.id;
             pieceEl.style.width = `${prefData.width}px`;
             pieceEl.style.height = `${prefData.height}px`;
+            pieceEl.style.display = 'none'; // 最初は非表示
             
-            allPieces.push({ ...prefData, element: pieceEl });
+            const pieceObj = { ...prefData, element: pieceEl };
+            allPieces.push(pieceObj);
             puzzleBoard.appendChild(pieceEl);
 
             pieceEl.addEventListener('mousedown', startDrag);
             pieceEl.addEventListener('touchstart', startDrag, { passive: false });
-        });
-    }
-
-    /**
-     * ピースを完成エリアの外側にランダムに配置します。
-     */
-    function scatterPieces() {
-        const boardRect = puzzleBoard.getBoundingClientRect();
-        const margin = 50; // ピースが表示される盤外のマージン
-
-        allPieces.forEach(piece => {
-            if (placedPieces.has(piece.id)) return;
-
-            let x, y;
-            const side = Math.floor(Math.random() * 4); // 0:上, 1:下, 2:左, 3:右
-
-            switch (side) {
-                case 0: // 上
-                    x = Math.random() * (boardRect.width - piece.width);
-                    y = -margin - Math.random() * 50;
-                    break;
-                case 1: // 下
-                    x = Math.random() * (boardRect.width - piece.width);
-                    y = boardRect.height + margin + Math.random() * 50;
-                    break;
-                case 2: // 左
-                    x = -margin - piece.width - Math.random() * 50;
-                    y = Math.random() * (boardRect.height - piece.height);
-                    break;
-                case 3: // 右
-                    x = boardRect.width + margin + Math.random() * 50;
-                    y = Math.random() * (boardRect.height - piece.height);
-                    break;
-            }
-            piece.element.style.left = `${x}px`;
-            piece.element.style.top = `${y}px`;
         });
     }
 
@@ -147,46 +112,62 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => selectRegion(id));
             regionSelector.appendChild(btn);
         });
-        // 「すべて」ボタンを追加
-        const allBtn = document.createElement('button');
-        allBtn.classList.add('region-btn', 'selected');
-        allBtn.dataset.regionId = 'all';
-        allBtn.textContent = 'すべて';
-        allBtn.addEventListener('click', () => selectRegion('all'));
-        regionSelector.insertBefore(allBtn, regionSelector.firstChild);
-    }
-
-    // 地方を選択
-    function selectRegion(regionId) {
-        currentRegion = regionId;
-
-        // ボタンの選択状態を更新
-        document.querySelectorAll('.region-btn').forEach(btn => {
-            btn.classList.toggle('selected', btn.dataset.regionId === regionId);
-        });
-
-        // ピースのハイライト状態を更新
-        allPieces.forEach(piece => {
-            const isPlaced = placedPieces.has(piece.id);
-            if (isPlaced) return;
-
-            const isTargetRegion = regionId === 'all' || piece.region === regionId;
-            piece.element.classList.toggle('highlight', isTargetRegion);
-        });
     }
 
     // 地方を選択
     function selectRegion(regionId) {
         if (currentRegion === regionId) return;
         currentRegion = regionId;
-        selectRegion(regionId);
+
+        document.querySelectorAll('.region-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.regionId === regionId);
+        });
+
+        // ピースの表示を切り替え
+        piecesContainer.innerHTML = ''; // サイドパネルをクリア
+        allPieces.forEach(piece => {
+            const isPlaced = placedPieces.has(piece.id);
+            const isCurrentRegion = piece.region === currentRegion;
+
+            if (!isPlaced && isCurrentRegion) {
+                const sidePiece = piece.element.cloneNode(true);
+                sidePiece.style.all = 'unset'; // スタイルをリセット
+                sidePiece.style.width = '80px'; // サイドパネル内でのサイズ
+                sidePiece.style.height = 'auto';
+                sidePiece.style.cursor = 'pointer';
+                sidePiece.addEventListener('click', () => bringPieceToBoard(piece.id));
+                piecesContainer.appendChild(sidePiece);
+                piece.element.style.display = 'none';
+            } else if (!isPlaced) {
+                piece.element.style.display = 'none';
+            }
+        });
+
+        const regionPrefectures = PREFECTURES_DATA.filter(p => p.region === regionId);
+        const unplacedCount = regionPrefectures.filter(p => !placedPieces.has(p.id)).length;
+
+        if (unplacedCount === 0 && regionPrefectures.length > 0) {
+            infoText.textContent = `「${REGIONS[regionId]}」はクリア！`;
+        } else {
+            infoText.textContent = `「${REGIONS[regionId]}」のピースをおいてね`;
+        }
+    }
+
+    function bringPieceToBoard(pieceId) {
+        const piece = allPieces.find(p => p.id === pieceId);
+        if (piece) {
+            piece.element.style.left = '850px';
+            piece.element.style.top = '250px';
+            piece.element.style.display = 'block';
+            selectRegion(currentRegion); // サイドパネルを更新
+        }
     }
 
     // ドラッグ開始
     function startDrag(e) {
         e.preventDefault();
         const pieceEl = e.target;
-        if (!pieceEl.classList.contains('unplaced')) return;
+        if (pieceEl.classList.contains('placed')) return;
 
         draggingPiece = allPieces.find(p => p.id === pieceEl.dataset.id);
         if (!draggingPiece) return;
@@ -249,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function placePiece(piece) {
         piece.element.style.left = `${piece.correctX}px`;
         piece.element.style.top = `${piece.correctY}px`;
-        piece.element.classList.replace('unplaced', 'placed');
+        piece.element.classList.add('placed');
         
         if (snapSound) playSE(snapSound.src);
         infoText.textContent = `${piece.name}、せいかい！`;
@@ -260,13 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 地方のクリア判定
     function checkRegionComplete() {
-        // 現在選択中の地方ではなく、ピースが属する地方で判定
-        const lastPlacedPiece = allPieces.find(p => p.id === Array.from(placedPieces).pop());
-        if (!lastPlacedPiece) return;
-        const regionOfPlacedPiece = lastPlacedPiece.region;
-
-        const regionPrefectures = PREFECTURES_DATA.filter(p => p.region === regionOfPlacedPiece);
+        const regionPrefectures = PREFECTURES_DATA.filter(p => p.region === currentRegion);
         const placedInRegion = Array.from(placedPieces).filter(id => regionPrefectures.some(p => p.id === id));
+
         if (regionPrefectures.length > 0 && regionPrefectures.length === placedInRegion.length) {
             if (regionCompleteSound) playSE(regionCompleteSound.src);
             infoText.textContent = `「${REGIONS[currentRegion]}」クリア！おめでとう！`;
@@ -293,12 +270,5 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => drawMap(false), 2000);
     }
 
-    // 初期化処理の最後に呼び出す
-    function setupGame() {
-        scatterPieces();
-        selectRegion('all'); // 最初はすべてのピースをハイライト
-    }
-
     init();
-    setupGame(); // ゲームのセットアップを実行
 });

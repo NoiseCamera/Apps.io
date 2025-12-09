@@ -1,54 +1,23 @@
 /* 基本的なスタイル */
 body {
-    background-color: #fffbeb;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    margin: 0;
-    padding: 20px;
-    overflow-x: hidden;
-    /* 背景パターン（ドットとチェック） */
-    background-image:
-        radial-gradient(#ffd54f 15%, transparent 15%),
-        radial-gradient(#4fc3f7 15%, transparent 15%);
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
+    font-family: 'Kosugi Maru', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #fffde7 0%, #e3f2fd 100%); /* 明るい黄色から水色へのグラデーション */
     color: #333;
     text-align: center;
+    margin: 0;
+    padding: 20px;
     -webkit-font-smoothing: antialiased;
 }
 
-header {
-    margin-bottom: 30px;
-    position: relative;
-    z-index: 10;
-}
-
 header h1 {
-    background: #ffffff;
-    border: 6px solid #8d6e63;
-    /* 木の枠風 */
-    border-radius: 20px;
-    padding: 15px 30px;
-    box-shadow: 0 10px 0 #5d4037, 0 20px 20px rgba(0, 0, 0, 0.2);
-    display: inline-block;
-    transform: rotate(-2deg);
-    background-image: linear-gradient(to bottom, #fff, #fff8e1);
-    color: #ff6f00;
-    font-size: 2.5rem;
-    margin: 0;
-    line-height: 1.2;
-    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ffca28;
-    letter-spacing: 0.05em;
+    color: #ff69b4; /* ホットピンク */
+    font-size: 2.5em;
+    font-weight: 800;
+    text-shadow: 3px 3px 0 #ffffff, 6px 6px 0 rgba(255, 105, 180, 0.3);
 }
 
 header p {
     font-size: 1.2em;
-    margin-top: 20px;
-    font-weight: bold;
-    color: #5d4037;
-    background: rgba(255, 255, 255, 0.8);
-    display: inline-block;
-    padding: 5px 15px;
-    border-radius: 20px;
 }
 
 /* アプリ選択画面のスタイル */
@@ -64,10 +33,8 @@ header p {
 
 .category-title {
     font-size: 2.2rem;
-    color: #004d40;
-    /* 濃いティール */
-    border-bottom: 4px solid #4db6ac;
-    /* 明るいティール */
+    color: #004d40; /* 濃いティール */
+    border-bottom: 4px solid #4db6ac; /* 明るいティール */
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
@@ -85,315 +52,216 @@ header p {
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    min-height: 180px;
-    /* 高さを揃える */
+    min-height: 180px; /* 高さを揃える */
 
     /* 既存のスタイルを微調整 */
     padding: 25px 20px;
     border-width: 4px;
     border-style: solid;
-    border-radius: 15px;
-    /* 少し角を戻す */
+    border-radius: 15px; /* 少し角を戻す */
     text-decoration: none;
     color: #333;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 /* 各リンクの色分け */
 .app-link[href="calculation.html"] {
-    background-color: #fffde7;
-    /* クリームイエロー */
-    border-color: #fbc02d;
-    /* 濃い黄色 */
+    background-color: #fffde7; /* クリームイエロー */
+    border-color: #fbc02d; /* 濃い黄色 */
 }
-
 .app-link[href="hiragana.html"] {
-    background-color: #fff0f5;
-    /* ラベンダーブラッシュ */
-    border-color: #f06292;
-    /* 明るいピンク */
+    background-color: #fff0f5; /* ラベンダーブラッシュ */
+    border-color: #f06292; /* 明るいピンク */
 }
-
 .app-link[href="katakana.html"] {
-    background-color: #e8f5e9;
-    /* 薄い緑 */
-    border-color: #66bb6a;
-    /* 緑 */
+    background-color: #e8f5e9; /* 薄い緑 */
+    border-color: #66bb6a; /* 緑 */
 }
-
 .app-link[href="slide-puzzle.html"] {
-    background-color: #e3f2fd;
-    /* 薄い青 */
-    border-color: #42a5f5;
-    /* 青 */
+    background-color: #e3f2fd; /* 薄い青 */
+    border-color: #42a5f5; /* 青 */
 }
-
 .app-link[href="jigsaw-puzzle.html"] {
-    background-color: #f3e5f5;
-    /* 薄い紫 */
-    border-color: #ab47bc;
-    /* 紫 */
+    background-color: #f3e5f5; /* 薄い紫 */
+    border-color: #ab47bc; /* 紫 */
 }
-
 .app-link[href="hiragana-stroke.html"] {
-    background-color: #e0f2f1;
-    /* 薄いティール */
-    border-color: #26a69a;
-    /* ティール */
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
 }
-
 .app-link[href="katakana-stroke.html"] {
-    background-color: #e0f2f1;
-    /* 薄いティール */
-    border-color: #26a69a;
-    /* ティール */
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
 }
-
 .app-link[href="clock.html"] {
-    background-color: #fff3e0;
-    /* 薄いオレンジ */
-    border-color: #ff9800;
-    /* オレンジ */
+    background-color: #fff3e0; /* 薄いオレンジ */
+    border-color: #ff9800; /* オレンジ */
 }
-
 .app-link[href="traffic-signal.html"] {
-    background-color: #e0f7fa;
-    /* 薄いシアン */
-    border-color: #00bcd4;
-    /* シアン */
+    background-color: #e0f7fa; /* 薄いシアン */
+    border-color: #00bcd4; /* シアン */
 }
-
+.app-link[href="fruit-catcher.html"] {
+    background-color: #f9fbe7; /* 薄いライム */
+    border-color: #cddc39; /* ライム */
+}
 .app-link[href="drawing-board.html"] {
-    background-color: #e1f5fe;
-    /* Light Cyan */
-    border-color: #29b6f6;
-    /* Light Blue */
+    background-color: #e1f5fe; /* Light Cyan */
+    border-color: #29b6f6; /* Light Blue */
 }
-
 /* ぬりえ選択画面へのリンクにスタイルを適用 */
 .app-link[href="coloring-select.html"] {
-    background-color: #f1f8e9;
-    /* Light Green */
-    border-color: #aed581;
-    /* Light Green */
+    background-color: #f1f8e9; /* Light Green */
+    border-color: #aed581; /* Light Green */
 }
-
 /* 以下、未設定だったアプリのスタイルを追加 */
 .app-link[href="shape-matching.html"] {
-    background-color: #e8eaf6;
-    /* 薄いインディゴ */
-    border-color: #5c6bc0;
-    /* インディゴ */
+    background-color: #e8eaf6; /* 薄いインディゴ */
+    border-color: #5c6bc0; /* インディゴ */
 }
-
 .app-link[href="gacha.html"] {
-    background-color: #fff8e1;
-    /* 薄いアンバー */
-    border-color: #ffc107;
-    /* アンバー */
+    background-color: #fff8e1; /* 薄いアンバー */
+    border-color: #ffc107; /* アンバー */
 }
-
 .app-link[href="collection.html"] {
-    background-color: #efebe9;
-    /* 薄いブラウン */
-    border-color: #8d6e63;
-    /* ブラウン */
+    background-color: #efebe9; /* 薄いブラウン */
+    border-color: #8d6e63; /* ブラウン */
 }
-
 .app-link[href="typing.html"] {
-    background-color: #eceff1;
-    /* ブルーグレー */
-    border-color: #78909c;
-    /* 濃いブルーグレー */
+    background-color: #eceff1; /* ブルーグレー */
+    border-color: #78909c; /* 濃いブルーグレー */
 }
-
 .app-link[href="memory-game.html"] {
-    background-color: #f9fbe7;
-    /* ライム */
-    border-color: #dce775;
-    /* 濃いライム */
+    background-color: #f9fbe7; /* ライム */
+    border-color: #dce775; /* 濃いライム */
 }
-
 .app-link[href="maze-game.html"] {
-    background-color: #efebe9;
-    /* 薄いブラウン */
-    border-color: #a1887f;
-    /* やさしい茶色 */
+    background-color: #efebe9; /* 薄いブラウン */
+    border-color: #a1887f; /* やさしい茶色 */
 }
-
 .app-link[href="programming-game.html"] {
-    background-color: #eceff1;
-    /* ブルーグレー */
-    border-color: #78909c;
-    /* 濃いブルーグレー */
+    background-color: #eceff1; /* ブルーグレー */
+    border-color: #78909c; /* 濃いブルーグレー */
 }
-
 .app-link[href="othello.html"] {
-    background-color: #e0f2f1;
-    /* 薄いティール */
-    border-color: #26a69a;
-    /* ティール */
+    background-color: #e0f2f1; /* 薄いティール */
+    border-color: #26a69a; /* ティール */
 }
-
 .app-link[href="shogi.html"] {
-    background-color: #efebe9;
-    /* 薄いブラウン */
-    border-color: #8d6e63;
-    /* ブラウン */
+    background-color: #efebe9; /* 薄いブラウン */
+    border-color: #8d6e63; /* ブラウン */
 }
-
 .app-link[href="mojifound.html"] {
-    background-color: #ede7f6;
-    /* 薄いディープパープル */
-    border-color: #673ab7;
-    /* ディープパープル */
+    background-color: #ede7f6; /* 薄いディープパープル */
+    border-color: #673ab7; /* ディープパープル */
 }
-
 .app-link[href="colorfound.html"] {
-    background-color: #e3f2fd;
-    /* 薄い青 */
-    border-color: #2196f3;
-    /* はっきりした青 */
+    background-color: #e3f2fd; /* 薄い青 */
+    border-color: #2196f3; /* はっきりした青 */
 }
-
 .app-link[href="kotoba_puzzle.html"] {
-    background-color: #ffebee;
-    /* 薄い赤 */
-    border-color: #ef5350;
-    /* 明るい赤 */
+    background-color: #ffebee; /* 薄い赤 */
+    border-color: #ef5350; /* 明るい赤 */
 }
-
 .app-link[href="japan-puzzle.html"] {
-    background-color: #fbe9e7;
-    /* 薄いオレンジ */
-    border-color: #ff8a65;
-    /* 明るいオレンジ */
+    background-color: #fbe9e7; /* 薄いオレンジ */
+    border-color: #ff8a65; /* 明るいオレンジ */
 }
-
 /* 新しい「おんがく」カテゴリの配色 */
 .app-link[href="keyboard.html"],
 .app-link[href="movies.html"] {
-    background-color: #f3e5f5;
-    /* 薄い紫 */
-    border-color: #ba68c8;
-    /* 紫 */
+    background-color: #f3e5f5; /* 薄い紫 */
+    border-color: #ba68c8; /* 紫 */
 }
 
 .app-link:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
 }
 
 /* h2からh3に変更したため、セレクタを更新 */
 .app-link h3 {
     margin: 0 0 10px 0;
-    font-size: 1.5rem;
-    /* 少し小さくして2行でも収まりやすくする */
-    line-height: 1.3;
-    /* 2行になったときの行間を調整 */
+    font-size: 1.5rem; /* 少し小さくして2行でも収まりやすくする */
+    line-height: 1.3; /* 2行になったときの行間を調整 */
 }
 
 /* h3の文字色を各リンクのテーマカラーに合わせる */
 .app-link[href="calculation.html"] h3 {
     color: #fbc02d;
 }
-
 .app-link[href="hiragana.html"] h3 {
     color: #f06292;
 }
-
 .app-link[href="katakana.html"] h3 {
     color: #66bb6a;
 }
-
 .app-link[href="slide-puzzle.html"] h3 {
     color: #42a5f5;
 }
-
 .app-link[href="jigsaw-puzzle.html"] h3 {
     color: #ab47bc;
 }
-
 .app-link[href="clock.html"] h3 {
     color: #ff9800;
 }
-
 .app-link[href="traffic-signal.html"] h3 {
     color: #00bcd4;
 }
-
+.app-link[href="fruit-catcher.html"] h3 {
+    color: #827717; /* 濃いライム */
+}
 .app-link[href="hiragana-stroke.html"] h3,
 .app-link[href="katakana-stroke.html"] h3 {
     color: #26a69a;
 }
-
 .app-link[href="drawing-board.html"] h3 {
-    color: #039be5;
-    /* Blue */
+    color: #039be5; /* Blue */
 }
-
 .app-link[href="coloring-select.html"] h3 {
-    color: #558b2f;
-    /* Green */
+    color: #558b2f; /* Green */
 }
-
 /* 以下、未設定だったアプリのタイトル色を追加 */
 .app-link[href="shape-matching.html"] h3 {
     color: #3f51b5;
 }
-
 .app-link[href="gacha.html"] h3 {
     color: #ff8f00;
 }
-
 .app-link[href="collection.html"] h3 {
     color: #5d4037;
 }
-
 .app-link[href="typing.html"] h3 {
     color: #546e7a;
 }
-
 .app-link[href="memory-game.html"] h3 {
-    color: #afb42b;
-    /* ライム */
+    color: #afb42b; /* ライム */
 }
-
 .app-link[href="maze-game.html"] h3 {
-    color: #8d6e63;
-    /* ブラウン */
+    color: #8d6e63; /* ブラウン */
 }
-
 .app-link[href="programming-game.html"] h3 {
     color: #546e7a;
 }
-
 .app-link[href="othello.html"] h3 {
     color: #26a69a;
 }
-
 .app-link[href="shogi.html"] h3 {
     color: #5d4037;
 }
-
 .app-link[href="mojifound.html"] h3 {
     color: #673ab7;
 }
-
 .app-link[href="colorfound.html"] h3 {
     color: #2196f3;
 }
-
 .app-link[href="kotoba_puzzle.html"] h3 {
     color: #ef5350;
 }
-
 .app-link[href="japan-puzzle.html"] h3 {
-    color: #f4511e;
-    /* 濃いオレンジ */
+    color: #f4511e; /* 濃いオレンジ */
 }
-
 /* 新しい「おんがく」カテゴリのタイトル色 */
 .app-link[href="keyboard.html"] h3,
 .app-link[href="movies.html"] h3 {
@@ -406,14 +274,12 @@ header p {
     color: #666;
     line-height: 1.5;
 }
-
 /* 各アプリ共通のナビゲーション */
 nav {
     display: flex;
     justify-content: center;
     margin-bottom: 25px;
-    gap: 15px;
-    /* ボタン間の隙間 */
+    gap: 15px; /* ボタン間の隙間 */
 }
 
 /* 計算ゲームのオプションコンテナ */
@@ -424,14 +290,12 @@ nav {
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    /* 中の要素を中央揃えにする */
+    align-items: center; /* 中の要素を中央揃えにする */
     gap: 15px;
 }
 
 #mode-selector {
-    margin-bottom: 0;
-    /* コンテナ側で管理 */
+    margin-bottom: 0; /* コンテナ側で管理 */
     display: flex;
     justify-content: center;
     gap: 15px;
@@ -439,54 +303,39 @@ nav {
 
 /* 難易度選択ボタン */
 #difficulty-selector {
-    margin-bottom: 0;
-    /* コンテナ側で管理 */
+    margin-bottom: 0; /* コンテナ側で管理 */
     display: flex;
     justify-content: center;
     gap: 15px;
-    flex-wrap: wrap;
-    /* 画面が狭い時に折り返す */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
 }
 
 /* 計算アプリのレイアウト */
 .calculation-layout {
-    display: flex; /* Flexboxを有効にする */
-    justify-content: center; /* 中央揃え */
-    align-items: flex-start; /* 上端揃えに変更 */
-    gap: 20px; /* 各要素間のスペース */
-    position: relative;
-    /* 青虫の位置決めの基準にする */
-    flex-wrap: wrap;
-    /* 画面が狭い時に折り返す */
-    padding: 0 20px;
-    /* 画面幅が狭いときのための余白 */
-
+    display: flex;
+    justify-content: center;
+    align-items: center; /* ボタンとコンテナを中央揃え */
+    gap: 20px; /* 各要素間のスペースを少し広げる */
+    position: relative; /* 青虫の位置決めの基準にする */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+    padding: 0 20px; /* 画面幅が狭いときのための余白 */
 }
-
-/* calculation-layout内の子要素の表示順を制御 */
-.calculation-layout > #left-items { order: 1 !important; } /* 1番目に表示 */
-.calculation-layout > #calculation-container { order: 2 !important; } /* 2番目に表示 */
-.calculation-layout > #right-items { order: 3 !important; } /* 3番目に表示 */
 
 #calculation-container {
     background-color: #fff;
-    border: 4px solid #a5d6a7;
-    /* 薄い緑 */
+    border: 4px solid #a5d6a7; /* 薄い緑 */
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 330px; /* 固定幅を調整 */
-    max-width: 90%; /* 画面幅が狭い場合に縮小する */
+    width: 90%;
+    max-width: 400px;
 }
-
 /* リンゴ表示用のコンテナ */
 .item-container {
-    width: 250px;
-    /* 横幅を広げて桁ごとの表示に対応 */
+    width: 250px; /* 横幅を広げて桁ごとの表示に対応 */
     height: 350px;
     display: flex;
-    justify-content: space-around;
-    /* 桁ごとのグループを均等に配置 */
+    justify-content: space-around; /* 桁ごとのグループを均等に配置 */
     gap: 5px;
     padding: 10px;
     border: 3px dashed #a0d8ef;
@@ -500,8 +349,7 @@ nav {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    flex-basis: 75px;
-    /* 各グループの基本幅 */
+    flex-basis: 75px; /* 各グループの基本幅 */
 }
 
 /* 桁の数字ラベル */
@@ -513,18 +361,15 @@ nav {
 
 /* ヒントの数字の色を問題の数字の色と合わせる */
 .digit-group.hundreds .digit-label {
-    color: #448AFF;
-    /* あかるい あお */
+    color: #448AFF; /* あかるい あお */
 }
 
 .digit-group.tens .digit-label {
-    color: #E91E63;
-    /* あかるい あか (ピンク) */
+    color: #E91E63; /* あかるい あか (ピンク) */
 }
 
 .digit-group.ones .digit-label {
-    color: #FFC107;
-    /* あかるい きいろ */
+    color: #FFC107; /* あかるい きいろ */
 }
 
 /* リンゴを並べるコンテナ */
@@ -534,8 +379,7 @@ nav {
     justify-content: center;
     gap: 2px;
     width: 100%;
-    position: relative;
-    /* アニメーションのために追加 */
+    position: relative; /* アニメーションのために追加 */
 }
 
 .item-img-wrapper {
@@ -556,8 +400,7 @@ nav {
 .item-img-wrapper.moving {
     /* transformはJSで設定するため、ここではtransitionのみ */
     transition: transform 0.8s ease-in-out;
-    z-index: 10;
-    /* 移動中に他の要素の上に表示 */
+    z-index: 10; /* 移動中に他の要素の上に表示 */
     transform: translate(var(--move-x, 0), var(--move-y, 0));
 }
 
@@ -573,8 +416,7 @@ nav {
 .item-img-wrapper.newly-borrowed {
     /* JSでtransformとopacityを制御するため、transitionのみ設定 */
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
-    z-index: 15;
-    /* 散らばる時に手前に表示 */
+    z-index: 15; /* 散らばる時に手前に表示 */
 }
 
 /* 借りてきた1個が弾けるアニメーション */
@@ -596,8 +438,7 @@ nav {
 .item-img-wrapper.carrying-in {
     /* 中央で変身して現れるアニメーション */
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 20;
-    /* 最も手前に表示 */
+    z-index: 20; /* 最も手前に表示 */
 }
 
 /* 引き算で消えるアイテムのスタイル (subtractedクラスは移動アニメーション後に付与される想定) */
@@ -612,32 +453,24 @@ nav {
     font-weight: bold;
     margin-bottom: 20px;
     letter-spacing: 0.1em;
-    color: #4682b4;
-    /* スチールブルー */
-    display: flex;
-    /* 横並びにする */
-    justify-content: center;
-    /* 中央揃え */
-    align-items: center;
-    /* 上下中央揃え */
-    gap: 0.2em;
-    /* 要素間の隙間 */
+    color: #4682b4; /* スチールブルー */
+    display: flex; /* 横並びにする */
+    justify-content: center; /* 中央揃え */
+    align-items: center; /* 上下中央揃え */
+    gap: 0.2em; /* 要素間の隙間 */
 }
 
 /* 計算式の数字の色分け */
 .digit-hundreds {
-    color: #448AFF;
-    /* あかるい あお */
+    color: #448AFF; /* あかるい あお */
 }
 
 .digit-tens {
-    color: #E91E63;
-    /* あかるい あか (ピンク) */
+    color: #E91E63; /* あかるい あか (ピンク) */
 }
 
 .digit-ones {
-    color: #FFC107;
-    /* あかるい きいろ */
+    color: #FFC107; /* あかるい きいろ */
 }
 
 /* 桁数を揃えるための見えないゼロ */
@@ -645,7 +478,6 @@ nav {
     /* 色を透明にすることで、場所は確保しつつ見えなくする */
     color: transparent;
 }
-
 /* 答えの入力欄とヒントボタンを横並びにするスタイル */
 
 /* 繰り上がり・繰り下がり時の数字ラベルの強調 */
@@ -668,18 +500,15 @@ nav {
     position: absolute;
     font-size: 1.5em;
     font-weight: bold;
-    color: blue;
-    /* 繰り上がりは青 */
+    color: blue; /* 繰り上がりは青 */
     opacity: 1;
     animation: carry-borrow-move 0.8s ease-out forwards;
-    pointer-events: none;
-    /* クリックイベントをブロックしない */
+    pointer-events: none; /* クリックイベントをブロックしない */
     z-index: 20;
 }
 
 .borrow-one-animation {
-    color: red;
-    /* 繰り下がりは赤 */
+    color: red; /* 繰り下がりは赤 */
 }
 
 @keyframes carry-borrow-move {
@@ -687,7 +516,6 @@ nav {
         transform: translate(0, 0) scale(1);
         opacity: 1;
     }
-
     100% {
         transform: translate(var(--carry-move-x, var(--borrow-move-x, 0)), var(--carry-move-y, var(--borrow-move-y, 0))) scale(0.5);
         opacity: 0;
@@ -696,42 +524,34 @@ nav {
 
 /* 答えの入力欄とヒントボタンを横並びにするスタイル */
 .answer-area {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    /* 答えとヒントボタンの間隔 */
-    margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem; /* 答えとヒントボタンの間隔 */
+  margin: 1rem 0;
 }
 
 /* 答えの入力欄のスタイルを追加 */
 #answer-input {
-    font-size: 3em;
-    /* 問題と同じフォントサイズに */
+    font-size: 3em; /* 問題と同じフォントサイズに */
     font-weight: bold;
-    color: #4caf50;
-    /* 少し落ち着いた緑色 */
+    color: #4caf50; /* 少し落ち着いた緑色 */
     background-color: #f1f8e9;
     border: 3px solid #aed581;
     border-radius: 15px;
     padding: 10px 20px;
-    min-width: 150px;
-    /* 最小幅を確保 */
-    height: 60px;
-    /* 高さを確保してレイアウトを安定させる */
+    min-width: 150px; /* 最小幅を確保 */
+    height: 60px; /* 高さを確保してレイアウトを安定させる */
     display: flex;
     justify-content: center;
     align-items: center;
     transition: all 0.2s;
-    box-sizing: border-box;
-    /* paddingとborderをwidth/heightに含める */
+    box-sizing: border-box; /* paddingとborderをwidth/heightに含める */
 }
 
 #answer-input.is-placeholder {
-    color: #9e9e9e;
-    /* プレースホルダーの文字色 */
-    font-size: 1.8em;
-    /* プレースホルダーの文字を少し小さく */
+    color: #9e9e9e; /* プレースホルダーの文字色 */
+    font-size: 1.8em; /* プレースホルダーの文字を少し小さく */
 }
 
 #number-buttons {
@@ -751,8 +571,7 @@ nav {
     margin-top: 20px;
     font-size: 2em;
     font-weight: bold;
-    height: 50px;
-    /* 高さを確保してレイアウトがずれないようにする */
+    height: 50px; /* 高さを確保してレイアウトがずれないようにする */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -760,99 +579,60 @@ nav {
 }
 
 .correct {
-    color: #e53935;
-    /* 濃い赤 */
+    color: #e53935; /* 濃い赤 */
     animation: feedback-anim 0.5s ease-out;
 }
 
 .incorrect {
-    color: #1e88e5;
-    /* 濃い青 */
+    color: #1e88e5; /* 濃い青 */
     animation: feedback-shake 0.5s ease;
 }
 
 @keyframes feedback-anim {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.2);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
-
 @keyframes feedback-shake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    20%,
-    60% {
-        transform: translateX(-10px);
-    }
-
-    40%,
-    80% {
-        transform: translateX(10px);
-    }
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
 }
-
 /* --- ヒントアニメーション改善のためのスタイル --- */
 /* CSSでリンゴを描画 */
 .item-img.item-circle {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background-color: #f44336;
-    /* 赤 */
+    background-color: #f44336; /* 赤 */
 }
 
 /* CSSで10の箱を描画 */
 .item-img.item-basket {
     width: 100%;
     height: 100%;
-    background-image: url('assets/images/basket.png');
-    /* バスケットの画像を指定 */
+    background-image: url('assets/images/basket.png'); /* バスケットの画像を指定 */
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    display: grid;
-    /* グリッドレイアウトに変更 */
-    grid-template-columns: repeat(5, 1fr);
-    /* 5列 */
-    grid-template-rows: repeat(2, 1fr);
-    /* 2行 */
-    overflow: visible;
-    /* 中のリンゴが見えるように */
+    display: grid; /* グリッドレイアウトに変更 */
+    grid-template-columns: repeat(5, 1fr); /* 5列 */
+    grid-template-rows: repeat(2, 1fr);    /* 2行 */
+    overflow: visible; /* 中のリンゴが見えるように */
 }
 
 /* 箱の中の小さいリンゴのスタイル */
 .item-img-small {
-    width: 100%;
-    /* グリッドセルに合わせる */
+    width: 100%; /* グリッドセルに合わせる */
     height: 100%;
     object-fit: contain;
 }
 
 /* 移動後にポヨンと弾むアニメーション */
 @keyframes bounce-in-anim {
-    0% {
-        transform: scale(0.8);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
-
 .item-img-wrapper.bounce-in {
     animation: bounce-in-anim 0.3s ease-out;
 }
@@ -872,18 +652,15 @@ nav {
         transform: scale(1) rotate(0deg);
         filter: brightness(1);
     }
-
     40% {
         transform: scale(1.3) rotate(-15deg);
         filter: brightness(2) drop-shadow(0 0 10px yellow);
     }
-
     100% {
         transform: scale(0) rotate(-360deg);
         filter: brightness(1);
     }
 }
-
 .item-img-wrapper.transform-to-box .item-img {
     animation: transform-to-box-anim 0.6s ease-in-out forwards;
 }
@@ -891,17 +668,14 @@ nav {
 /* --- 青虫アニメーション --- */
 /* 右側のアイテムとしてのあおむし */
 .aomusi-item {
-    width: 45px !important;
-    /* 重なりを避けるために少し小さく調整 */
+    width: 45px !important; /* 重なりを避けるために少し小さく調整 */
     height: 45px !important;
-    transform: scaleX(-1);
-    /* 左向きにする */
+    transform: scaleX(-1); /* 左向きにする */
 }
 
 #aomusi-img {
     width: 100%;
-    transform: scaleX(-1);
-    /* 画像を左向きにする */
+    transform: scaleX(-1); /* 画像を左向きにする */
 }
 
 /* 10の箱が1個のリンゴに変身するアニメーション */
@@ -910,25 +684,20 @@ nav {
         transform: scale(1);
         opacity: 1;
     }
-
     50% {
-        transform: scale(1.2);
-        /* 少し大きくなる */
+        transform: scale(1.2); /* 少し大きくなる */
     }
-
     100% {
         transform: scale(0);
         opacity: 0;
     }
 }
-
 .item-img-wrapper.transform-to-single {
     animation: transform-to-single 0.5s ease-in-out forwards;
 }
 
 .item-img-wrapper.transform-to-single .item-img-small {
-    display: none;
-    /* 変身中は中の小さいリンゴを隠す */
+    display: none; /* 変身中は中の小さいリンゴを隠す */
 }
 
 /* --- トグルスイッチのコンテナ --- */
@@ -938,8 +707,7 @@ nav {
     justify-content: center;
     gap: 20px;
     margin-bottom: 10px;
-    flex-wrap: wrap;
-    /* 画面が狭い時に折り返す */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
 }
 
 .toggle-switch-container {
@@ -948,8 +716,7 @@ nav {
     gap: 10px;
     font-size: 16px;
     font-weight: bold;
-    color: #555;
-    /* テキストの色 */
+    color: #555; /* テキストの色 */
 }
 
 .toggle-switch {
@@ -989,78 +756,44 @@ nav {
     border-radius: 50%;
 }
 
-input:checked+.slider {
-    background-color: #2196F3;
-    /* 青色 */
+input:checked + .slider {
+    background-color: #2196F3; /* 青色 */
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
     transform: translateX(26px);
 }
-
 /* --- スマホ・タブレット横画面対応 --- */
-@media screen and (max-height: 550px) and (orientation: landscape),
-screen and (max-width: 950px) and (orientation: landscape) {
+@media screen and (max-height: 550px) and (orientation: landscape), screen and (max-width: 950px) and (orientation: landscape) {
     body {
         padding: 10px 5px;
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 20px);
-        /* padding分を引く */
+        min-height: calc(100vh - 20px); /* padding分を引く */
     }
 
-    header {
-        flex-shrink: 0;
-    }
+    header { flex-shrink: 0; }
+    header h1 { font-size: 1.5em; margin: 0; }
+    header p { font-size: 0.9em; margin: 2px 0 5px 0; }
 
-    header h1 {
-        font-size: 1.5em;
-        margin: 0;
-    }
-
-    header p {
-        font-size: 0.9em;
-        margin: 2px 0 5px 0;
-    }
-
-    nav {
-        margin-bottom: 10px;
-    }
-
-    nav a {
-        padding: 4px 8px;
-        margin: 0 4px;
-        font-size: 0.9em;
-    }
+    nav { margin-bottom: 10px; }
+    nav a { padding: 4px 8px; margin: 0 4px; font-size: 0.9em; }
 
     #game-options-container {
         padding: 10px;
         margin-bottom: 10px;
         gap: 10px;
     }
-
     .setting-group {
         gap: 10px;
         margin-bottom: 5px;
         flex-wrap: wrap;
         gap: 10px;
     }
-
-    #difficulty-selector,
-    #mode-selector {
-        gap: 5px;
-    }
-
-    .difficulty-btn {
-        padding: 4px 8px;
-        font-size: 0.8em;
-    }
-
-    .mode-btn {
-        padding: 4px 8px;
-        font-size: 0.8em;
-    }
-
+    #difficulty-selector, #mode-selector { gap: 5px; }
+    .difficulty-btn { padding: 4px 8px; font-size: 0.8em; }
+    .mode-btn { padding: 4px 8px; font-size: 0.8em; }
+ 
     main.calculation-layout {
         gap: 5px;
         align-items: flex-start;
@@ -1070,25 +803,15 @@ screen and (max-width: 950px) and (orientation: landscape) {
 
     .item-container {
         width: 180px;
-        height: auto;
-        /* 高さを自動に */
+        height: auto; /* 高さを自動に */
         min-height: 220px;
         padding: 5px;
         border-width: 2px;
     }
 
-    .digit-group {
-        flex-basis: 55px;
-    }
-
-    .digit-label {
-        font-size: 2em;
-    }
-
-    .item-img-wrapper {
-        width: 20px;
-        height: 20px;
-    }
+    .digit-group { flex-basis: 55px; }
+    .digit-label { font-size: 2em; }
+    .item-img-wrapper { width: 20px; height: 20px; }
 
     #calculation-container {
         padding: 10px;
@@ -1097,44 +820,15 @@ screen and (max-width: 950px) and (orientation: landscape) {
         flex-shrink: 0;
     }
 
-    .problem {
-        font-size: 2.2em;
-        margin-bottom: 5px;
-    }
+    .problem { font-size: 2.2em; margin-bottom: 5px; }
+    .answer-area { margin: 0.5rem 0; gap: 0.5rem; }
+    #answer-input { font-size: 2.2em; padding: 5px; height: auto; min-width: 100px; }
+    #hint-btn { font-size: 1.5rem; padding: 0.3rem; min-width: 45px; height: 45px; }
 
-    .answer-area {
-        margin: 0.5rem 0;
-        gap: 0.5rem;
-    }
+    #number-buttons { gap: 5px; margin-bottom: 10px; }
+    .number-btn { font-size: 1.2em; padding: 8px; }
 
-    #answer-input {
-        font-size: 2.2em;
-        padding: 5px;
-        height: auto;
-        min-width: 100px;
-    }
-
-    #hint-btn {
-        font-size: 1.5rem;
-        padding: 0.3rem;
-        min-width: 45px;
-        height: 45px;
-    }
-
-    #number-buttons {
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-
-    .number-btn {
-        font-size: 1.2em;
-        padding: 8px;
-    }
-
-    .buttons {
-        gap: 8px;
-    }
-
+    .buttons { gap: 8px; }
     button#clear-btn,
     button#check-btn,
     button#next-btn {
@@ -1142,106 +836,91 @@ screen and (max-width: 950px) and (orientation: landscape) {
         font-size: 0.9em;
     }
 
-    #feedback {
-        font-size: 1.5em;
-        height: 25px;
-        margin-top: 5px;
-    }
+    #feedback { font-size: 1.5em; height: 25px; margin-top: 5px; }
 }
 
 /* --- 時計アプリの新しいレイアウト --- */
 
 .clock-game-layout {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    /* 中央から広がるように配置 */
-    gap: 30px;
-    /* 要素間の隙間を調整 */
-    width: 100%;
-    max-width: 900px;
-    /* アプリ全体の最大幅 */
-    margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around; /* 中央から広がるように配置 */
+  gap: 30px; /* 要素間の隙間を調整 */
+  width: 100%;
+  max-width: 900px; /* アプリ全体の最大幅 */
+  margin: 20px auto;
 }
 
 .clock-display-area {
-    /* 時計エリアがより多くのスペースを占めるようにして中央に寄せる */
-    flex: 1.5;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  /* 時計エリアがより多くのスペースを占めるようにして中央に寄せる */
+  flex: 1.5;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .clock-wrapper {
-    position: relative;
-    width: 100%;
-    /* 正方形を維持する */
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    /* アニメーションがはみ出さないようにする */
+  position: relative;
+  width: 100%;
+  /* 正方形を維持する */
+  aspect-ratio: 1 / 1;
+  overflow: hidden; /* アニメーションがはみ出さないようにする */
 }
 
 #clock-canvas {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-    /* 時計に影をつけて立体感を出す */
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); /* 時計に影をつけて立体感を出す */
 }
 
 .clock-controls-area {
-    /* 操作エリアのスペースを相対的に小さくする */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 15px;
+  /* 操作エリアのスペースを相対的に小さくする */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
 }
 
-.read-mode #controls,
-.set-mode #controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+.read-mode #controls, .set-mode #controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .choice-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* ボタンを2列に */
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ボタンを2列に */
+  gap: 10px;
 }
 
 .main-action-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
-    /* ボタンを垂直方向にも中央揃えにする */
-    margin-top: 10px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center; /* ボタンを垂直方向にも中央揃えにする */
+  margin-top: 10px;
 }
 
 /* 答え合わせで不正解だったボタンのスタイル */
 #controls .choice-btn.wrong-answer {
-    opacity: 0.6;
-    filter: grayscale(50%);
+  opacity: 0.6;
+  filter: grayscale(50%);
 }
 
 /* 「とけいをあわせる」モードのボタン（グリッドレイアウトに変更） */
 .time-setter-grid {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    /* [-] [label] [+] の3列 */
-    gap: 10px 15px;
-    /* 行と列の間の隙間 */
-    align-items: center;
-    justify-items: center;
-    /* 各セル内のアイテムを中央揃え */
-    margin-bottom: 15px;
-    background-color: #f0f8ff;
-    padding: 15px;
-    border-radius: 10px;
+  display: grid;
+  grid-template-columns: auto auto auto; /* [-] [label] [+] の3列 */
+  gap: 10px 15px; /* 行と列の間の隙間 */
+  align-items: center;
+  justify-items: center; /* 各セル内のアイテムを中央揃え */
+  margin-bottom: 15px;
+  background-color: #f0f8ff;
+  padding: 15px;
+  border-radius: 10px;
 }
 
 .time-setter-grid label {
@@ -1252,8 +931,7 @@ screen and (max-width: 950px) and (orientation: landscape) {
 
 /* 「つぎのもんだい」ボタンのスタイル */
 #next-question-btn {
-    background-color: #64b5f6;
-    /* 青 */
+    background-color: #64b5f6; /* 青 */
     box-shadow: 0 6px #42a5f5;
 }
 
@@ -1262,33 +940,31 @@ screen and (max-width: 950px) and (orientation: landscape) {
 }
 
 /* 「よむ れんしゅう」モードの「つぎのもんだい」ボタンに余白を追加 */
-.read-mode #controls>#next-question-btn {
+.read-mode #controls > #next-question-btn {
     margin-top: 15px;
 }
 
 /* 画面幅が狭い場合（スマホ縦向きなど）は縦並びに戻す */
 @media (max-width: 768px) {
-    .clock-game-layout {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .clock-display-area,
-    .clock-controls-area {
-        max-width: 380px;
-        width: 100%;
-    }
+  .clock-game-layout {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .clock-display-area,
+  .clock-controls-area {
+    max-width: 380px;
+    width: 100%;
+  }
 }
 
 /* 答え合わせ後の正解/不正解ボタンのスタイル */
 #controls .choice-btn.correct-answer {
-    background-color: #ffd54f;
-    /* 黄色でハイライト */
-    color: #424242;
-    text-shadow: none;
-    box-shadow: 0 5px #ffc107;
-    transform: scale(1.1);
-    z-index: 1;
+  background-color: #ffd54f; /* 黄色でハイライト */
+  color: #424242;
+  text-shadow: none;
+  box-shadow: 0 5px #ffc107;
+  transform: scale(1.1);
+  z-index: 1;
 }
 
 /* --- トグルスイッチのコンテナ --- */
@@ -1296,380 +972,75 @@ screen and (max-width: 950px) and (orientation: landscape) {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    /* スイッチ間の隙間を調整 */
-    margin-bottom: 20px;
-    /* レイアウト用のマージン */
-    flex-wrap: wrap;
-    /* 画面が狭い時に折り返す */
+    gap: 20px; /* スイッチ間の隙間を調整 */
+    margin-bottom: 20px; /* レイアウト用のマージン */
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
 }
 
 /* --- 「ほんもの とけい」モード切り替えスイッチのスタイル --- */
-#advanced-mode-toggle-container,
-#minute-display-toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 1.1em;
-    color: #555;
-    font-weight: bold;
-    /* 以下を追加して、各スイッチを枠で囲み分かりやすくする */
-    background-color: rgba(255, 255, 255, 0.6);
-    padding: 8px 15px;
-    border-radius: 25px;
-    border: 2px solid #ffca28;
-    /* Amber */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+#advanced-mode-toggle-container, #minute-display-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.1em;
+  color: #555;
+  font-weight: bold;
+  /* 以下を追加して、各スイッチを枠で囲み分かりやすくする */
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: 2px solid #ffca28; /* Amber */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
 
 .switch input {
-
-    button#check-btn,
-    button#next-btn {
-        padding: 8px 12px;
-        font-size: 0.9em;
-    }
-
-    #feedback {
-        font-size: 1.5em;
-        height: 25px;
-        margin-top: 5px;
-    }
-}
-
-/* --- 時計アプリの新しいレイアウト --- */
-
-.clock-game-layout {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    /* 中央から広がるように配置 */
-    gap: 30px;
-    /* 要素間の隙間を調整 */
-    width: 100%;
-    max-width: 900px;
-    /* アプリ全体の最大幅 */
-    margin: 20px auto;
-}
-
-.clock-display-area {
-    /* 時計エリアがより多くのスペースを占めるようにして中央に寄せる */
-    flex: 1.5;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.clock-wrapper {
-    position: relative;
-    width: 100%;
-    /* 正方形を維持する */
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    /* アニメーションがはみ出さないようにする */
-}
-
-#clock-canvas {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-    /* 時計に影をつけて立体感を出す */
-}
-
-.clock-controls-area {
-    /* 操作エリアのスペースを相対的に小さくする */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 15px;
-}
-
-.read-mode #controls,
-.set-mode #controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.choice-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* ボタンを2列に */
-    gap: 10px;
-}
-
-.main-action-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
-    /* ボタンを垂直方向にも中央揃えにする */
-    margin-top: 10px;
-}
-
-/* 答え合わせで不正解だったボタンのスタイル */
-#controls .choice-btn.wrong-answer {
-    opacity: 0.6;
-    filter: grayscale(50%);
-}
-
-/* 「とけいをあわせる」モードのボタン（グリッドレイアウトに変更） */
-.time-setter-grid {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    /* [-] [label] [+] の3列 */
-    gap: 10px 15px;
-    /* 行と列の間の隙間 */
-    align-items: center;
-    justify-items: center;
-    /* 各セル内のアイテムを中央揃え */
-    margin-bottom: 15px;
-    background-color: #f0f8ff;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.time-setter-grid label {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #555;
-}
-
-/* 「つぎのもんだい」ボタンのスタイル */
-#next-question-btn {
-    background-color: #64b5f6;
-    /* 青 */
-    box-shadow: 0 6px #42a5f5;
-}
-
-#next-question-btn:active {
-    box-shadow: 0 2px #42a5f5;
-}
-
-/* 「よむ れんしゅう」モードの「つぎのもんだい」ボタンに余白を追加 */
-.read-mode #controls>#next-question-btn {
-    margin-top: 15px;
-}
-
-/* 画面幅が狭い場合（スマホ縦向きなど）は縦並びに戻す */
-@media (max-width: 768px) {
-    .clock-game-layout {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .clock-display-area,
-    .clock-controls-area {
-        max-width: 380px;
-        width: 100%;
-    }
-}
-
-/* 答え合わせ後の正解/不正解ボタンのスタイル */
-#controls .choice-btn.correct-answer {
-    background-color: #ffd54f;
-    /* 黄色でハイライト */
-    color: #424242;
-    text-shadow: none;
-    box-shadow: 0 5px #ffc107;
-    transform: scale(1.1);
-    z-index: 1;
-}
-
-/* --- トグルスイッチのコンテナ --- */
-#toggle-switches-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    /* スイッチ間の隙間を調整 */
-    margin-bottom: 20px;
-    /* レイアウト用のマージン */
-    flex-wrap: wrap;
-    /* 画面が狭い時に折り返す */
-}
-
-/* --- 「ほんもの とけい」モード切り替えスイッチのスタイル --- */
-#advanced-mode-toggle-container,
-#minute-display-toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 1.1em;
-    color: #555;
-    font-weight: bold;
-    /* 以下を追加して、各スイッチを枠で囲み分かりやすくする */
-    background-color: rgba(255, 255, 255, 0.6);
-    padding: 8px 15px;
-    border-radius: 25px;
-    border: 2px solid #ffca28;
-    /* Amber */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
 }
 
-input:checked+.slider {
-    background-color: #4caf50;
-    /* Green */
+input:checked + .slider {
+  background-color: #4caf50; /* Green */
 }
 
-input:checked+.slider:before {
-    transform: translateX(26px);
+input:checked + .slider:before {
+  transform: translateX(26px);
 }
 
 .slider.round {
-    border-radius: 34px;
+  border-radius: 34px;
 }
 
 .slider.round:before {
-    border-radius: 50%;
-}
-
-/* --- 背景のアニメーション装飾 --- */
-.bg-decorations {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.floating-item {
-    position: absolute;
-    font-size: 4rem;
-    opacity: 0.6;
-    animation: floatUp 15s linear infinite;
-}
-
-.balloon-1 {
-    left: 10%;
-    animation-duration: 12s;
-}
-
-.balloon-2 {
-    right: 15%;
-    animation-duration: 18s;
-    animation-delay: 2s;
-}
-
-.cloud-1 {
-    top: 20%;
-    left: -10%;
-    font-size: 8rem;
-    animation: drift 25s linear infinite;
-    opacity: 0.4;
-}
-
-.star-1 {
-    bottom: 10%;
-    left: 50%;
-    animation: twinkle 3s ease-in-out infinite;
-}
-
-@keyframes floatUp {
-    0% {
-        transform: translateY(110vh) rotate(0deg);
-    }
-
-    100% {
-        transform: translateY(-10vh) rotate(20deg);
-    }
-}
-
-@keyframes drift {
-    0% {
-        left: -20%;
-    }
-
-    100% {
-        left: 120%;
-    }
-}
-
-@keyframes twinkle {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.5;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-}
-
-/* --- ゲームコンテナのカード風デザイン --- */
-#app-container,
-.clock-game-layout {
-    background: #ffffff;
-    border-radius: 30px;
-    padding: 20px;
-    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.05), 0 20px 20px rgba(0, 0, 0, 0.1);
-    border: 4px dashed #ffd54f;
-    margin: 0 auto;
-    max-width: 1000px;
-    position: relative;
-    z-index: 1;
-}
-
-/* レスポンシブ対応 */
-@media (max-width: 600px) {
-
-    #app-container,
-    #calculation-container,
-    .clock-game-layout {
-        padding: 10px;
-        border-width: 2px;
-    }
+  border-radius: 50%;
 }

@@ -1,0 +1,125 @@
+/* fruit-catcher.css */
+
+body {
+    overflow: hidden; /* スクロールバーを非表示に */
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#loading-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    font-size: 1.5em;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#game-area {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 4 / 3; /* 640 / 480 */
+    margin: 10px auto;
+    border: 4px solid #8d6e63;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #333;
+}
+
+#video, #canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 左右反転して鏡のようにする */
+    transform: scaleX(-1);
+    z-index: 1; /* ★追加: ビデオを最背面に配置 */
+}
+
+#canvas {
+    background: transparent;
+    z-index: 10;
+}
+
+#basket {
+    position: absolute;
+    bottom: 10px;
+    width: 120px;
+    height: 80px;
+    z-index: 20;
+    transition: left 0.1s linear;
+    /* ユーザーが直接バスケットを操作しないように */
+    pointer-events: none;
+}
+
+#basket img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#info-panel {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 640px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #5d4037;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ゲームオーバーモーダル */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: #fffde7;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+/* カメラ許可モーダルのボタンの色 */
+#start-camera-btn {
+    background-color: #4caf50; /* Green */
+    margin-top: 15px;
+}

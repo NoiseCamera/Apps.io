@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>たのしいがくしゅうランド</title>
+    <title>たのしいがくしゅうアプリ</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,301 +11,175 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="settings.css">
     <link rel="stylesheet" href="buttons.css">
-    <link rel="stylesheet" href="index-design.css">
 </head>
-
 <body>
 
-    <div class="bg-decorations">
-        <div class="floating-item balloon-1">🎈</div>
-        <div class="floating-item balloon-2">🧸</div>
-        <div class="floating-item cloud-1">☁️</div>
-        <div class="floating-item star-1">⭐</div>
-    </div>
-
+    <!-- アプリ一覧画面用のBGM -->
     <audio id="bgm" src="assets/sounds/title.mp3" loop></audio>
 
-    <header class="main-header">
-        <div class="header-decorations">
-            <img src="assets/images/イヌ.png" class="char-img char-left bounce" alt="いぬ">
-            <img src="assets/images/ネコ.png" class="char-img char-right bounce-delay" alt="ねこ">
-            <span class="deco-emoji emoji-tl">✨</span>
-            <span class="deco-emoji emoji-tr">🎵</span>
-        </div>
-        <div class="title-board">
-            <h1>たのしい<br>がくしゅうランド</h1>
-            <div class="ribbon">
-                <p>すきな アプリで あそぼう！</p>
-            </div>
-        </div>
+    <header>
+        <h1>たのしいがくしゅうアプリ</h1>
+        <p>すきなアプリをえらんであそんでね！</p>
     </header>
 
     <main id="app-selector">
-
-        <section class="category-section area-pink">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/usagi.png" alt="うさぎ">
-                </div>
-                <h2 class="category-title">📝 もじの れんしゅう</h2>
-            </div>
+        <div class="category-group">
+            <h2 class="category-title">📝 もじの れんしゅう</h2>
             <div class="app-grid">
-                <a href="hiragana.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">あ</span>
-                        <h3>ひらがな</h3>
-                    </div>
+                <a href="hiragana.html" class="app-link">
+                    <h3>ひらがな</h3>
+                    <p>もじの かたちを<br>おぼえよう！</p>
                 </a>
-                <a href="katakana.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">ア</span>
-                        <h3>カタカナ</h3>
-                    </div>
+                <a href="katakana.html" class="app-link">
+                    <h3>カタカナ</h3>
+                    <p>もじの かたちを<br>おぼえよう！</p>
                 </a>
-                <a href="hiragana-stroke.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">✍️</span>
-                        <h3>ひらがな<br>かきじゅん</h3>
-                    </div>
+                <a href="hiragana-stroke.html" class="app-link">
+                    <h3>ひらがな<br>かきじゅん</h3>
+                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
                 </a>
-                <a href="katakana-stroke.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">✍️</span>
-                        <h3>カタカナ<br>かきじゅん</h3>
-                    </div>
+                <a href="katakana-stroke.html" class="app-link">
+                    <h3>カタカナ<br>かきじゅん</h3>
+                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
                 </a>
-                <a href="typing.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">⌨️</span>
-                        <h3>タイピング</h3>
-                    </div>
+                <a href="typing.html" class="app-link">
+                    <h3>⌨️ タイピング</h3>
+                    <p>キーボードで もじを<br>うつ れんしゅう！</p>
                 </a>
-                <a href="mojifound.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🔎</span>
-                        <h3>もじさがし</h3>
-                    </div>
+                <a href="mojifound.html" class="app-link">
+                    <h3>🔎 もじさがし<br>ゲーム</h3>
+                    <p>もじを みつけて<br>スコアを きそおう！</p>
                 </a>
-                <a href="kotoba_puzzle.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🧩</span>
-                        <h3>ことばパズル</h3>
-                    </div>
+                <a href="kotoba_puzzle.html" class="app-link">
+                    <h3>🧩 ことば<br>パズル</h3>
+                    <p>もじを ならべて<br>ことばを つくろう！</p>
                 </a>
             </div>
-            <div class="section-decorations">
-                <span>🌷</span><span>🦋</span><span>🌷</span>
-            </div>
-        </section>
-
-        <section class="category-section area-blue">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/クマ.png" alt="くま">
-                </div>
-                <h2 class="category-title">🔢 すうじと パズル</h2>
-            </div>
-            <div class="app-grid">
-                <a href="calculation.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">➕</span>
-                        <h3>けいさん</h3>
-                    </div>
-                </a>
-                <a href="slide-puzzle.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🧩</span>
-                        <h3>スライド</h3>
-                    </div>
-                </a>
-                <a href="jigsaw-puzzle.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🖼️</span>
-                        <h3>ジグソー</h3>
-                    </div>
-                </a>
-                <a href="shape-matching.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🔺</span>
-                        <h3>かたちあわせ</h3>
-                    </div>
-                </a>
-                <a href="memory-game.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🃏</span>
-                        <h3>カードめくり</h3>
-                    </div>
-                </a>
-                <a href="maze-game.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🌀</span>
-                        <h3>めいろ</h3>
-                    </div>
-                </a>
-                <a href="othello.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">⚫</span>
-                        <h3>いご (囲碁)</h3>
-                    </div>
-                </a>
-
-                <a href="colorfound.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🎨</span>
-                        <h3>いろさがし</h3>
-                    </div>
-                </a>
-                <a href="japan-map-puzzle.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🗾</span>
-                        <h3>にほんちず</h3>
-                    </div>
-                </a>
-            </div>
-            <div class="section-decorations">
-                <span>🚀</span><span>🤖</span><span>🚂</span>
-            </div>
-        </section>
-
-        <section class="category-section area-green">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/パンダ.png" alt="パンダ">
-                </div>
-                <h2 class="category-title">🏠 せいかつ・ルール</h2>
-            </div>
-            <div class="app-grid">
-                <a href="clock.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🕒</span>
-                        <h3>とけい</h3>
-                    </div>
-                </a>
-                <a href="traffic-signal.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🚦</span>
-                        <h3>しんごうき</h3>
-                    </div>
-                </a>
-            </div>
-            <div class="section-decorations">
-                <span>🌳</span><span>🚙</span><span>🌳</span>
-            </div>
-        </section>
-
-        <section class="category-section area-purple">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/リス.png" alt="リス">
-                </div>
-                <h2 class="category-title">🎵 おんがく</h2>
-            </div>
-            <div class="app-grid">
-                <a href="keyboard.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🎹</span>
-                        <h3>ピアノ</h3>
-                    </div>
-                </a>
-                <a href="movies.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🎬</span>
-                        <h3>どうが</h3>
-                    </div>
-                </a>
-            </div>
-            <div class="section-decorations">
-                <span>🎺</span><span>🎻</span><span>🥁</span>
-            </div>
-        </section>
-
-        <section class="category-section area-orange">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/ハムスター.png" alt="ハムスター">
-                </div>
-                <h2 class="category-title">🎨 おえかき</h2>
-            </div>
-            <div class="app-grid">
-                <a href="drawing-board.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🖍️</span>
-                        <h3>おえかき</h3>
-                    </div>
-                </a>
-                <a href="coloring-select.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🖼️</span>
-                        <h3>ぬりえ</h3>
-                    </div>
-                </a>
-            </div>
-            <div class="section-decorations">
-                <span>✏️</span><span>🖌️</span><span>✂️</span>
-            </div>
-        </section>
-
-        <section class="category-section area-gray">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/ペンギン.png" alt="ペンギン">
-                </div>
-                <h2 class="category-title">🤖 プログラミング</h2>
-            </div>
-            <div class="app-grid">
-                <a href="programming-game.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🎮</span>
-                        <h3>プログラミング</h3>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <section class="category-section area-yellow">
-            <div class="category-header-wrapper">
-                <div class="char-bubble">
-                    <img src="assets/images/treasure_chest_closed.png" alt="たからばこ">
-                </div>
-                <h2 class="category-title">🎁 おたのしみ</h2>
-            </div>
-            <div class="app-grid">
-                <a href="gacha.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">🔮</span>
-                        <h3>がちゃ</h3>
-                    </div>
-                </a>
-                <a href="collection.html" class="app-card">
-                    <div class="card-inner">
-                        <span class="app-icon">💎</span>
-                        <h3>コレクション</h3>
-                    </div>
-                </a>
-            </div>
-            <div class="section-decorations">
-                <span>🍬</span><span>🍭</span><span>🍫</span>
-            </div>
-        </section>
-
-    </main>
-
-    <footer>
-        <div class="footer-parade">
-            🐘 🦒 🐎 🐄 🐖 🐕 🐈 🐇
         </div>
-        <p>© 2024 たのしいがくしゅうランド</p>
-    </footer>
 
+        <div class="category-group">
+            <h2 class="category-title">🔢 すうじと パズル</h2>
+            <div class="app-grid">
+                <a href="calculation.html" class="app-link">
+                    <h3>➕ けいさん</h3>
+                    <p>たしざん ひきざんの<br>れんしゅう！</p>
+                </a>
+                <a href="slide-puzzle.html" class="app-link">
+                    <h3>🧩 スライドパズル</h3>
+                    <p>パネルを うごかして<br>えを そろえよう！</p>
+                </a>
+                <a href="jigsaw-puzzle.html" class="app-link">
+                    <h3>🧩 ジグソーパズル</h3>
+                    <p>ピースを くみあわせて<br>えを かんせいさせよう！</p>
+                </a>
+                <a href="shape-matching.html" class="app-link">
+                    <h3>かたちあわせ</h3>
+                    <p>おなじ かたちを<br>みつけて あわせよう！</p>
+                </a>
+                <a href="memory-game.html" class="app-link">
+                    <h3>しんけいすいじゃく</h3>
+                    <p>カードを めくって<br>ペアを さがそう！</p>
+                </a>
+                <a href="maze-game.html" class="app-link">
+                    <h3>めいろゲーム</h3>
+                    <p>ゴールを めざして<br>めいろを すすもう！</p>
+                </a>
+                <a href="othello.html" class="app-link">
+                    <h3>囲碁 (いご)</h3>
+                    <p>いしで あいてより<br>たくさんの じんちを とろう！</p>
+                </a>
+                <a href="colorfound.html" class="app-link">
+                    <h3>いろさがしゲーム</h3>
+                    <p>おなじ いろを<br>みつけて タッチ！</p>
+                </a>
+                <a href="japan-puzzle.html" class="app-link">
+                    <h3>🗾 にほんちず<br>パズル</h3>
+                    <p>ピースを うごかして<br>ちずを かんせいさせよう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🏠 せいかつと ルール</h2>
+            <div class="app-grid">
+                <a href="clock.html" class="app-link">
+                    <h3>🕒 とけい</h3>
+                    <p>とけいの よみかたを<br>おぼえよう！</p>
+                </a>
+                <a href="traffic-signal.html" class="app-link">
+                    <h3>🚦 しんごうき</h3>
+                    <p>こうつうルールを<br>たのしく まなぼう！</p>
+                </a>
+                <a href="fruit-catcher.html" class="app-link">
+                    <h3> FRUIT CATCHER</h3>
+                    <p>カメラをつかって<br>フルーツをとろう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🎵 おんがく</h2>
+            <div class="app-grid">
+                <a href="keyboard.html" class="app-link">
+                    <h3>🎹 けんばんあそび</h3>
+                    <p>ピアノを ひいて<br>おとを たのしもう！</p>
+                </a>
+                <a href="movies.html" class="app-link">
+                    <h3>🎬 うたのどうが</h3>
+                    <p>たのしい うたを<br>みて きいてみよう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🎨 おえかきと こうさく</h2>
+            <div class="app-grid">
+                <a href="drawing-board.html" class="app-link">
+                    <h3>おえかき</h3>
+                    <p>じゆうに えを<br>かいてみよう！</p>
+                </a>
+                <a href="coloring-select.html" class="app-link">
+                    <h3>ぬりえ</h3>
+                    <p>すきな えを<br>えらんで ぬろう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🤖 プログラミング</h2>
+            <div class="app-grid">
+                <a href="programming-game.html" class="app-link">
+                    <h3>プログラミング</h3>
+                    <p>めいれいを ならべて<br>うごかしてみよう！</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="category-group">
+            <h2 class="category-title">🎁 おたのしみ</h2>
+            <div class="app-grid">
+                <a href="gacha.html" class="app-link">
+                    <h3>がちゃ</h3>
+                    <p>ほしを つかって<br>がちゃを まわそう！</p>
+                </a>
+                <a href="collection.html" class="app-link">
+                    <h3>コレクション</h3>
+                    <p>あつめた アイテムを<br>みてみよう！</p>
+                </a>
+            </div>
+        </div>
+
+        
+    </main>
     <script src="settings.js"></script>
     <script>
+        // ユーザーが最初に画面をクリックしたときにBGMを再生します
         document.body.addEventListener('click', () => {
             const bgm = document.getElementById('bgm');
             if (bgm && bgm.paused) {
-                bgm.play().catch(e => console.error("BGM Error:", e));
+                bgm.play().catch(e => console.error("BGMの再生に失敗しました:", e));
             }
         }, { once: true });
     </script>
 </body>
-
 </html>
