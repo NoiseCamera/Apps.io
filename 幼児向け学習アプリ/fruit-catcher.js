@@ -74,7 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
         gameArea.style.width = '100vw';
         gameArea.style.height = '100vh';
 
-        infoBar.style.zIndex = '100';
+        if (infoBar) {
+            infoBar.style.zIndex = '100';
+        }
     }
 
     /**
