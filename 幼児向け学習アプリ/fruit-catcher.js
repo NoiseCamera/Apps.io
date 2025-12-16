@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.querySelector('#score-display span');
     const livesDisplay = document.querySelector('#lives-display span');
     const basket = document.getElementById('basket');
-    const infoBar = document.getElementById('info-bar');
+    const infoBar = document.getElementById('info-panel'); // IDを修正
     const gameOverModal = document.getElementById('game-over-modal');
     const finalScore = document.getElementById('final-score');
     const restartBtn = document.getElementById('restart-btn');
@@ -68,23 +68,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
-        gameArea.style.position = 'fixed';
-        gameArea.style.top = '0';
-        gameArea.style.left = '0';
-        gameArea.style.width = '100vw';
-        gameArea.style.height = '100vh';
+        if (gameArea) {
+            gameArea.style.position = 'fixed';
+            gameArea.style.top = '0';
+            gameArea.style.left = '0';
+            gameArea.style.width = '100vw';
+            gameArea.style.height = '100vh';
+        }
 
-        if (infoBar) {
-            infoBar.style.zIndex = '100';
+        // infoBarのIDがinfo-panelなので修正
+        const infoPanel = document.getElementById('info-panel');
+        if (infoPanel) {
+            infoPanel.style.zIndex = '100';
+            infoPanel.style.position = 'fixed'; // 全画面表示時に情報パネルが隠れないように
+            infoPanel.style.top = '10px';
+            infoPanel.style.width = '100%';
+            infoPanel.style.display = 'flex';
+            infoPanel.style.justifyContent = 'space-around';
         }
     }
 
     /**
-     * COCO-SSDモデルをロードします。
-     * @returns {Promise<cocoSsd.ObjectDetection>} ロードされたモデルを返します。
+     * 手のひら検出モデルをロードします。
+     * @returns {Promise<handPoseDetection.HandDetector>} ロードされたモデルを返します。
      */
-    async function loadModel() {
-        return await cocoSsd.load();
+    async function loadModel() { // ★★★ 変更: 手のひら検出モデルをロードする ★★★
+        const model = handPoseDetection.SupportedModels.MediaPipeHands;
+        const detectorConfig = {
+            runtime: 'mediapipe', // or 'tfjs'
+            solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/hands',
+        };
+        return await handPoseDetection.createDetector(model, detectorConfig);
     }
 
     function startGame() {
@@ -139,22 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
             lastFruitTime = timestamp;
         }
 
-        // --- ここから下の処理はほぼ同じ ---
-
-        const predictions = await model.detect(video);
+        const hands = await model.estimateHands(video); // ★★★ 変更: model.detect -> model.estimateHands
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // ★★★ 変更: 'person'クラスに検出を限定し、その中で最大のものを探す ★★★
-        const personPredictions = predictions.filter(p => p.class === 'person');
-
+        // ★★★ 変更: 検出された手の中で、最も大きいものを探す ★★★
         let largestObject = null;
         let maxArea = 0;
 
-        personPredictions.forEach(prediction => {
-            const area = prediction.bbox[2] * prediction.bbox[3];
+        hands.forEach(hand => {
+            // hand.boundingBoxから幅と高さを取得
+            const area = hand.boundingBox.width * hand.boundingBox.height;
             if (area > maxArea) {
                 maxArea = area;
-                largestObject = prediction;
+                largestObject = hand;
             }
         });
         // ★★★ 変更ここまで ★★★
@@ -162,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (largestObject) {
             // 検出されたオブジェクトの中心にバスケットを移動
             // 映像は左右反転しているので、x座標の計算も反転させる
-            const objectCenterX = largestObject.bbox[0] + largestObject.bbox[2] / 2;
+            const objectCenterX = largestObject.boundingBox.xMin + largestObject.boundingBox.width / 2;
             const basketX = canvas.width - objectCenterX - (basket.offsetWidth / 2);
             basket.style.left = `${basketX}px`;
         }

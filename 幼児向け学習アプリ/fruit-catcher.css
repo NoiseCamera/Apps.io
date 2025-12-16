@@ -40,11 +40,8 @@ body {
 #game-area {
     position: relative;
     width: 100%;
-    max-width: 640px;
-    aspect-ratio: 4 / 3; /* 640 / 480 */
-    margin: 10px auto;
-    border: 4px solid #8d6e63;
-    border-radius: 10px;
+    /* JavaScriptで全画面スタイルが設定されるため、基本的な設定のみ残す */
+    margin: 0 auto;
     overflow: hidden;
     background-color: #333;
 }
