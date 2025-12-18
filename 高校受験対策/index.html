@@ -26,7 +26,18 @@
         <button data-level="2">中学2年生</button>
         <button data-level="3">中学3年生</button>
         <button data-level="all">全範囲</button>
-        <button id="js-back-to-subject-btn" class="back-btn">科目選択に戻る</button>
+        <button id="js-back-to-subject-from-level-btn" class="back-btn">科目選択に戻る</button>
+      </div>
+    </div>
+
+    <div id="js-count-container" style="display: none;">
+      <h1>問題数を選択してください</h1>
+      <div id="js-count-selection" class="level-selection-container">
+        <button data-count="10">10問</button>
+        <button data-count="20">20問</button>
+        <button data-count="50">50問</button>
+        <button data-count="all">全問</button>
+        <button id="js-back-to-level-btn" class="back-btn">学年選択に戻る</button>
       </div>
     </div>
 
@@ -37,7 +48,7 @@
       <div id="js-items" class="items-container"></div>
       <div id="js-explanation" class="explanation-container" style="display: none;"></div>
       <button id="js-next-btn" class="next-btn" style="display: none;">次の問題へ</button>
-      <button id="js-back-btn" class="back-btn" style="display: none;">科目選択に戻る</button>
+      <button id="js-back-to-subject-from-quiz-btn" class="back-btn" style="display: none;">科目選択に戻る</button>
     </div>
   </div>
 

@@ -52,6 +52,11 @@ button {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* ハイスコアがある科目のボタンのスタイル例 */
+button.has-high-score {
+    border: 2px solid #ff69b4; /* ホットピンクの枠線 */
+}
+
 button:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -222,7 +227,7 @@ button:hover {
         padding: 40px;
     }
 
-    .subject-selection-container, .level-selection-container {
+    .subject-selection-container, .level-selection-container, #js-count-selection {
         flex-direction: row; /* 横並びに戻す */
         flex-wrap: wrap;
     }

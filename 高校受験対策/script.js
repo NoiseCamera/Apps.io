@@ -13,22 +13,27 @@ const subjectContainer = document.getElementById('js-subject-container');
 const subjectSelectionContainer = document.getElementById('js-subject-selection');
 const levelContainer = document.getElementById('js-level-container');
 const levelSelectionContainer = document.getElementById('js-level-selection');
+const countContainer = document.getElementById('js-count-container');
+const countSelectionContainer = document.getElementById('js-count-selection');
 const quizContainer = document.getElementById('js-quiz-container');
 const quizTitleElement = document.getElementById('js-quiz-title');
 const questionElement = document.getElementById('js-question');
 const answersContainer = document.getElementById('js-items');
 const explanationContainer = document.getElementById('js-explanation');
 const nextButton = document.getElementById('js-next-btn');
-const backButton = document.getElementById('js-back-btn');
-const backToSubjectButton = document.getElementById('js-back-to-subject-btn');
+const backToSubjectFromQuizButton = document.getElementById('js-back-to-subject-from-quiz-btn');
+const backToSubjectFromLevelButton = document.getElementById('js-back-to-subject-from-level-btn');
+const backToLevelButton = document.getElementById('js-back-to-level-btn');
 const progressElement = document.getElementById('js-progress'); // 追加
 
 // クイズの状態を管理する変数
 let currentQuiz = [];
 let currentQuizIndex = 0;
 let selectedSubject = '';
+let selectedLevel = '';
 let score = 0;
 let incorrectQuestions = []; // 間違えた問題を保存する配列
+let highScores = JSON.parse(localStorage.getItem('highScores')) || {}; // 科目ごとのハイスコアを保存
 
 // クイズ表示エリアを完全にリセットする関数
 function resetQuizDisplay() {
@@ -46,10 +51,18 @@ function createSubjectButtons() {
   const subjectNames = Object.keys(quizzes);
   subjectNames.forEach(name => {
     const button = document.createElement('button');
-    const questionCount = quizzes[name].length;
-    button.textContent = `${name} (${questionCount}問)`;
+    const totalQuestions = quizzes[name].length;
+    const highScore = highScores[name] || 0; // その科目のハイスコアを取得、なければ0
+    button.textContent = `${name} (${totalQuestions}問) ハイスコア: ${highScore}点`;
     subjectSelectionContainer.appendChild(button);
 
+    // ハイスコア表示用のスタイルを適用
+    if (highScore > 0) {
+      button.style.fontWeight = 'bold';
+      button.style.color = '#ff69b4'; // ハイスコアがある科目は色を変えるなど
+    }
+
+    // イベントリスナーは既存のまま
     button.addEventListener('click', () => {
       showLevelSelection(name);
     });
@@ -61,8 +74,22 @@ function setupLevelButtons() {
   Array.from(levelSelectionContainer.children).forEach(button => {
     button.addEventListener('click', (e) => {
       const level = e.target.dataset.level;
-      startQuiz(level);
+      if (level) { // 戻るボタンでないことを確認
+        showCountSelection(level);
+      }
     });
+  });
+}
+
+// 問題数選択ボタンにイベントリスナーを設定する関数
+function setupCountButtons() {
+  Array.from(countSelectionContainer.children).forEach(button => {
+      button.addEventListener('click', (e) => {
+          const count = e.target.dataset.count;
+          if (count) { // 戻るボタンでないことを確認
+              startQuiz(selectedLevel, count);
+          }
+      });
   });
 }
 
@@ -72,8 +99,17 @@ function showLevelSelection(subjectName) {
   subjectContainer.style.display = 'none';
   levelContainer.style.display = 'block';
   quizContainer.style.display = 'none';
-  backToSubjectButton.style.display = 'block';
+  countContainer.style.display = 'none';
   resetQuizDisplay(); // レベル選択画面に遷移する際もクイズ表示をリセット
+}
+
+// 問題数選択画面を表示する関数
+function showCountSelection(level) {
+  selectedLevel = level;
+  levelContainer.style.display = 'none';
+  countContainer.style.display = 'block';
+  subjectContainer.style.display = 'none';
+  quizContainer.style.display = 'none';
 }
 
 // 配列をシャッフルする関数（Fisher-Yatesアルゴリズム）
@@ -87,25 +123,28 @@ function shuffleArray(array) {
 }
 
 // 指定された科目と学年のクイズを開始する関数
-function startQuiz(level) {
+function startQuiz(level, count) {
   let allQuestions = quizzes[selectedSubject];
 
   // 学年で問題をフィルタリング
   if (level !== 'all') {
     allQuestions = allQuestions.filter(q => q.level == level);
   }
+  
+  // 問題数を設定
+  const questionCount = count === 'all' ? allQuestions.length : Math.min(parseInt(count, 10), allQuestions.length);
 
   // 状態をリセット
-  currentQuiz = shuffleArray(allQuestions).slice(0, 10); // 問題をシャッフルして先頭から10問取得
+  currentQuiz = shuffleArray(allQuestions).slice(0, questionCount); // 問題をシャッフルして指定数取得
   currentQuizIndex = 0;
   score = 0;
   incorrectQuestions = []; // 間違えた問題リストをリセット
 
   // 画面を切り替え
   levelContainer.style.display = 'none';
+  countContainer.style.display = 'none';
   quizContainer.style.display = 'block';
-  backToSubjectButton.style.display = 'none';
-  backButton.style.display = 'block'; // クイズ開始時から表示
+  backToSubjectFromQuizButton.style.display = 'block'; // クイズ開始時から表示
 
   const levelText = level === 'all' ? '全範囲' : `中学${level}年生`;
   quizTitleElement.textContent = `${selectedSubject}のクイズ - ${levelText}（全${currentQuiz.length}問）`;
@@ -205,6 +244,14 @@ function showResult() {
     messageClass = 'fail-message';
   }
 
+  // ハイスコアの更新
+  if (!highScores[selectedSubject] || score > highScores[selectedSubject]) {
+    highScores[selectedSubject] = score;
+    localStorage.setItem('highScores', JSON.stringify(highScores));
+    // ハイスコアが更新されたことをユーザーに通知するなどの処理を追加しても良い
+    console.log(`${selectedSubject}のハイスコアが${score}点に更新されました！`);
+  }
+
   let incorrectQuestionsHTML = '';
   if (incorrectQuestions.length > 0) {
     incorrectQuestionsHTML += '<h2 class="result-subtitle">間違えた問題の復習</h2>';
@@ -257,18 +304,27 @@ function goBackToSubjectSelection() {
   resetQuizDisplay(); // クイズ表示をリセット
   subjectContainer.style.display = 'block';
   levelContainer.style.display = 'none';
+  countContainer.style.display = 'none';
 }
 
 // クイズ中/結果画面の「科目選択に戻る」ボタンがクリックされたときの処理
-backButton.addEventListener('click', goBackToSubjectSelection);
+backToSubjectFromQuizButton.addEventListener('click', goBackToSubjectSelection);
 
 // 学年選択画面の「科目選択に戻る」ボタンがクリックされたときの処理
-backToSubjectButton.addEventListener('click', goBackToSubjectSelection);
+backToSubjectFromLevelButton.addEventListener('click', goBackToSubjectSelection);
+
+// 問題数選択画面の「学年選択に戻る」ボタンがクリックされたときの処理
+backToLevelButton.addEventListener('click', () => {
+    levelContainer.style.display = 'block';
+    countContainer.style.display = 'none';
+});
 
 // 初期化関数
 function init() {
   createSubjectButtons();
+  // 科目選択ボタンの生成後にハイスコアを読み込む
   setupLevelButtons();
+  setupCountButtons();
 }
 
 // アプリケーションの開始
