@@ -24,6 +24,11 @@ body {
     text-align: center;
 }
 
+/* New style for screen containers */
+.screen {
+    /* display property will be controlled by JavaScript */
+}
+
 h1 {
     color: #ff69b4; /* ホットピンク */
     font-weight: 700;
@@ -111,10 +116,18 @@ button:hover {
 }
 
 /* --- ボタン類 --- */
-.next-btn, .back-btn {
+.next-btn, .back-btn, .review-btn {
     margin-top: 20px;
     width: 100%;
     max-width: 300px;
+    padding: 12px 24px; /* Consistent padding with other buttons */
+    font-size: 1.1em; /* Consistent font size */
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    border-radius: 30px; /* Consistent border-radius */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .next-btn {
@@ -126,6 +139,16 @@ button:hover {
     background-color: #98fb98 !important; /* ペールグリーン */
     color: #fff;
     border-color: #3cb371 !important;
+}
+
+.back-btn {
+    background-color: #a5b1c2; /* Inline style moved here */
+    color: white;
+}
+
+.back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .incorrect {
@@ -203,22 +226,40 @@ button:hover {
     font-size: 1.4em;
 }
 
-.incorrect-question-item {
-    background-color: #fff5f5;
-    border: 1px solid #ffc0cb;
-    border-radius: 12px;
+.result-item {
     padding: 15px;
     margin-bottom: 15px;
+    border-radius: 12px;
     text-align: left;
     line-height: 1.7;
 }
 
-.incorrect-question {
+.result-item.result-correct {
+    background-color: #f0fff0;
+    border: 1px solid #98fb98;
+}
+
+.result-item.result-incorrect {
+    background-color: #fff5f5;
+    border: 1px solid #ffc0cb;
+}
+
+.result-question {
     font-weight: bold;
     color: #5d5d5d;
 }
-.incorrect-answer {
-    color: #d32f2f; /* 濃い赤 */
+
+.result-item p {
+    margin: 5px 0;
+}
+
+.result-item .result-explanation {
+    font-size: 0.9em;
+    color: #777;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
 }
 
 /* スマートフォン向けの調整 (横幅600px以上の場合) */

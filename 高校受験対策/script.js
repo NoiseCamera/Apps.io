@@ -9,6 +9,7 @@ const quizzes = {
 };
 
 // DOM要素の取得
+const screens = document.querySelectorAll('.screen');
 const subjectContainer = document.getElementById('js-subject-container');
 const subjectSelectionContainer = document.getElementById('js-subject-selection');
 const levelContainer = document.getElementById('js-level-container');
@@ -21,9 +22,9 @@ const questionElement = document.getElementById('js-question');
 const answersContainer = document.getElementById('js-items');
 const explanationContainer = document.getElementById('js-explanation');
 const nextButton = document.getElementById('js-next-btn');
-const backToSubjectFromQuizButton = document.getElementById('js-back-to-subject-from-quiz-btn');
-const backToSubjectFromLevelButton = document.getElementById('js-back-to-subject-from-level-btn');
-const backToLevelButton = document.getElementById('js-back-to-level-btn');
+const backToSubjectFromQuizButton = document.getElementById('js-back-to-subject-from-quiz-btn'); // クイズ画面から科目選択へ
+const backToSubjectFromLevelButton = document.getElementById('js-back-to-subject-from-level-btn'); // 学年選択画面から科目選択へ
+const backToLevelButton = document.getElementById('js-back-to-level-btn'); // 問題数選択画面から学年選択へ
 const progressElement = document.getElementById('js-progress'); // 追加
 
 // クイズの状態を管理する変数
@@ -33,7 +34,16 @@ let selectedSubject = '';
 let selectedLevel = '';
 let score = 0;
 let incorrectQuestions = []; // 間違えた問題を保存する配列
+let quizHistory = []; // 回答履歴を保存する配列
 let highScores = JSON.parse(localStorage.getItem('highScores')) || {}; // 科目ごとのハイスコアを保存
+
+// 画面表示を管理する関数
+function showScreen(targetScreen) {
+  screens.forEach(screen => {
+    screen.style.display = 'none';
+  });
+  targetScreen.style.display = 'block';
+}
 
 // クイズ表示エリアを完全にリセットする関数
 function resetQuizDisplay() {
@@ -58,8 +68,7 @@ function createSubjectButtons() {
 
     // ハイスコア表示用のスタイルを適用
     if (highScore > 0) {
-      button.style.fontWeight = 'bold';
-      button.style.color = '#ff69b4'; // ハイスコアがある科目は色を変えるなど
+      button.classList.add('has-high-score');
     }
 
     // イベントリスナーは既存のまま
@@ -96,20 +105,14 @@ function setupCountButtons() {
 // 学年選択画面を表示する関数
 function showLevelSelection(subjectName) {
   selectedSubject = subjectName;
-  subjectContainer.style.display = 'none';
-  levelContainer.style.display = 'block';
-  quizContainer.style.display = 'none';
-  countContainer.style.display = 'none';
+  showScreen(levelContainer);
   resetQuizDisplay(); // レベル選択画面に遷移する際もクイズ表示をリセット
 }
 
 // 問題数選択画面を表示する関数
 function showCountSelection(level) {
   selectedLevel = level;
-  levelContainer.style.display = 'none';
-  countContainer.style.display = 'block';
-  subjectContainer.style.display = 'none';
-  quizContainer.style.display = 'none';
+  showScreen(countContainer);
 }
 
 // 配列をシャッフルする関数（Fisher-Yatesアルゴリズム）
@@ -139,11 +142,10 @@ function startQuiz(level, count) {
   currentQuizIndex = 0;
   score = 0;
   incorrectQuestions = []; // 間違えた問題リストをリセット
+  quizHistory = []; // 回答履歴をリセット
 
   // 画面を切り替え
-  levelContainer.style.display = 'none';
-  countContainer.style.display = 'none';
-  quizContainer.style.display = 'block';
+  showScreen(quizContainer);
   backToSubjectFromQuizButton.style.display = 'block'; // クイズ開始時から表示
 
   const levelText = level === 'all' ? '全範囲' : `中学${level}年生`;
@@ -182,6 +184,13 @@ function updateProgress() {
 function checkAnswer(selectedButton) {
   const currentQuestion = currentQuiz[currentQuizIndex];
   const isCorrect = selectedButton.textContent === currentQuestion.correct;
+
+  // 回答履歴を保存
+  quizHistory.push({
+    question: currentQuestion,
+    selectedAnswer: selectedButton.textContent,
+    isCorrect: isCorrect
+  });
 
   if (isCorrect) {
     selectedButton.classList.add('correct');
@@ -252,25 +261,28 @@ function showResult() {
     console.log(`${selectedSubject}のハイスコアが${score}点に更新されました！`);
   }
 
-  let incorrectQuestionsHTML = '';
-  if (incorrectQuestions.length > 0) {
-    incorrectQuestionsHTML += '<h2 class="result-subtitle">間違えた問題の復習</h2>';
-    incorrectQuestions.forEach(question => {
-      incorrectQuestionsHTML += `
-        <div class="incorrect-question-item">
-          <p class="incorrect-question">Q. ${question.question}</p>
-          <p class="incorrect-answer"><strong>正解: </strong>${question.correct}</p>
-          <p class="incorrect-explanation"><strong>解説: </strong>${question.explanation}</p>
+  let resultListHTML = '<h2 class="result-subtitle">結果一覧</h2>';
+  quizHistory.forEach((result, index) => {
+    const resultClass = result.isCorrect ? 'result-correct' : 'result-incorrect';
+    const resultIcon = result.isCorrect ? '正解' : '不正解';
+    const yourAnswer = result.selectedAnswer ? `あなたの回答: ${result.selectedAnswer}` : 'あなたの回答: 未回答';
+
+    resultListHTML += `
+        <div class="result-item ${resultClass}">
+          <p class="result-question"><strong>${index + 1}. ${result.question.question}</strong></p>
+          <p><strong>結果: ${resultIcon}</strong></p>
+          <p>${yourAnswer}</p>
+          <p>正解: ${result.question.correct}</p>
+          <p class="result-explanation">解説: ${result.question.explanation}</p>
         </div>
-      `;
-    });
-  }
+    `;
+  });
 
   answersContainer.innerHTML = `
     <p class="result-text">あなたの正解率は <strong>${percentage}%</strong> でした！</p>
     <p class="result-score">（${currentQuiz.length} 問中 ${score} 問正解）</p>
     <p class="border-message ${messageClass}">${borderMessage}</p>
-    ${incorrectQuestionsHTML}
+    ${resultListHTML}
   `;
 
   nextButton.style.display = 'none';
@@ -302,9 +314,7 @@ function startReview() {
 // 科目選択画面に戻る共通の関数
 function goBackToSubjectSelection() {
   resetQuizDisplay(); // クイズ表示をリセット
-  subjectContainer.style.display = 'block';
-  levelContainer.style.display = 'none';
-  countContainer.style.display = 'none';
+  showScreen(subjectContainer);
 }
 
 // クイズ中/結果画面の「科目選択に戻る」ボタンがクリックされたときの処理
@@ -315,8 +325,7 @@ backToSubjectFromLevelButton.addEventListener('click', goBackToSubjectSelection)
 
 // 問題数選択画面の「学年選択に戻る」ボタンがクリックされたときの処理
 backToLevelButton.addEventListener('click', () => {
-    levelContainer.style.display = 'block';
-    countContainer.style.display = 'none';
+    showScreen(levelContainer);
 });
 
 // 初期化関数
