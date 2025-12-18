@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
+/* 基本スタイル */
+body {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    background-color: #fff0f5; /* ラベンダーブラッシュ (薄いピンク) */
+    color: #5d5d5d;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box; /* paddingを含めてサイズ計算 */
+}
+
+.container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #ff69b4; /* ホットピンク */
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+/* 科目・学年選択 */
+.subject-selection-container, .level-selection-container {
+    display: flex;
+    flex-direction: column; /* 縦並びに変更 */
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    border-radius: 30px; /* 丸いボタン */
+    background-color: #ffb6c1; /* ライトピンク */
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* --- クイズ画面 --- */
+#js-quiz-title {
+    font-size: 1.5em;
+    color: #db7093; /* ペールバイオレットレッド */
+}
+
+.progress-container {
+    font-size: 1.1em;
+    color: #888;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.question-container {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.items-container {
+    display: grid;
+    grid-template-columns: 1fr; /* 縦画面では1列表示に */
+    gap: 15px;
+}
+
+.items-container button {
+    width: 100%;
+    background-color: #fce4ec; /* ピンクの淡い色 */
+    color: #ad1457; /* 濃いピンク */
+    border: 2px solid #f8bbd0;
+    font-weight: 700;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.explanation-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fffaf0; /* フローラルホワイト */
+    border: 2px dashed #ffd700; /* ゴールド */
+    border-radius: 12px;
+    text-align: left;
+    color: #5d5d5d;
+    line-height: 1.7;
+}
+
+/* --- ボタン類 --- */
+.next-btn, .back-btn {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.next-btn {
+    background-color: #ffd700; /* ゴールド */
+    color: #333;
+}
+
+.correct {
+    background-color: #98fb98 !important; /* ペールグリーン */
+    color: #fff;
+    border-color: #3cb371 !important;
+}
+
+.incorrect {
+    background-color: #ffc0cb !important; /* ピンク */
+    color: #fff;
+    border-color: #ff69b4 !important;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.review-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border: none;
+    border-radius: 30px;
+    background-color: #87cefa; /* ライトスカイブルー */
+    color: white;
+    font-weight: 700;
+}
+
+/* --- 結果画面 --- */
+.result-text {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #db7093;
+}
+
+.result-score {
+    font-size: 1.2em;
+    color: #777;
+}
+
+.border-message {
+    font-size: 1.2em;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.pass-message {
+    background-color: #f0fff0; /* ハニーデュー */
+    border: 2px solid #98fb98;
+    color: #2e8b57;
+}
+
+.fail-message {
+    background-color: #fff0f5; /* ラベンダーブラッシュ */
+    border: 2px solid #ffb6c1;
+    color: #c71585;
+}
+
+/* 結果画面の間違えた問題リスト */
+.result-subtitle {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #db7093;
+    border-bottom: 2px dotted #ffb6c1;
+    padding-bottom: 10px;
+    font-size: 1.4em;
+}
+
+.incorrect-question-item {
+    background-color: #fff5f5;
+    border: 1px solid #ffc0cb;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: left;
+    line-height: 1.7;
+}
+
+.incorrect-question {
+    font-weight: bold;
+    color: #5d5d5d;
+}
+.incorrect-answer {
+    color: #d32f2f; /* 濃い赤 */
+}
+
+/* スマートフォン向けの調整 (横幅600px以上の場合) */
+@media (min-width: 600px) {
+    .container {
+        padding: 40px;
+    }
+
+    .subject-selection-container, .level-selection-container {
+        flex-direction: row; /* 横並びに戻す */
+        flex-wrap: wrap;
+    }
+
+    .items-container {
+        grid-template-columns: 1fr 1fr; /* 2列表示に戻す */
+    }
+
+    .next-btn, .back-btn, .review-btn {
+        width: auto; /* 幅を自動調整 */
+    }
+}

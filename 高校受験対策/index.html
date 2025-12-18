@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高校受験対策クイズ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div id="js-subject-container">
+      <h1>科目を選択してください</h1>
+      <div id="js-subject-selection" class="subject-selection-container">
+        <!-- JavaScriptによって科目ボタンがここに表示されます -->
+      </div>
+    </div>
+
+    <div id="js-level-container" style="display: none;">
+      <h1>学年を選択してください</h1>
+      <div id="js-level-selection" class="level-selection-container">
+        <button data-level="1">中学1年生</button>
+        <button data-level="2">中学2年生</button>
+        <button data-level="3">中学3年生</button>
+        <button data-level="all">全範囲</button>
+        <button id="js-back-to-subject-btn" class="back-btn">科目選択に戻る</button>
+      </div>
+    </div>
+
+    <div id="js-quiz-container" style="display: none;">
+      <h1 id="js-quiz-title"></h1>
+      <div id="js-progress" class="progress-container"></div>
+      <div id="js-question" class="question-container"></div>
+      <div id="js-items" class="items-container"></div>
+      <div id="js-explanation" class="explanation-container" style="display: none;"></div>
+      <button id="js-next-btn" class="next-btn" style="display: none;">次の問題へ</button>
+      <button id="js-back-btn" class="back-btn" style="display: none;">科目選択に戻る</button>
+    </div>
+  </div>
+
+  <script src="quizzes/kokugo.js"></script>
+  <script src="quizzes/shakai.js"></script>
+  <script src="quizzes/rika.js"></script>
+  <script src="quizzes/eigo.js"></script>
+  <script src="quizzes/sugaku.js"></script>
+  <script src="quizzes/sugaku2.js"></script>
+  <script src="quizzes/kanji.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
