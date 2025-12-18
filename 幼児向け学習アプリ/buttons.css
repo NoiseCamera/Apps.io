@@ -48,7 +48,8 @@ button:disabled,
 /* --- オレンジ (基本、メニューに戻る系) --- */
 #footer-nav-button,
 #back-to-menu-link,
-#start-game-btn,
+#start-game-btn, /* 他のゲームのスタートボタン */
+#start-button, /* フルーツキャッチのスタートボタン */
 #start-btn { /* slide-puzzleのスタートボタンを追加 */
   background-color: #ff9800; /* Orange */
 }
@@ -65,6 +66,7 @@ button:disabled,
 #close-reward-btn,
 #close-detail-modal-btn,
 #play-again-btn,
+#restart-button, /* フルーツキャッチのもう一度ボタン */
 #check-btn,
 #replay-btn,
 .win-buttons button,
@@ -76,7 +78,8 @@ button:disabled,
 /* --- 青 (次の問題、メニューに戻る、待つなど) --- */
 #next-btn,
 #next-question-btn,
-#back-to-menu-btn,
+#back-to-menu-btn, /* フルーツキャッチのゲームオーバー画面のボタン */
+.modal-buttons a.button-style, /* スタート画面の「もどる」ボタン */
 .win-buttons a,
 #wait-btn,
 .time-adjust-btn, /* 時計の時間調整ボタンを追加 */
@@ -120,7 +123,8 @@ button:disabled,
 
 /* --- ティール (モード・難易度選択など) --- */
 .mode-btn,
-.difficulty-btn {
+.difficulty-btn,
+.mode-btn { /* fruit-catcherのモードボタン */
     background-color: #e0f2f1; /* 薄いティール */
     color: #004d40;
     padding: 10px 20px;
@@ -128,7 +132,8 @@ button:disabled,
 }
 
 .mode-btn.selected,
-.difficulty-btn.selected {
+.difficulty-btn.selected,
+.mode-btn.selected { /* fruit-catcherのモードボタン */
     background-color: #26a69a; /* ティール */
     color: #fff;
     top: 2px;

@@ -1,0 +1,199 @@
+/* fruit-catcher.css */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    text-align: center;
+    overflow: hidden;
+    background: #f0f8ff; /* 明るい空色 */
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 2px solid #87cefa;
+}
+
+body.game-active header {
+    display: none;
+}
+
+#game-container {
+    position: relative;
+    flex-grow: 1; /* 残りの高さをすべて使用 */
+    width: 100vw;
+    height: 100%; /* body.game-active の時に 100vh になる */
+    background-color: #000;
+    overflow: hidden;
+}
+body.game-active #game-container {
+    height: 100vh;
+}
+
+#game-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* 鏡像にする */
+}
+
+#output-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#basket {
+    position: absolute;
+    width: 120px; /* かごのサイズ調整 */
+    height: auto;
+    transform: translateX(-50%); /* 中央揃え */
+    transition: left 0.1s linear, bottom 0.1s linear; /* なめらかな動き */
+    z-index: 10;
+    pointer-events: none; /* クリックイベントを無効化 */
+}
+
+#basket img {
+    width: 100%;
+}
+
+#info-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 20;
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#lives-display span {
+    color: #ff4757; /* ハートの色 */
+    font-size: 30px;
+}
+
+/* モーダル共通スタイル */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 90%;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+.modal-content p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: #555;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* カウントダウン表示 */
+#countdown-display {
+    font-size: 15vw;
+    font-weight: 800;
+    color: #ff6347;
+    animation: countdown-zoom 1s infinite;
+}
+
+@keyframes countdown-zoom {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.8; }
+}
+
+/* 結果画面 */
+.final-score-text {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.points-feedback {
+    font-size: 1.3em;
+    color: #ff9f43;
+    font-weight: bold;
+}
+
+/* ローダー */
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1.5s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}

@@ -1,35 +1,402 @@
 /* fruit-catcher.css */
 
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
 body {
-    overflow: hidden; /* スクロールバーを非表示に */
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    text-align: center;
+    overflow: hidden;
+    background: #f0f8ff; /* 明るい空色 */
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 2px solid #87cefa;
+}
+
+body.game-active header {
+    display: none;
 }
 
 #game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    position: relative;
+    flex-grow: 1; /* 残りの高さをすべて使用 */
+    width: 100vw;
+    background-color: #000;
+    overflow: hidden;
+}
+body.game-active #game-container {
+    height: 100vh;
+}
+
+#game-area {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+    height: 100%;
 }
 
-#loading-message {
+#video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* 鏡像にする */
+}
+
+#output-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+}
+
+#basket, #basket2 {
+    position: absolute;
+    width: 150px; /* かごのサイズ調整 */
+    height: 100px; /* 画像のアスペクト比に合わせて高さを指定 */
+    transform: translateX(-50%); /* 中央揃え */
+    transition: left 0.1s linear, bottom 0.1s linear; /* なめらかな動き */
+    z-index: 10;
+    pointer-events: none; /* クリックイベントを無効化 */
+    background-image: url('assets/images/basket.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    height: 400px;
-    font-size: 1.5em;
+    align-items: center;
 }
 
+/* フルーツキャッチ時の揺れアニメーション */
+@keyframes wobble {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-8deg); }
+    50% { transform: translateX(-50%) rotate(8deg); }
+    75% { transform: translateX(-50%) rotate(-4deg); }
+    100% { transform: translateX(-50%) rotate(0deg); }
+}
+.basket-wobble {
+    animation: wobble 0.5s ease-in-out;
+}
+
+.player-label {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: white;
+    /* 白い文字に黒いフチをつけて視認性を上げる */
+    text-shadow: 
+        -2px -2px 0 #000,  
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000;
+    padding-bottom: 15px; /* かごの中央に表示されるように微調整 */
+}
+
+#basket .player-label {
+    color: #e53935; /* 1Pは赤色 */
+}
+
+#basket2 .player-label {
+    color: #1e88e5; /* 2Pは青色 */
+}
+
+.avatar { /* IDセレクタをクラスセレクタに変更 */
+    position: absolute;
+    transform: translateX(-50%); /* 中央揃え */
+    z-index: 1; /* 一番後ろのレイヤーにする */
+    pointer-events: none;
+    transition: left 0.1s linear, top 0.1s linear, width 0.1s linear, height 0.1s linear;
+}
+
+.avatar img { /* IDセレクタをクラスセレクタに変更 */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 画面シェイク */
+body.screen-shake {
+    animation: shake-animation 0.4s ease-in-out;
+}
+
+@keyframes shake-animation {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+    20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+
+/* ゲーム中の「もどる」ボタン */
+.ingame-back-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 50;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background-color: rgba(33, 150, 243, 0.8) !important; /* 半透明の青 */
+    box-shadow: 0 4px rgba(25, 118, 210, 0.8) !important;
+}
+.ingame-back-btn:hover {
+    /* topプロパティを上書きして、正しい位置から少しだけ浮き上がるようにする */
+    background-color: rgba(33, 150, 243, 1) !important;
+    top: 13px !important; /* 15px - 2px. !importantを追加して他のスタイルを上書き */
+}
+
+#basket img {
+    width: 100%;
+}
+
+#info-panel {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-around; /* 中央に寄せるように変更 */
+    align-items: center; /* 垂直方向中央揃え */
+    z-index: 20;
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    gap: 20px; /* 要素間の隙間 */
+}
+
+/* ゲーム中のフィードバックテキスト（回復など） */
+.feedback-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #ff69b4; /* ホットピンク */
+    text-shadow: 3px 3px 0 white, -3px -3px 0 white, 3px -3px 0 white, -3px 3px 0 white;
+    z-index: 60;
+    pointer-events: none;
+    animation: feedback-animation 1.5s ease-out forwards;
+}
+
+@keyframes feedback-animation {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -150%) scale(1);
+        opacity: 0;
+    }
+}
+
+#player-turn-display {
+    font-size: 22px;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 5px 15px;
+    border-radius: 15px;
+}
+
+#lives-display span {
+    color: #ff4757; /* ハートの色 */
+    font-size: 30px;
+}
+
+/* モーダル共通スタイル */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 90%;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+.modal-content p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: #555;
+}
+
+.fruit-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+/* ゲームモード選択 */
+#game-mode-selection {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fffde7;
+    border-radius: 10px;
+}
+
+.mode-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* 難易度選択 */
+#difficulty-selection {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #e3f2fd; /* 少し違う青色 */
+    border-radius: 10px;
+}
+
+.difficulty-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* アバター選択コンテナ */
+#avatar-selection-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.avatar-selection-group {
+    padding: 15px;
+    background-color: #f0f8ff;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.avatar-selection-group.hidden {
+    display: none;
+}
+
+.avatar-choices {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.avatar-choice {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.avatar-choice:hover {
+    background-color: #e3f2fd;
+}
+
+.avatar-choice.selected {
+    border-color: #2196f3;
+    background-color: #bbdefb;
+}
+
+.avatar-choice img {
+    width: 100px;
+    height: 100px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* カウントダウン表示 */
+#countdown-display {
+    font-size: 15vw;
+    font-weight: 800;
+    color: #ff6347;
+    animation: countdown-zoom 1s infinite;
+}
+
+@keyframes countdown-zoom {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.8; }
+}
+
+/* 結果画面 */
+.final-score-text {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.points-feedback {
+    font-size: 1.3em;
+    color: #ff9f43;
+    font-weight: bold;
+}
+
+/* ローダー */
 .loader {
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
     border-radius: 50%;
     width: 60px;
     height: 60px;
-    animation: spin 1s linear infinite;
-    margin-top: 20px;
+    animation: spin 1.5s linear infinite;
+    margin: 20px auto;
 }
 
 @keyframes spin {
@@ -37,86 +404,41 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-#game-area {
-    position: relative;
-    width: 100%;
-    /* JavaScriptで全画面スタイルが設定されるため、基本的な設定のみ残す */
-    margin: 0 auto;
-    overflow: hidden;
-    background-color: #333;
-}
-
-#video, #canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* 左右反転して鏡のようにする */
-    transform: scaleX(-1);
-    z-index: 1; /* ★追加: ビデオを最背面に配置 */
-}
-
-#canvas {
-    background: transparent;
-    z-index: 10;
-}
-
-#basket {
-    position: absolute;
-    bottom: 10px;
-    width: 120px;
-    height: 80px;
-    z-index: 20;
-    transition: left 0.1s linear;
-    /* ユーザーが直接バスケットを操作しないように */
-    pointer-events: none;
-}
-
-#basket img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-#info-panel {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    max-width: 640px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #5d4037;
-}
-
 .hidden {
     display: none !important;
 }
 
-/* ゲームオーバーモーダル */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+/* 協力プレイ時の担当フルーツ表示 */
+#co-op-info {
     display: flex;
     justify-content: center;
+    gap: 30px;
+}
+
+.player-fruits-display {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 5px 10px;
+    display: flex;
     align-items: center;
-    z-index: 100;
+    gap: 8px;
 }
 
-.modal-content {
-    background: #fffde7;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    font-size: 1.5em;
+.neutral-fruit {
+    opacity: 0.7;
+    border: 2px dashed #ffca28;
 }
 
-/* カメラ許可モーダルのボタンの色 */
-#start-camera-btn {
-    background-color: #4caf50; /* Green */
-    margin-top: 15px;
+.player-fruits-display img {
+    width: 32px;
+    height: 32px;
 }
+
+.player-label-small {
+    font-size: 24px;
+    font-weight: 800;
+    text-shadow: 1px 1px 2px #fff;
+}
+
+.player-label-small.p1 { color: #e53935; }
+.player-label-small.p2 { color: #1e88e5; }

@@ -232,7 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!document.body.classList.contains('no-bgm') && !document.getElementById('bgm')) {
         const bgmAudio = document.createElement('audio');
         bgmAudio.id = 'bgm';
-        bgmAudio.src = 'assets/sounds/bgm.mp3'; // BGMのソースをここで指定
+        // 現在のHTMLファイル名によってBGMを切り替える
+        if (window.location.pathname.includes('fruit-catcher.html')) {
+            bgmAudio.src = 'assets/sounds/bgm_pop.mp3';
+        } else {
+            bgmAudio.src = 'assets/sounds/bgm.mp3'; // デフォルトのBGM
+        }
         bgmAudio.loop = true;
         bgmAudio.preload = 'auto'; // BGMファイルを事前に読み込むようブラウザにヒントを与える
         document.body.appendChild(bgmAudio);

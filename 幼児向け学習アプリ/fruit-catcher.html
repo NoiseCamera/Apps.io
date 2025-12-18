@@ -2,62 +2,143 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>フルーツキャッチ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>フルーツキャッチゲーム</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="settings.css">
     <link rel="stylesheet" href="buttons.css">
     <link rel="stylesheet" href="fruit-catcher.css">
-    <!-- Hand Pose Detection Model Libraries -->
+    <!-- TensorFlow.js と Hand Pose Detection ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
 </head>
 <body>
-    <audio id="bgm" src="assets/sounds/bgm_pop.mp3" loop></audio>
+    <!-- 効果音 -->
+    <audio id="catch-sound" src="assets/sounds/kirakira.mp3"></audio>
+    <audio id="drop-sound" src="assets/sounds/incorrect.mp3"></audio>
+    <audio id="game-over-sound" src="assets/sounds/lose.mp3"></audio>
 
     <header>
-        <h1>フルーツキャッチ</h1>
-        <p>カメラをつかって、おちてくるフルーツをキャッチしよう！</p>
+        <h1>フルーツキャッチゲーム</h1>
     </header>
 
     <main id="game-container">
-        <div id="loading-message" class="hidden">
-            <p>カメラとモデルをじゅんびしています...</p>
-            <div class="loader"></div>
-        </div>
-
+        <!-- ゲーム画面 -->
         <div id="game-area" class="hidden">
-            <video id="video" autoplay playsinline muted></video>
-            <canvas id="canvas" width="640" height="480"></canvas>
-            <div id="basket"><img src="assets/images/basket.png" alt="かご"></div>
+            <video id="video" playsinline muted></video>
+            <canvas id="output-canvas"></canvas>
+            <button id="back-to-menu-ingame" class="button-style ingame-back-btn">もどる</button>
+            <div id="avatar1" class="avatar hidden"><img src="" alt="アバター1"></div>
+            <div id="avatar2" class="avatar hidden"><img src="" alt="アバター2"></div>
+            <div id="basket2" class="hidden"><span class="player-label">2P</span></div>
+            <div id="basket"><span class="player-label">1P</span></div>
         </div>
 
+        <div id="feedback-text" class="feedback-text hidden"></div>
+
+        <!-- スコアなどの情報パネル -->
         <div id="info-panel">
             <div id="score-display">スコア: <span>0</span></div>
-            <div id="lives-display">いのち: <span>❤️❤️❤️</span></div>
+            <div id="co-op-info" class="hidden">
+                <div id="player1-fruits-display" class="player-fruits-display"></div>
+                <div id="player2-fruits-display" class="player-fruits-display"></div>
+            </div>
+            <div id="lives-display">いのち: <span></span></div>
         </div>
     </main>
 
-    <div id="camera-permission-modal" class="overlay">
+    <!-- モーダルウィンドウ群 -->
+    <div id="start-modal" class="overlay visible">
         <div class="modal-content">
-            <h2>カメラをつかうよ！</h2>
-            <p>このゲームでは、カメラにうつった<br>あなたの て や からだ をつかって<br>フルーツをキャッチします。</p>
-            <p>「カメラをつかってあそぶ」ボタンをおして、<br>カメラの しようを きょか してね。</p>
-            <button id="start-camera-btn" class="button-style">カメラをつかってあそぶ</button>
+            <h2>あそびかたを えらんでね！</h2>
+
+            <div id="game-mode-selection">
+                <div class="mode-buttons">
+                    <button class="mode-btn selected" data-mode="single">ひとりであそぶ</button>
+                    <button class="mode-btn" data-mode="co-op">ふたりできょうりょく</button>
+                </div>
+            </div>
+
+            <p>このゲームでは、カメラにうつった<br>あなたの て をつかって<br>フルーツをキャッチします。</p>
+
+            <div id="difficulty-selection">
+                <p>むずかしさを えらんでね！</p>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn selected" data-difficulty="easy">かんたん</button>
+                    <button class="difficulty-btn" data-difficulty="normal">ふつう</button>
+                    <button class="difficulty-btn" data-difficulty="hard">むずかしい</button>
+                </div>
+            </div>
+
+            <div id="avatar-selection-container">
+                <div id="avatar-selection-p1" class="avatar-selection-group">
+                    <p>1Pのアバター</p>
+                    <div class="avatar-choices" data-player="1">
+                        <div class="avatar-choice selected" data-avatar="none"><img src="assets/images/no-avatar.png" alt="アバターなし"><span>つけない</span></div>
+                        <div class="avatar-choice" data-avatar="boy"><img src="assets/images/boy.png" alt="おとこのこ"><span>おとこのこ</span></div>
+                        <div class="avatar-choice" data-avatar="girl"><img src="assets/images/girl.png" alt="おんなのこ"><span>おんなのこ</span></div>
+                    </div>
+                </div>
+                <div id="avatar-selection-p2" class="avatar-selection-group hidden">
+                    <p>2Pのアバター</p>
+                    <div class="avatar-choices" data-player="2">
+                        <div class="avatar-choice selected" data-avatar="none"><img src="assets/images/no-avatar.png" alt="アバターなし"><span>つけない</span></div>
+                        <div class="avatar-choice" data-avatar="boy"><img src="assets/images/boy.png" alt="おとこのこ"><span>おとこのこ</span></div>
+                        <div class="avatar-choice" data-avatar="girl"><img src="assets/images/girl.png" alt="おんなのこ"><span>おんなのこ</span></div>
+                    </div>
+                </div>
+            </div>
+            <p>「ゲームスタート！」ボタンをおしてね。<br>カメラの しようを きょか してね。</p>
+            <div class="modal-buttons">
+                <button id="start-button" class="button-style">ゲームスタート！</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2>じゅんびちゅう...</h2>
+            <p>カメラとAIのじゅんびをしています。<br>すこしまっててね。</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <div id="countdown-modal" class="overlay hidden">
+        <div class="modal-content">
+            <div id="countdown-display">3</div>
+        </div>
+    </div>
+
+    <div id="turn-switch-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2>あそびかたせつめい</h2>
+            <p>かごが２つでてくるよ！<br>1Pのかごは <img src="assets/images/fruits/apple.png" class="fruit-icon"> と <img src="assets/images/fruits/strawberry.png" class="fruit-icon"> をとってね！<br>2Pのかごは <img src="assets/images/fruits/orange.png" class="fruit-icon"> と <img src="assets/images/fruits/grape.png" class="fruit-icon"> をとってね！</p>
+            <p>ちがうフルーツをとるとライフがへっちゃうからきをつけて！</p>
+            <button id="start-co-op-btn" class="button-style">わかった！</button>
         </div>
     </div>
 
     <div id="game-over-modal" class="overlay hidden">
         <div class="modal-content">
             <h2>ゲームオーバー</h2>
-            <p>さいしゅうスコア: <span id="final-score">0</span></p>
-            <button id="restart-btn" class="button-style">もういちど あそぶ</button>
+            <p class="final-score-text">さいしゅうスコア: <span id="final-score">0</span></p>
+            <p class="points-feedback">★ ほしを <span id="earned-stars"></span>こ ゲット！ ★</p>
+            <div class="modal-buttons">
+                <button id="restart-button" class="button-style">もういちど あそぶ</button>
+                <button id="back-to-menu-btn" class="button-style">なんいどを えらびなおす</button>
+            </div>
         </div>
     </div>
 
-    <!-- <script src="settings.js"></script> -->
-    <script src="fruit-catcher.js"></script>
+    <script src="settings.js" type="module"></script>
+    <script src="fruit-catcher.js" type="module"></script>
 </body>
 </html>
