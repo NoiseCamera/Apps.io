@@ -67,6 +67,8 @@ button:disabled,
 #close-detail-modal-btn,
 #play-again-btn,
 #restart-button, /* フルーツキャッチのもう一度ボタン */
+#restart-btn, /* ４もくならべのもう一度ボタン */
+#modal-restart-btn, /* ４もくならべのモーダル内もう一度ボタン */
 #check-btn,
 #replay-btn,
 .win-buttons button,
@@ -79,6 +81,9 @@ button:disabled,
 #next-btn,
 #next-question-btn,
 #back-to-menu-btn, /* フルーツキャッチのゲームオーバー画面のボタン */
+#back-to-menu-title-btn, /* 4もくならべのタイトル画面の戻るボタン */
+#back-to-title-btn, /* 4もくならべのゲーム画面の戻るボタン */
+#modal-back-to-title-btn, /* 4もくならべのモーダル内戻るボタン */
 .modal-buttons a.button-style, /* スタート画面の「もどる」ボタン */
 .win-buttons a,
 #wait-btn,
@@ -124,7 +129,10 @@ button:disabled,
 /* --- ティール (モード・難易度選択など) --- */
 .mode-btn,
 .difficulty-btn,
-.mode-btn { /* fruit-catcherのモードボタン */
+.mode-select-btn, /* 4もくならべのモード選択ボタン */
+.difficulty-select-btn, /* 4もくならべの難易度選択ボタン */
+.mode-btn, /* fruit-catcherのモードボタン */
+#mode-toggle-btn { /* ４もくならべのモード切替ボタン */
     background-color: #e0f2f1; /* 薄いティール */
     color: #004d40;
     padding: 10px 20px;
@@ -133,7 +141,10 @@ button:disabled,
 
 .mode-btn.selected,
 .difficulty-btn.selected,
-.mode-btn.selected { /* fruit-catcherのモードボタン */
+.mode-select-btn.selected,
+.difficulty-select-btn.selected,
+.mode-btn.selected, /* fruit-catcherのモードボタン */
+#mode-toggle-btn.selected {
     background-color: #26a69a; /* ティール */
     color: #fff;
     top: 2px;

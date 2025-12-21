@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>４もくならべ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="connect4.css">
+</head>
+<body>
+    <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
+    <audio id="drop-sound" src="assets/sounds/kachi.mp3"></audio>
+    <audio id="win-sound" src="assets/sounds/win.mp3"></audio>
+
+    <header>
+        <h1>４もくならべ</h1>
+    </header>
+
+    <main>
+        <!-- タイトル画面 -->
+        <div id="title-screen">
+            <div class="menu-buttons">
+                <button id="mode-2p-btn" class="button-style mode-select-btn">ふたりで あそぶ</button>
+                <button id="mode-cpu-btn" class="button-style mode-select-btn">CPUと あそぶ</button>
+            </div>
+            
+            <!-- CPUモード選択時のみ表示 -->
+            <div id="difficulty-selection" class="hidden">
+                <p>むずかしさを えらんでね</p>
+                <div class="difficulty-buttons-group">
+                    <button class="difficulty-select-btn button-style" data-level="easy">かんたん</button>
+                    <button class="difficulty-select-btn button-style" data-level="normal">ふつう</button>
+                    <button class="difficulty-select-btn button-style" data-level="hard">むずかしい</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="index.html" class="button-style back-btn" id="back-to-menu-title-btn">メニューにもどる</a>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div id="game-container" class="hidden">
+            <div id="status-bar">
+                <div id="turn-indicator" class="turn-yellow">きいろ の ばんです</div>
+            </div>
+            
+            <div id="board-wrapper">
+                <div id="board">
+                    <!-- JSでセルを生成 -->
+                </div>
+                <div id="ai-thinking-overlay" class="is-hidden">
+                    <div class="thinking-content">
+                        <div class="spinner"></div>
+                        <p>かんがえちゅう...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="controls">
+                <button id="back-to-title-btn" class="button-style">タイトルへ</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="result-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2 id="result-message"></h2>
+            <div class="modal-buttons">
+                <button id="modal-restart-btn" class="button-style">もういちど</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="settings.js"></script>
+    <script src="connect4.js"></script>
+</body>
+</html>

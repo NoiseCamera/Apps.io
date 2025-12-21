@@ -67,6 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedAvatar2 = null; // 2Pのアバター
     let isGameOver = false;
 
+    // パフォーマンス改善: AI検出の結果を保持する変数
+    let lastHands = [];
+    let lastFaces = [];
+    let isDetecting = false;
+    let lastDetectionTime = 0;
+    const DETECTION_INTERVAL = 100; // 検出頻度を制限 (ms)
+
     const fruitImages = [];
     const fruitPaths = [
         'assets/images/fruits/apple.png',
@@ -375,10 +382,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameLoopId = requestAnimationFrame(gameLoop);
 
         // 手と顔の検出を並行して実行
-        const [hands, faces] = await Promise.all([
-            handDetector.estimateHands(video, { flipHorizontal: true }),
-            faceDetector.estimateFaces(video, { flipHorizontal: true })
-        ]);
+        const now = Date.now();
+        if (!isDetecting && handDetector && faceDetector && (now - lastDetectionTime > DETECTION_INTERVAL)) {
+            lastDetectionTime = now;
+            detectPose();
+        }
+
+        const hands = lastHands;
+        const faces = lastFaces;
 
         // 描画クリア
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -421,6 +432,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // ゲームが始まっている場合のみフルーツを更新する
         if (!isGameOver) {
             updateFruits();
+        }
+    }
+
+    async function detectPose() {
+        isDetecting = true;
+        try {
+            const [hands, faces] = await Promise.all([
+                handDetector.estimateHands(video, { flipHorizontal: true }),
+                faceDetector.estimateFaces(video, { flipHorizontal: true })
+            ]);
+            lastHands = hands;
+            lastFaces = faces;
+        } catch (e) {
+            console.error("Detection error:", e);
+        } finally {
+            isDetecting = false;
         }
     }
 

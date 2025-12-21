@@ -1,0 +1,274 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0; /* style.cssのpaddingを上書き */
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* タイトル画面のスタイル */
+#title-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.menu-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.mode-select-btn {
+    font-size: 1.5rem;
+    padding: 20px 40px;
+    min-width: 200px;
+}
+
+#difficulty-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#difficulty-selection p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.difficulty-buttons-group {
+    display: flex;
+    gap: 10px;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1vh;
+    padding: 1vh 2vw;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+#status-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+#turn-indicator {
+    font-size: clamp(1rem, 3vh, 1.5rem);
+    font-weight: bold;
+    padding: 1vh 3vw;
+    border-radius: 50px;
+    background-color: white;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
+
+.turn-yellow {
+    color: #d4a000;
+    border: 3px solid #d4a000;
+}
+
+.turn-red {
+    color: #cc0000;
+    border: 3px solid #cc0000;
+}
+
+#board-wrapper {
+    /* 明るい空のようなグラデーションに変更 */
+    background: linear-gradient(to bottom, #87CEEB, #4682B4);
+    padding: 1.5vmin;
+    border-radius: 25px; /* 角をより丸く */
+    box-shadow: 0 1vh 0 #2E6494; /* 影の色を調整 */
+    margin-bottom: 0;
+    position: relative; /* AI思考中オーバーレイのため */
+    
+    /* 画面サイズに合わせて調整 */
+    width: auto;
+    height: auto;
+    max-width: 95vw;
+    max-height: 60vh;
+    aspect-ratio: 7 / 6;
+    flex-grow: 1;
+    flex-shrink: 1; /* 念のため残す */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 1vmin;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    aspect-ratio: 7 / 6;
+}
+
+.cell {
+    /* 背景を少し透過させて、下のグラデーションが見えるように */
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    position: relative;
+    box-shadow: inset 0 0.5vmin 1vmin rgba(0, 0, 0, 0.15); /* 影をよりソフトに */
+}
+
+.cell::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: translateY(calc(-100vh)); /* 初期位置は画面外 */
+    opacity: 0;
+}
+
+.cell.yellow::after {
+    /* 光沢感のあるグラデーションに変更 */
+    background-color: #ffc107;
+    background-image: radial-gradient(circle at 70% 30%, #ffffff, #ffeebb 40%, #ffc107 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    opacity: 1;
+    animation: bounce-drop 0.5s cubic-bezier(0.5, 0.05, 0.2, 1.5) forwards;
+}
+
+.cell.red::after {
+    /* 光沢感のあるグラデーションに変更 */
+    background-color: #f44336;
+    background-image: radial-gradient(circle at 70% 30%, #ffffff, #ffaaaa 40%, #f44336 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    opacity: 1;
+    animation: bounce-drop 0.5s cubic-bezier(0.5, 0.05, 0.2, 1.5) forwards;
+}
+
+@keyframes bounce-drop {
+    0% {
+        /* 自分の行数分だけ上にずらした位置からスタート */
+        transform: translateY(calc( -1 * (var(--row) * (100% + 1vmin) + 120%) ));
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* 勝利時のハイライト */
+.cell.win-highlight {
+    animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.5); }
+}
+
+/* 列のホバーハイライト */
+.cell.column-hover:not(.yellow):not(.red) {
+    background-color: #e6f3ff;
+    transition: background-color 0.1s ease-out;
+}
+
+#controls {
+    flex-shrink: 0;
+    margin-top: 1vh;
+}
+
+header h1 {
+    font-size: clamp(1.2rem, 4vh, 2rem);
+    margin: 0;
+}
+
+.small-btn {
+    font-size: 0.9rem;
+    padding: 5px 15px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* AI思考中オーバーレイ */
+#ai-thinking-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+#ai-thinking-overlay.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.thinking-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.thinking-content p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.spinner {
+    border: 8px solid #e0e0e0;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
