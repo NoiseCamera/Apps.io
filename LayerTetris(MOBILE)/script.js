@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startSingleButton = document.getElementById('start-single-button');
     const startLayerButton = document.getElementById('start-layer-button');
     const startSpectateButton = document.getElementById('start-spectate-button');
+    const modeSelection = document.getElementById('mode-selection');
     
     // BGM Buttons and Inputs
     const bgmPlayer = document.getElementById('bgm-player');
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // NEW: Group menu buttons for easier navigation
     const titleButtons = [startSingleButton, startLayerButton, startSpectateButton];
     const pauseButtons = [resumeButton, backToMenuButton];
+    let gameOverButtons = [];
 
     // --- Sound Effects ---
     const seLand = document.getElementById('se-land');
@@ -569,14 +571,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function playerRotate() {
         const originalShape = player.shape;
         player.shape = rotate(player.shape);
-        let offset = 1;
-        while (collide(boards[activeLayerIndex], player)) {
-            player.pos.x += offset;
-            offset = -(offset + (offset > 0 ? 1 : -1));
-            if (offset > player.shape[0].length) {
-                player.shape = originalShape; // Can't rotate, revert
-                return;
-            }
+        if (collide(boards[activeLayerIndex], player)) {
+            player.shape = originalShape; // 回転できない場合は元に戻す
+            return;
         }
         playSoundEffect(seRotate);
     }
@@ -1000,13 +997,16 @@ document.addEventListener('DOMContentLoaded', () => {
             buttons = titleButtons;
         } else if (menuState.current === 'pause') {
             buttons = pauseButtons;
+        } else if (menuState.current === 'gameOver') {
+            buttons = gameOverButtons;
         } else {
             // Clear all highlights if no menu is active
-            [...titleButtons, ...pauseButtons].forEach(btn => btn.classList.remove('selected'));
+            [...titleButtons, ...pauseButtons, ...gameOverButtons].forEach(btn => { if(btn) btn.classList.remove('selected'); });
             return;
         }
 
         buttons.forEach((btn, index) => {
+            if (!btn) return;
             if (index === menuState.selectedIndex) {
                 btn.classList.add('selected');
             } else {
@@ -1062,7 +1062,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Menu Navigation Logic ---
         if (gameOver || isPaused) {
-            const menuButtons = isPaused ? pauseButtons : titleButtons;
+            let menuButtons;
+            if (isPaused) {
+                menuButtons = pauseButtons;
+            } else if (menuState.current === 'gameOver') {
+                menuButtons = gameOverButtons;
+            } else {
+                menuButtons = titleButtons;
+            }
+
             if (menuButtons.length === 0) return;
 
             // Input detection (single press)
@@ -1526,23 +1534,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (touchControls) touchControls.classList.add('hidden'); // Hide touch controls
         if (bgmControlsContainer) bgmControlsContainer.style.display = 'none'; // Hide BGM controls
 
-        // Clear all canvases to prevent old game state from showing on the title screen
-        contexts.forEach(ctx => {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        });
-        nextContext.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-        holdContext.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
-
         if (isSurrender) {
             // Just go back to title without the "Game Over" text
             titleScreen.classList.remove('game-over');
             titleMainText.innerText = 'CYBER LAYER TETRIS';
             finalScoreElement.innerText = '';
+            if (modeSelection) modeSelection.style.display = 'flex';
+            menuState.current = 'title';
         } else {
             // Actual game over
             titleScreen.classList.add('game-over');
             titleMainText.innerText = "GAME OVER";
-            finalScoreElement.innerText = `FINAL SCORE: ${score}`;
+            if (modeSelection) modeSelection.style.display = 'none';
+
+            finalScoreElement.innerHTML = `
+                FINAL SCORE: ${score}<br>
+                <span style="font-size: 0.75em; color: var(--text-color);">LINES: ${lines}</span>
+                <span style="font-size: 0.75em; color: var(--text-color); margin-left: 15px;">LEVEL: ${level}</span>
+                <div id="game-over-buttons" style="margin-top: 25px; display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%;">
+                    <button id="retry-button" class="mode-button">RETRY</button>
+                    <button id="return-title-button" class="mode-button">TITLE</button>
+                </div>
+            `;
+
+            // Setup new buttons
+            const retryBtn = document.getElementById('retry-button');
+            const titleBtn = document.getElementById('return-title-button');
+            gameOverButtons = [retryBtn, titleBtn];
+
+            retryBtn.addEventListener('click', () => startGame(gameMode));
+            titleBtn.addEventListener('click', () => {
+                titleScreen.classList.remove('game-over');
+                titleMainText.innerText = 'CYBER LAYER TETRIS';
+                finalScoreElement.innerText = '';
+                if (modeSelection) modeSelection.style.display = 'flex';
+                menuState.current = 'title';
+                menuState.selectedIndex = 0;
+                updateMenuHighlight();
+            });
+
+            gameOverButtons.forEach((btn, index) => {
+                btn.addEventListener('mouseenter', () => {
+                    menuState.selectedIndex = index;
+                    updateMenuHighlight();
+                });
+            });
+            menuState.current = 'gameOver';
         }
         titleScreen.classList.remove('hidden');
         // When the game ends, disable the AI if it was running
@@ -1550,7 +1587,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.aiAPI.disableAI();
         }
 
-        menuState.current = 'title';
         menuState.selectedIndex = 0;
         updateMenuHighlight();
 

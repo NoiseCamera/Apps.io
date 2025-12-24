@@ -11,8 +11,8 @@
     const WEIGHTS = {
         aggregateHeight: -0.510066, // Penalty for higher stacks
         completeLines: 0.760666,  // Reward for clearing lines
-        holes: -0.35663,          // Penalty for creating holes
-        bumpiness: -0.184483,      // Penalty for uneven surfaces
+        holes: -1.5,              // Penalty for creating holes (大幅に強化: Tスピン用の屋根を作らせない)
+        bumpiness: -0.5,          // Penalty for uneven surfaces (強化: 平らな積み方を優先)
         garbageLinesCleared: 50.0, // Massively increased bonus to ensure garbage clearing is the absolute top priority
         unattendedDanger: -15.0    // Further increased penalty to make ignoring danger extremely costly
     };
@@ -375,18 +375,7 @@
         let simulatedPiece = JSON.parse(JSON.stringify(initialPlayerState));
         for (let i = 0; i < move.rotation; i++) {
             simulatedPiece.shape = rotateMatrix(simulatedPiece.shape);
-            // Simulate wall kick logic from script.js
-            let offset = 1;
-            while (isCollision(board, simulatedPiece, rows, cols)) {
-                simulatedPiece.pos.x += offset;
-                offset = -(offset + (offset > 0 ? 1 : -1));
-                // Safety break to prevent infinite loops in rare, complex cases.
-                if (Math.abs(offset) > simulatedPiece.shape[0].length + 2) {
-                    console.error("AI: Wall kick simulation failed, move might be invalid.");
-                    simulatedPiece.pos.x -= (offset > 0 ? offset - 1 : offset + 1); // Revert last offset
-                    break;
-                }
-            }
+            // Wall kick simulation removed.
         }
 
         // 3. Add rotation actions to the plan
