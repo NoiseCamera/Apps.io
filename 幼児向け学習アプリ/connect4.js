@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficultySelection = document.getElementById('difficulty-selection');
     const difficultySelectButtons = document.querySelectorAll('.difficulty-select-btn');
 
+    // ボタンにスタイルを適用
+    mode2pBtn.classList.add('colorful-btn');
+    modeCpuBtn.classList.add('colorful-btn');
+    difficultySelectButtons.forEach(btn => btn.classList.add('colorful-btn'));
+    modalRestartBtn.classList.add('colorful-btn');
+    backToTitleBtn.classList.add('colorful-btn');
+
     // --- タイトル画面の処理 ---
 
     mode2pBtn.addEventListener('click', () => {
@@ -56,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTitleScreen() {
         gameContainer.classList.add('hidden');
         resultModal.classList.add('hidden');
+        resultModal.style.display = 'none';
         titleScreen.classList.remove('hidden');
         
         // タイトル画面の状態リセット
@@ -83,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTurnIndicator();
         renderBoard();
         resultModal.classList.add('hidden');
+        resultModal.style.display = 'none';
     }
 
     function updateTurnIndicator() {
@@ -296,8 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (r === -1) continue;
             tempBoard[r][c] = 2; // AIの手 (AIはプレイヤー2)
 
-            // 探索深度を5に設定（マシンスペックに応じて調整）
-            const score = minimax(tempBoard, 5, -Infinity, Infinity, false); // 次は相手(minimizing)の番
+            // 探索深度を4に設定（非力なデバイス向けに調整）
+            const score = minimax(tempBoard, 4, -Infinity, Infinity, false); // 次は相手(minimizing)の番
 
             if (score > bestScore) {
                 bestScore = score;
@@ -492,6 +501,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function showResult(msg) {
         resultMessage.textContent = msg;
         resultModal.classList.remove('hidden');
+        
+        // モーダルを中央に表示するためのスタイルを適用
+        resultModal.style.display = 'flex';
+        resultModal.style.flexDirection = 'column';
+        resultModal.style.justifyContent = 'center';
+        resultModal.style.alignItems = 'center';
+        resultModal.style.position = 'fixed';
+        resultModal.style.top = '50%';
+        resultModal.style.left = '50%';
+        resultModal.style.transform = 'translate(-50%, -50%)';
+        resultModal.style.width = 'auto';
+        resultModal.style.height = 'auto';
+        resultModal.style.minWidth = '300px';
+        resultModal.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'; // 背景を白く
+        resultModal.style.padding = '30px';
+        resultModal.style.borderRadius = '15px';
+        resultModal.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+        resultModal.style.zIndex = '1000';
 
         // 勝利メッセージが表示された時（引き分けでない場合）にポイントを追加
         if (msg.includes('かち')) {

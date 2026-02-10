@@ -1,0 +1,182 @@
+/* spot-difference.css */
+body {
+    background-color: #e0f7fa; /* 薄い水色 */
+    overflow: hidden; /* スクロール防止 */
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#status-bar {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.score-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #006064;
+}
+
+#loading-message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #555;
+    margin-top: 50px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+#game-area {
+    order: 1;
+    width: 100%;
+    max-width: 100%;
+    margin: 10px auto 0; /* 上に少しマージンを追加 */
+    display: flex;
+    flex-direction: row; /* 横並びに変更 */
+    flex-wrap: wrap;     /* 折り返し許可 */
+    align-items: center;
+    min-height: auto;
+    justify-content: center; /* 中央揃え */
+    gap: 10px;
+    padding: 0;
+    margin-bottom: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+
+.image-wrapper {
+    flex: 1; /* 左右均等に広げる */
+    position: relative;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    overflow: hidden;
+    /* タッチ操作の遅延を防ぐ */
+    touch-action: none;
+    width: calc(50% - 5px);
+    margin: 0;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto; /* アスペクト比を維持 */
+    max-height: 75vh; /* 画面の高さに合わせて調整 */
+    cursor: crosshair;
+}
+
+/* スマホ縦向き対応 */
+@media (max-width: 768px) and (orientation: portrait) {
+    #game-area {
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+    }
+    
+    canvas {
+        max-height: 35vh;
+    }
+}
+
+.controls {
+    margin-top: 10px;
+    order: 3;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* --- 画像選択エリア --- */
+#selection-area {
+    order: 2;
+    position: static;
+    width: 100%;
+    height: auto;
+    background-color: transparent;
+    z-index: auto;
+    display: block;
+    margin-top: 0;
+    padding-top: 10px;
+    flex-shrink: 0;
+}
+
+#selection-area h2 {
+    text-align: center;
+    color: #555;
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+
+#image-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 5px;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: transparent;
+    max-height: none;
+    overflow-y: visible;
+}
+
+.image-select-btn {
+    width: 100px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.image-select-btn:hover {
+    transform: scale(1.05);
+}
+.image-select-btn img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 0;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+}
+.image-select-btn span {
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    font-weight: 800;
+    color: #555;
+    font-size: 1.2rem;
+}
+
+/* 正解時の丸アニメーション用クラス (JSで描画するのでCSSアニメーションは補助的) */
+.found-circle {
+    position: absolute;
+    border: 3px solid #ff1744;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}

@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let offsetY = 0;
   let bgmInitialized = false;
   let isGameWon = false;
+  let isDragging = false; // ピースをドラッグ中かどうかのフラグ
+  let animationFrameId = null; // requestAnimationFrameのID
 
   let hintTimer = null;
   let showHintHighlight = false;
@@ -508,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
           mouseX > piece.dx && mouseX < piece.dx + piece.width &&
           mouseY > piece.dy && mouseY < piece.dy + piece.height) {
         
+
         selectedPiece = piece;
         offsetX = mouseX - piece.dx;
         offsetY = mouseY - piece.dy;
@@ -515,6 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Move the selected piece to the end of the array to draw it on top
         pieces.splice(i, 1);
         pieces.push(selectedPiece);
+
+        // ドラッグ開始をマークし、描画ループを開始
+        isDragging = true;
+        if (!animationFrameId) {
+            drawLoop();
+        }
 
         // Start hint timer
         clearTimeout(hintTimer);
@@ -530,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function onMouseMove(e) {
     if (!selectedPiece) return;
+    if (!isDragging || !selectedPiece) return;
     e.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
@@ -550,10 +560,12 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedPiece.dy = Math.max(-marginY, Math.min(newDy, canvas.height - marginY));
 
     draw();
+    // 描画はdrawLoopに任せる
   }
 
   function onMouseUp(e) {
     // Always clear hint timer and hide highlight on mouse up
+    isDragging = false; // ドラッグ終了
     clearTimeout(hintTimer);
     const needsRedrawToClearHint = showHintHighlight;
     showHintHighlight = false;
@@ -573,8 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (diffX < SNAP_DISTANCE && diffY < SNAP_DISTANCE) {
       animatePieceToFinalPosition(selectedPiece);
       selectedPiece = null; // アニメーションに任せるので、ドラッグは終了
+      selectedPiece = null;
     } else {
       selectedPiece = null;
+      // ループが止まった後に最後の状態を再描画
       draw();
     }
   }

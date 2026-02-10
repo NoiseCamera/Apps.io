@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>アルファベット かきじゅん</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="settings.css">
+  <link rel="stylesheet" href="buttons.css">
+  <!-- ひらがな用のCSSを流用してレイアウトを整えます -->
+  <link rel="stylesheet" href="hiragana-stroke.css">
+  <style>
+      /* アルファベット用にフォントなどを微調整 */
+      #model-character-display {
+          font-family: 'M PLUS Rounded 1c', sans-serif;
+      }
+      /* SVG描画エリアのスタイル */
+      #svg-container {
+          width: 300px;
+          height: 300px;
+          border: 1px solid #ccc;
+          margin: 0 auto;
+          background-color: #fff;
+          touch-action: none;
+      }
+      #stroke-svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+          cursor: crosshair;
+      }
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="assets/sounds/bgm2.mp3" loop></audio>
+
+  <header>
+    <h1>アルファベット かきじゅん</h1>
+  </header>
+
+  <main>
+    <div id="stroke-app-container">
+      <div id="character-selector">
+        <p>じを えらんでね</p>
+        <div id="character-grid"></div>
+      </div>
+      <div id="canvas-container">
+        <div id="model-character-display">A</div>
+        <!-- CanvasをSVGに置き換え -->
+        <div id="svg-container">
+            <svg id="stroke-svg" viewBox="0 0 300 300">
+                <line x1="150" y1="0" x2="150" y2="300" stroke="#f0f0f0" stroke-width="2" stroke-dasharray="5, 5" />
+                <line x1="0" y1="150" x2="300" y2="150" stroke="#f0f0f0" stroke-width="2" stroke-dasharray="5, 5" />
+                <g id="guide-paths-group"></g>
+                <g id="animated-paths-group"></g>
+                <g id="user-paths-group"></g>
+                <g id="stroke-numbers-group"></g>
+            </svg>
+        </div>
+        <div id="mode-selector">
+          <button id="watch-mode-btn" class="mode-btn selected">おてほん</button>
+          <button id="step-mode-btn" class="mode-btn">ひとふでずつ</button>
+          <button id="practice-mode-btn" class="mode-btn">れんしゅう</button>
+        </div>
+        <div id="controls">
+          <button id="replay-btn">もういちど</button>
+          <button id="toggle-numbers-btn" class="control-btn">ばんごう ON</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="alphabet-stroke.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

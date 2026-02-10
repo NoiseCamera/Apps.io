@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentWidth = 8; // デフォルトの太さをボタンの値に変更
     let lastX = 0;
     let lastY = 0;
+    let currentX = 0;
+    let currentY = 0;
     let currentStamp = 'circle'; // デフォルトのスタンプを図形に変更
     let stampSize = 50;
     let historyStack = [];
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_HISTORY_SIZE = 30; // 履歴の最大保存数（メモリ使用量対策）
     let stampSizeControlsContainer = null; // スタンプサイズボタンのコンテナを保持する変数
     let widthControlsContainer = null; // 太さボタンのコンテナを保持する変数
+    let animationFrameId = null; // 描画ループ用のID
     let bgmInitialized = false; // BGMが初期化されたかどうかのフラグ
 
     // このゲームで使う効果音のリスト (お絵描きアプリには固有の効果音は現在なし)。
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateToolUI();
         updateUndoRedoButtons();
 
+        drawLoop(); // 描画ループを開始
         // ウィンドウリサイズ時にキャンバスサイズを調整
         window.addEventListener('resize', handleResize);
 
@@ -251,6 +255,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * 描画ループ。isDrawingフラグが立っている間、線の描画を行う。
+     */
+    function drawLoop() {
+        // isDrawing中のみ描画処理を実行
+        if (isDrawing) {
+            draw();
+        }
+        animationFrameId = requestAnimationFrame(drawLoop);
+    }
+
     // --- Event Listeners ---
     function addEventListeners() {
         canvas.addEventListener('mousedown', startAction);
@@ -309,21 +324,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isDrawing = true;
         [lastX, lastY] = [x, y];
+        [currentX, currentY] = [x, y];
         // 点を描画するために、開始時にもdrawを呼び出す
-        draw(x, y);
+        // draw(x, y); // 描画ループに任せる
     }
 
     function moveAction(e) {
         if (!isDrawing) return;
         e.preventDefault();
-        const { x, y } = getEventPosition(e);
-        draw(x, y);
+        // 座標を更新するのみ。描画はdrawLoopが行う。
+        const pos = getEventPosition(e);
+        currentX = pos.x;
+        currentY = pos.y;
     }
 
-    function draw(x, y) {
+    function draw() {
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
+        ctx.lineTo(currentX, currentY);
 
         if (currentTool === 'pen') {
             ctx.strokeStyle = currentColor;
@@ -335,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineJoin = 'round';
         ctx.stroke();
 
-        [lastX, lastY] = [x, y];
+        [lastX, lastY] = [currentX, currentY];
     }
 
     function stopAction() {

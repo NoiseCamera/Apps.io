@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>おかいものミッション</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="shopping-mission.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- BGM & SE -->
+    <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3"></audio>
+    <audio id="fanfare-sound" src="assets/sounds/gacha-fanfare.mp3"></audio>
+    <audio id="pop-sound" src="assets/sounds/pop.mp3"></audio>
+
+    <header>
+        <h1>おかいものミッション</h1>
+        <div id="status-bar">
+            <div class="score-display">せいかい: <span id="score">0</span></div>
+        </div>
+        <div id="mode-switch-container">
+            <label class="switch">
+                <input type="checkbox" id="calc-mode-toggle">
+                <span class="slider round"></span>
+            </label>
+            <span id="mode-label">おにいさん・おねえさんモード</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- 指示エリア -->
+        <div id="instruction-area">
+            <p id="instruction-text">もんだいを よみこんでいます...</p>
+            <div id="money-display" class="hidden">
+                ごうけい: <span id="total-price">0</span>円 / よさん: <span id="budget-price">0</span>円
+            </div>
+        </div>
+
+        <!-- ゲームエリア -->
+        <div id="game-area">
+            <!-- 商品棚 -->
+            <div id="shelf-area">
+                <div class="shelf-label">おみせ</div>
+                <div id="shelf-items"></div>
+            </div>
+
+            <!-- カゴ -->
+            <div id="basket-area">
+                <div class="basket-label">カゴ</div>
+                <div id="budget-alert" class="hidden">よさんオーバー！</div>
+                <div id="basket-content">
+                    <div id="basket-placeholder">ここに いれてね</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- コントロール -->
+        <div class="controls">
+            <button id="check-btn" class="button-style">できた！</button>
+            <a href="index.html" class="button-style back-btn" id="back-to-menu-btn">もどる</a>
+        </div>
+    </main>
+
+    <!-- お釣りクイズモーダル -->
+    <div id="change-quiz-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2>おつりは いくら？</h2>
+            <div class="quiz-info">
+                <p>ごうけい: <span id="quiz-total">0</span>円</p>
+                <p>おあずかり: <span id="quiz-paid">0</span>円</p>
+            </div>
+            <div id="change-coins-area"></div>
+            <div class="quiz-answer-area">
+                <div id="quiz-answer-display">0</div>
+                <span class="unit">円</span>
+            </div>
+            <div id="keypad">
+                <button class="key-btn" data-num="7">7</button>
+                <button class="key-btn" data-num="8">8</button>
+                <button class="key-btn" data-num="9">9</button>
+                <button class="key-btn" data-num="4">4</button>
+                <button class="key-btn" data-num="5">5</button>
+                <button class="key-btn" data-num="6">6</button>
+                <button class="key-btn" data-num="1">1</button>
+                <button class="key-btn" data-num="2">2</button>
+                <button class="key-btn" data-num="3">3</button>
+                <button class="key-btn" data-num="0">0</button>
+                <button class="key-btn action-btn" id="key-clear">けす</button>
+                <button class="key-btn action-btn" id="key-enter">けってい</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- レシートモーダル (計算モード用) -->
+    <div id="receipt-modal" class="overlay hidden">
+        <div class="modal-content receipt-paper">
+            <h2>おかいもの レシート</h2>
+            <div id="receipt-display-area"></div>
+            <div class="modal-buttons">
+                <button id="receipt-next-btn" class="button-style">つぎのおかいもの</button>
+                <a href="index.html" class="button-style back-to-menu-modal">メニューへ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- クリアモーダル -->
+    <div id="result-modal" class="overlay hidden">
+        <div class="modal-content simple-result-content">
+            <h2 id="result-title">すごい！</h2>
+            <p id="result-message">ぜんぶ かえたね！</p>
+            <div id="result-items-container"></div>
+            <div class="modal-buttons">
+                <button id="next-btn" class="button-style">つぎのおかいもの</button>
+                <a href="index.html" class="button-style back-to-menu-modal">メニューへ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- フィードバックモーダル (不正解時など) -->
+    <div id="feedback-modal" class="overlay hidden">
+        <div class="modal-content feedback-content">
+            <p id="feedback-message"></p>
+            <button id="feedback-close-btn" class="button-style">OK</button>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="shopping-mission.js"></script>
+</body>
+</html>

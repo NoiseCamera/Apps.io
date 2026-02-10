@@ -1,0 +1,719 @@
+/* shopping-mission.css */
+body {
+    background-color: #fff3e0; /* 薄いオレンジ背景 */
+    overflow: hidden; /* スクロール防止 */
+    height: 100vh; /* 画面いっぱいの高さ */
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    flex-shrink: 0;
+    padding: 5px 10px;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    margin: 0 0 5px 0;
+}
+
+#status-bar {
+    margin-bottom: 5px;
+}
+
+#mode-switch-container {
+    margin-top: 0;
+    font-size: 0.9rem;
+}
+
+main {
+    flex-grow: 1;
+    width: 100%;
+    margin: 0 auto;
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 中央揃え */
+    gap: 10px;
+    box-sizing: border-box;
+    min-height: 0; /* Flexboxの子要素でスクロールさせるために必要 */
+}
+
+/* 指示エリア */
+#instruction-area {
+    flex-shrink: 0;
+    background-color: #fff;
+    border: 3px solid #ff9800;
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#instruction-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #e65100;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.highlight-text {
+    color: #d84315;
+    font-size: 1.6rem;
+    margin: 0 3px;
+}
+
+/* ゲームエリア */
+#game-area {
+    /* 自動設定を解除して固定サイズに */
+    width: 913px;
+    height: 400px;
+    display: flex;
+    flex-direction: row; /* 横並び固定 */
+    gap: 10px;
+}
+
+/* 商品棚 */
+#shelf-area {
+    flex: 1;
+    height: 100%; /* 高さを親に合わせる */
+    background-color: #8d6e63; /* 木の棚の色 */
+    border-radius: 15px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.shelf-label, .basket-label {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+#shelf-items {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+    background-color: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    align-content: start;
+}
+
+/* アイテム（棚） */
+.item-source {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    cursor: grab;
+    transition: transform 0.1s;
+    box-shadow: 0 3px 0 #bcaaa4;
+    border: 2px solid #d7ccc8;
+    user-select: none;
+    touch-action: none; /* タッチ操作用 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.item-source:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 0 #bcaaa4;
+}
+
+.item-emoji {
+    font-size: 2.2rem;
+    line-height: 1;
+    display: block;
+}
+
+.item-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #5d4037;
+    display: block;
+    margin-top: 2px;
+}
+
+/* カゴ */
+#basket-area {
+    flex: 1;
+    height: 100%; /* 高さを親に合わせる */
+    background-color: #fff8e1;
+    border: 3px dashed #ffb74d;
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: visible;
+}
+
+#basket-content {
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background-image: radial-gradient(#ffe0b2 20%, transparent 20%);
+    background-size: 20px 20px;
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+#basket-placeholder {
+    width: 100%;
+    text-align: center;
+    color: #ffb74d;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 30px;
+    pointer-events: none;
+}
+
+/* カゴの中のアイテム */
+.basket-item {
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+}
+
+.basket-item:hover {
+    transform: scale(1.1);
+    background-color: #ffebee; /* 削除を示唆する赤っぽい背景 */
+}
+
+@keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+/* ドラッグ中のクローン */
+.drag-clone {
+    position: fixed;
+    font-size: 4rem;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.9;
+    transform: translate(-50%, -150%); /* 指の上に表示されるように上にずらす */
+    text-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 正解時の跳ねるアニメーション */
+@keyframes bounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.1) translateY(-20px); }
+}
+
+.basket-item.bounce {
+    animation: bounce 0.5s ease-in-out;
+}
+
+/* 間違い時の震えるアニメーション */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px) rotate(-5deg); }
+    75% { transform: translateX(5px) rotate(5deg); }
+}
+
+.basket-item.shake {
+    animation: shake 0.4s ease-in-out;
+    background-color: #ffcdd2; /* 薄い赤背景で強調 */
+}
+
+/* ドラッグオーバー時のカゴのスタイル */
+#basket-area.drag-over {
+    transform: scale(1.02);
+    border-color: #e65100;
+    background-color: #ffe0b2;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+}
+
+/* --- 計算モード用スタイル --- */
+
+/* モード切替スイッチ */
+#mode-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 0;
+    font-weight: bold;
+    color: #e65100;
+}
+
+/* スイッチ本体 (style.cssの定義を利用しつつ調整) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+}
+
+.slider:before {
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+/* 金額表示エリア */
+#money-display {
+    background-color: #fff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 2px solid #ff9800;
+    font-size: 1rem;
+    color: #e65100;
+    font-weight: bold;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+#money-display.warning {
+    background-color: #ffebee;
+    border-color: #ef5350;
+    color: #c62828;
+    animation: pulse-warning 1s infinite;
+}
+
+#money-display.hidden {
+    display: none;
+}
+
+/* アイテムの値札 */
+.item-price {
+    display: block;
+    font-size: 0.75rem;
+    color: #fff;
+    background-color: #ef6c00;
+    border-radius: 10px;
+    padding: 1px 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-family: sans-serif;
+    box-shadow: 0 1px 0 #bcaaa4;
+}
+
+.over-budget {
+    color: #c62828;
+    font-weight: 900;
+}
+
+/* 予算オーバー吹き出し */
+#budget-alert {
+    position: absolute;
+    top: -15px;
+    right: 10px;
+    background-color: #d32f2f;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 20;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: nowrap;
+}
+
+#budget-alert::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    right: 20px;
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: #d32f2f transparent;
+}
+
+@keyframes pulse-warning {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* コントロール */
+.controls {
+    flex-shrink: 0;
+    padding: 10px 0 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* --- レシートのスタイル --- */
+/* レシートモーダル内のスタイル */
+.receipt-paper {
+    background-color: #fff;
+    border-radius: 5px;
+    border-bottom: 6px dashed #ccc; /* レシートの切れ端のようなギザギザ感 */
+    padding: 20px 30px;
+    max-width: 380px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-family: 'Courier New', monospace, sans-serif;
+    text-align: left;
+    color: #333;
+    position: relative;
+    animation: printReceipt 1s ease-out forwards;
+}
+
+.receipt-paper h2 {
+    text-align: center;
+    margin: 0 0 15px 0;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.receipt-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.receipt-list li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.receipt-name {
+    flex: 1;
+}
+
+.receipt-count {
+    margin: 0 10px;
+    color: #666;
+}
+
+.receipt-price {
+    font-weight: bold;
+}
+
+.receipt-total {
+    border-top: 2px dashed #333;
+    margin-top: 15px;
+    padding-top: 10px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+/* --- お釣りクイズモーダル --- */
+#change-quiz-modal .modal-content {
+    max-width: 400px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    border: 5px solid #ffb74d;
+    text-align: center;
+}
+
+.quiz-info {
+    background-color: #fff3e0;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #5d4037;
+    text-align: left;
+    display: inline-block;
+    border: 2px solid #ffe0b2;
+}
+
+.quiz-info p {
+    margin: 3px 0;
+}
+
+.quiz-answer-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e65100;
+}
+
+#quiz-answer-display {
+    border-bottom: 3px solid #e65100;
+    min-width: 100px;
+    text-align: center;
+    padding: 0 10px;
+    background-color: #fff;
+}
+
+#keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+.key-btn {
+    background-color: #fff;
+    border: 2px solid #ffcc80;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ef6c00;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #ffe0b2;
+    transition: transform 0.1s;
+}
+
+.key-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 #ffe0b2;
+}
+
+.key-btn.action-btn {
+    background-color: #ffcc80;
+    color: #fff;
+    font-size: 1rem;
+}
+
+#key-enter {
+    background-color: #4caf50;
+    border-color: #388e3c;
+    box-shadow: 0 3px 0 #c8e6c9;
+}
+
+#key-enter:active {
+    box-shadow: 0 0 0 #c8e6c9;
+}
+
+.receipt-detail {
+    text-align: right;
+    font-size: 1.1rem;
+    margin-top: 5px;
+    color: #555;
+}
+
+/* 値段ポップアップ */
+.price-popup {
+    position: fixed;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e65100;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 2000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: floatUp 0.8s ease-out forwards;
+    white-space: nowrap;
+}
+
+@keyframes floatUp {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -100%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -250%) scale(1); opacity: 0; }
+}
+
+.price-popup.negative {
+    color: #1976d2; /* 青色 */
+}
+
+/* レシート印刷アニメーション */
+@keyframes printReceipt {
+    0% {
+        clip-path: inset(0 0 100% 0);
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        clip-path: inset(0 0 0 0);
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* --- お釣り硬貨エリア --- */
+#change-coins-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    min-height: 50px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+/* 硬貨の共通スタイル */
+.coin {
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-family: sans-serif;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.2);
+    border: 2px solid #999;
+    color: #333;
+    user-select: none;
+}
+
+.coin-500 {
+    width: 48px; height: 48px;
+    background-color: #e0e0e0; /* ニッケル黄銅っぽい色 */
+    border-color: #bdbdbd;
+}
+.coin-100 {
+    width: 44px; height: 44px;
+    background-color: #f5f5f5; /* 白銅 */
+    border-color: #e0e0e0;
+}
+.coin-50 {
+    width: 40px; height: 40px;
+    background-color: #f5f5f5; /* 白銅 */
+    border-color: #e0e0e0;
+    /* 穴あき表現（中央に小さな円を描画） */
+    background-image: radial-gradient(circle, transparent 25%, #f5f5f5 26%);
+}
+.coin-10 {
+    width: 42px; height: 42px;
+    background-color: #d7ccc8; /* 青銅 */
+    border-color: #a1887f;
+    color: #5d4037;
+}
+/* 5円と1円は今回は省略（計算が複雑になりすぎるため） */
+
+/* 簡単モード結果のアイテム表示 */
+/* 簡単モード結果モーダルのスタイル */
+.simple-result-content {
+    background-color: #fff;
+    border: 5px solid #ffb74d; /* オレンジの枠線 */
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 400px;
+    text-align: center;
+    background-image: radial-gradient(#fff8e1 20%, transparent 20%);
+    background-size: 20px 20px;
+}
+
+.simple-result-content h2 {
+    color: #e65100;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #fff;
+}
+
+#result-items-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px auto;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    min-height: 80px;
+    box-shadow: inset 0 0 10px rgba(255, 152, 0, 0.2);
+}
+
+.result-item-icon {
+    font-size: 3.5rem;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+}
+
+/* モーダルオーバーレイ */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* レシートモーダルのボタン配色 */
+#receipt-next-btn {
+    background-color: #ff9800; /* オレンジ */
+    box-shadow: 0 5px #f57c00;
+}
+
+#receipt-next-btn:hover {
+    background-color: #fb8c00;
+}
+
+#receipt-next-btn:active {
+    box-shadow: 0 2px #f57c00;
+}
+
+/* フィードバックモーダル */
+.feedback-content {
+    border: 5px solid #ff9800;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 80%;
+    width: 400px;
+    text-align: center;
+}
+
+#feedback-message {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e65100;
+    margin: 10px 0 30px 0;
+}
+
+/* フィードバックモーダルのOKボタン配色 */
+#feedback-close-btn {
+    background-color: #4caf50; /* 緑 */
+    box-shadow: 0 5px #388e3c;
+}
+
+#feedback-close-btn:hover {
+    background-color: #66bb6a;
+}
+
+#feedback-close-btn:active {
+    box-shadow: 0 2px #388e3c;
+}

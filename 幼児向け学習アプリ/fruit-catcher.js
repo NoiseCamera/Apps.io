@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastFaces = [];
     let isDetecting = false;
     let lastDetectionTime = 0;
-    const DETECTION_INTERVAL = 100; // 検出頻度を制限 (ms)
+    const DETECTION_INTERVAL = 150; // 検出頻度を制限 (ms)。非力なデバイスのために少し間隔を長くする
 
     const fruitImages = [];
     const fruitPaths = [

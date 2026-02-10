@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>まちがいさがし</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="spot-difference.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        /* 画像選択肢の4番目、5番目、6番目を非表示にする */
+        #image-list > :nth-child(4),
+        #image-list > :nth-child(5),
+        #image-list > :nth-child(6) {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- BGM & SE -->
+    <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
+    <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3"></audio>
+    <audio id="fanfare-sound" src="assets/sounds/gacha-fanfare.mp3"></audio>
+
+    <header>
+        <h1>まちがいさがし</h1>
+        <div id="status-bar">
+            <div class="score-display">みつけた: <span id="found-count">0</span> / <span id="total-count">?</span></div>
+        </div>
+    </header>
+
+    <main>
+        <div id="game-area" class="hidden">
+            <div class="image-wrapper">
+                <canvas id="canvas1"></canvas>
+            </div>
+            <div class="image-wrapper">
+                <canvas id="canvas2"></canvas>
+            </div>
+        </div>
+
+        <!-- 画像選択エリア -->
+        <div id="selection-area">
+            <h2>あそぶ がぞうを えらんでね</h2>
+            <div id="image-list" class="image-grid"></div>
+        </div>
+
+        <div class="controls">
+            <button id="restart-btn" class="button-style">もういちど</button>
+            <a href="index.html" class="button-style back-btn" id="back-to-menu-btn">もどる</a>
+        </div>
+    </main>
+
+    <!-- クリアモーダル -->
+    <div id="win-modal" class="overlay hidden">
+        <div class="modal-content">
+            <h2>ぜんぶ みつけたよ！</h2>
+            <p>すごい！ おめでとう！</p>
+            <div class="modal-buttons">
+                <button id="play-again-btn" class="button-style">もういちど</button>
+                <a href="index.html" class="button-style back-to-menu-modal">メニューへ</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script src="image-analysis.js"></script>
+    <script src="spot-difference.js"></script>
+</body>
+</html>

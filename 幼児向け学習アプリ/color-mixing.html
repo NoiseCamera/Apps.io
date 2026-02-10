@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>いろまぜじっけん</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="buttons.css">
+    <link rel="stylesheet" href="color-mixing.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- BGM -->
+    <audio id="bgm" src="assets/sounds/bgm_pop.mp3" loop></audio>
+    <audio id="correct-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3"></audio>
+
+    <header>
+        <h1>いろまぜ じっけん</h1>
+    </header>
+
+    <main>
+        <!-- モード選択画面 -->
+        <div id="mode-select-screen">
+            <p>あそびかたを えらんでね</p>
+            <div class="menu-buttons">
+                <button id="mode-free-btn" class="button-style title-menu-btn">じゆうに まぜる</button>
+                <button id="mode-quiz-btn" class="button-style title-menu-btn">いろあて クイズ</button>
+            </div>
+        </div>
+
+        <!-- 自由モード画面 -->
+        <div id="free-mode-screen" class="hidden">
+            <div class="instruction">すきな いろを ２つ えらんでね</div>
+            
+            <div class="mixing-area">
+                <div class="tube-container" id="tube-1">
+                    <div class="paint-blob"></div>
+                    <div class="tube-body">?</div>
+                </div>
+                <div class="plus-sign">＋</div>
+                <div class="tube-container" id="tube-2">
+                    <div class="paint-blob"></div>
+                    <div class="tube-body">?</div>
+                </div>
+                <div class="equals-sign">＝</div>
+                <div class="result-container">
+                    <div class="result-blob" id="result-blob">?</div>
+                    <div class="result-name" id="result-name"></div>
+                </div>
+            </div>
+
+            <div class="palette-area" id="free-palette">
+                <!-- JSで色ボタン生成 -->
+            </div>
+
+            <div class="controls">
+                <button id="mix-btn" class="button-style" disabled>まぜる！</button>
+                <button id="reset-btn" class="button-style">やりなおす</button>
+            </div>
+
+            <div id="history-section">
+                <h3>つくった いろの りれき</h3>
+                <div id="history-list"></div>
+            </div>
+            
+            <button id="back-to-mode-free" class="button-style back-btn">モードせんたくへ</button>
+        </div>
+
+        <!-- クイズモード画面 -->
+        <div id="quiz-mode-screen" class="hidden">
+            <div class="quiz-header">
+                <div class="score-display">せいかい: <span id="quiz-score">0</span></div>
+                <div class="question-text">このいろを つくろう！</div>
+            </div>
+
+            <div class="target-color-display">
+                <div class="target-blob" id="target-blob"></div>
+                <div class="target-name" id="target-name">?</div>
+            </div>
+
+            <div class="mixing-area quiz-mixing">
+                <div class="tube-container small" id="quiz-tube-1">
+                    <div class="paint-blob"></div>
+                </div>
+                <div class="plus-sign">＋</div>
+                <div class="tube-container small" id="quiz-tube-2">
+                    <div class="paint-blob"></div>
+                </div>
+            </div>
+
+            <div class="palette-area" id="quiz-palette">
+                <!-- JSで色ボタン生成 -->
+            </div>
+
+            <div class="controls">
+                <button id="quiz-check-btn" class="button-style" disabled>これだ！</button>
+            </div>
+
+            <button id="back-to-mode-quiz" class="button-style back-btn">モードせんたくへ</button>
+        </div>
+    </main>
+
+    <script src="settings.js"></script>
+    <script src="color-mixing.js"></script>
+</body>
+</html>

@@ -120,6 +120,10 @@ header p {
     background-color: #e8eaf6; /* 薄いインディゴ */
     border-color: #5c6bc0; /* インディゴ */
 }
+.app-link[href="spot-difference.html"] {
+    background-color: #e0f7fa; /* 薄いシアン */
+    border-color: #00bcd4; /* シアン */
+}
 .app-link[href="gacha.html"] {
     background-color: #fff8e1; /* 薄いアンバー */
     border-color: #ffc107; /* アンバー */
@@ -167,6 +171,10 @@ header p {
 .app-link[href="japan-puzzle.html"] {
     background-color: #fbe9e7; /* 薄いオレンジ */
     border-color: #ff8a65; /* 明るいオレンジ */
+}
+.app-link[href="shopping-mission.html"] {
+    background-color: #fff8e1; /* 薄いアンバー */
+    border-color: #ffc107; /* アンバー */
 }
 /* 新しい「おんがく」カテゴリの配色 */
 .app-link[href="keyboard.html"],
@@ -226,6 +234,9 @@ header p {
 .app-link[href="shape-matching.html"] h3 {
     color: #3f51b5;
 }
+.app-link[href="spot-difference.html"] h3 {
+    color: #006064;
+}
 .app-link[href="gacha.html"] h3 {
     color: #ff8f00;
 }
@@ -261,6 +272,9 @@ header p {
 }
 .app-link[href="japan-puzzle.html"] h3 {
     color: #f4511e; /* 濃いオレンジ */
+}
+.app-link[href="shopping-mission.html"] h3 {
+    color: #ff6f00; /* 濃いアンバー */
 }
 /* 新しい「おんがく」カテゴリのタイトル色 */
 .app-link[href="keyboard.html"] h3,

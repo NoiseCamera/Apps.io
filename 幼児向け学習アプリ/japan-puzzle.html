@@ -8,54 +8,22 @@
   <link rel="stylesheet" href="settings.css">
   <link rel="stylesheet" href="buttons.css">
   <link rel="stylesheet" href="japan-puzzle.css"> <!-- 新しいCSS -->
+  <style>
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .construction-icon { animation: bounce 2s infinite ease-in-out; display: inline-block; }
+    .construction-title { animation: float 3s infinite ease-in-out; }
+    .back-btn { transition: transform 0.2s; }
+    .back-btn:hover { transform: scale(1.1); }
+    .back-btn:active { transform: scale(0.95); }
+  </style>
 </head>
 <body>
-  <audio id="bgm" src="assets/sounds/bgm3.mp3" loop></audio>
-  <audio id="snap-sound" src="assets/sounds/kachi.mp3"></audio>
-  <audio id="region-complete-sound" src="assets/sounds/seikai.mp3"></audio>
-  <audio id="win-sound" src="assets/sounds/kirakira.mp3"></audio>
-
-  <header>
-    <h1>にほんちずパズル</h1>
-  </header>
-
-  <main id="game-area">
-    <div id="puzzle-wrapper">
-      <div id="puzzle-board">
-        <canvas id="puzzle-canvas"></canvas>
-        <!-- 県ピースがここに絶対配置される -->
-      </div>
-      <div id="side-panel">
-        <div id="region-selector-container">
-            <p>ちほうを えらんでね</p>
-            <div id="region-selector">
-              <!-- 地方選択ボタンがJSで生成される -->
-            </div>
-        </div>
-        <div id="pieces-container">
-            <!-- 選択した地方のピースがここに表示される -->
-        </div>
-        <div id="info-panel">
-            <p id="info-text">ピースをちずのうえにおいてね</p>
-        </div>
-        <button id="hint-btn" class="button-style">ヒント</button>
-      </div>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f8ff; font-family: 'M PLUS Rounded 1c', sans-serif;">
+        <h1 class="construction-title" style="color: #ff9800; font-size: 2em; margin-bottom: 20px;">ただいま こうじちゅう</h1>
+        <div class="construction-icon" style="font-size: 4em; margin-bottom: 20px;">🚧</div>
+        <p style="font-size: 1.2em; color: #333; text-align: center;">このゲームは まだ つくっている とちゅうだよ。<br>かんせいするまで まっててね！</p>
+        <button class="back-btn" onclick="history.back()" style="margin-top: 30px; padding: 15px 30px; font-size: 1.2em; background-color: #4caf50; color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px #2e7d32;">もどる</button>
     </div>
-  </main>
-
-  <div id="win-modal" class="overlay hidden">
-    <div class="modal-content">
-        <h2 id="win-title">ぜんぶクリア！</h2>
-        <p>にほんちずを かんせいさせたね！すごい！</p>
-        <div class="win-buttons">
-          <button id="play-again-btn">もういちど あそぶ</button>
-          <a href="index.html" class="button-style">えらぶがめんへ</a>
-        </div>
-    </div>
-  </div>
-
-  <script src="settings.js"></script>
-  <script src="japan-puzzle-data.js"></script> <!-- 県データファイルを分離 -->
-  <script src="japan-puzzle.js"></script>
 </body>
 </html>

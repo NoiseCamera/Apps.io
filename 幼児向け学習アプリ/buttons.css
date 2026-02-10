@@ -49,8 +49,11 @@ button:disabled,
 #footer-nav-button,
 #back-to-menu-link,
 #start-game-btn, /* 他のゲームのスタートボタン */
+#reset-btn, /* 色混ぜのやりなおすボタン */
+#quit-to-difficulty-btn, /* ことばパズルのやめるボタン */
 #start-button, /* フルーツキャッチのスタートボタン */
-#start-btn { /* slide-puzzleのスタートボタンを追加 */
+#start-btn, /* slide-puzzleのスタートボタンを追加 */
+#mode-free-btn { /* 色混ぜの自由モードボタン */
   background-color: #ff9800; /* Orange */
 }
 
@@ -69,6 +72,11 @@ button:disabled,
 #restart-button, /* フルーツキャッチのもう一度ボタン */
 #restart-btn, /* ４もくならべのもう一度ボタン */
 #modal-restart-btn, /* ４もくならべのモーダル内もう一度ボタン */
+#mix-btn, /* 色混ぜのまぜるボタン */
+#quiz-check-btn, /* 色混ぜクイズの決定ボタン */
+#check-button, /* ことばパズルのチェックボタン */
+#resume-game-btn, /* ことばパズルのつづけるボタン */
+#play-again-btn, /* まちがいさがしのもう一度ボタン */
 #check-btn,
 #replay-btn,
 .win-buttons button,
@@ -81,16 +89,25 @@ button:disabled,
 #next-btn,
 #next-question-btn,
 #back-to-menu-btn, /* フルーツキャッチのゲームオーバー画面のボタン */
+#back-to-menu-ingame, /* フルーツキャッチのゲーム中もどるボタン */
+#back-to-mode-free, /* 色混ぜのモード選択へボタン */
+#back-to-mode-quiz, /* 色混ぜのモード選択へボタン */
+#back-to-difficulty-btn, /* ことばパズルの難易度選択へボタン */
 #back-to-menu-title-btn, /* 4もくならべのタイトル画面の戻るボタン */
 #back-to-title-btn, /* 4もくならべのゲーム画面の戻るボタン */
 #modal-back-to-title-btn, /* 4もくならべのモーダル内戻るボタン */
 .modal-buttons a.button-style, /* スタート画面の「もどる」ボタン */
 .win-buttons a,
 #wait-btn,
+#save-btn, /* お絵かき・ぬりえの保存ボタン */
+#undo-btn, /* お絵かき・ぬりえの戻るボタン */
+#redo-btn, /* お絵かき・ぬりえの進むボタン */
 .time-adjust-btn, /* 時計の時間調整ボタンを追加 */
 #hint-btn, /* 計算のヒントボタンを追加 */
+#toggle-numbers-btn, /* かきじゅんの番号表示ボタン */
 #shuffle-btn, /* スライドパズルのシャッフルボタンを追加 */
-#toggle-collection-view-btn {
+#toggle-collection-view-btn,
+#mode-quiz-btn { /* 色混ぜのクイズモードボタン */
   background-color: #2196f3; /* Blue */
 }
 
@@ -132,6 +149,10 @@ button:disabled,
 .mode-select-btn, /* 4もくならべのモード選択ボタン */
 .difficulty-select-btn, /* 4もくならべの難易度選択ボタン */
 .mode-btn, /* fruit-catcherのモードボタン */
+#watch-mode-btn, /* かきじゅんのお手本ボタン */
+#practice-mode-btn, /* かきじゅんのれんしゅうボタン */
+#step-mode-btn, /* かきじゅんのひとふでずつボタン */
+#pen-tool, #eraser-tool, #fill-tool, #stamp-tool, /* お絵かきツール */
 #mode-toggle-btn { /* ４もくならべのモード切替ボタン */
     background-color: #e0f2f1; /* 薄いティール */
     color: #004d40;
@@ -144,6 +165,9 @@ button:disabled,
 .mode-select-btn.selected,
 .difficulty-select-btn.selected,
 .mode-btn.selected, /* fruit-catcherのモードボタン */
+#watch-mode-btn.selected,
+#practice-mode-btn.selected,
+#step-mode-btn.selected,
 #mode-toggle-btn.selected {
     background-color: #26a69a; /* ティール */
     color: #fff;
