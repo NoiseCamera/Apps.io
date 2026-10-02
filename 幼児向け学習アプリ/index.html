@@ -1,229 +1,221 @@
-<!-- 
-    Live Server not responding?
-
-    I was unable to restart the live server for you.
-    Please try restarting the live server from your code editor (e.g., VS Code).
-
-    I have also created a file named server.js that you can use to run a local server.
-    If you have Node.js installed, you can run 'node server.js' in your terminal to start a server at http://localhost:3000.
--->
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>たのしいがくしゅうアプリ</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="settings.css">
-    <link rel="stylesheet" href="buttons.css">
-</head>
-<body>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>わくわくおべんきょう</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
 
-    <!-- アプリ一覧画面用のBGM -->
-    <audio id="bgm" src="assets/sounds/title.mp3" loop></audio>
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
 
-    <header>
-        <h1>たのしいがくしゅうアプリ</h1>
-        <p>すきなアプリをえらんであそんでね！</p>
-    </header>
+#canvas {
+	display: block;
+}
 
-    <main id="app-selector">
-        <div class="category-group">
-            <h2 class="category-title">📝 もじの れんしゅう</h2>
-            <div class="app-grid">
-                <a href="hiragana.html" class="app-link">
-                    <h3>ひらがな</h3>
-                    <p>もじの かたちを<br>おぼえよう！</p>
-                </a>
-                <a href="katakana.html" class="app-link">
-                    <h3>カタカナ</h3>
-                    <p>もじの かたちを<br>おぼえよう！</p>
-                </a>
-                <a href="hiragana-stroke.html" class="app-link">
-                    <h3>ひらがな<br>かきじゅん</h3>
-                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
-                </a>
-                <a href="katakana-stroke.html" class="app-link">
-                    <h3>カタカナ<br>かきじゅん</h3>
-                    <p>ただしい かきじゅんを<br>おぼえよう！</p>
-                </a>
-                <a href="alphabet-stroke.html" class="app-link">
-                    <h3>アルファベット<br>かきじゅん</h3>
-                    <p>ABCの かきじゅんを<br>おぼえよう！</p>
-                </a>
-                <a href="typing.html" class="app-link">
-                    <h3>⌨️ タイピング</h3>
-                    <p>キーボードで もじを<br>うつ れんしゅう！</p>
-                </a>
-                <a href="mojifound.html" class="app-link">
-                    <h3>🔎 もじさがし<br>ゲーム</h3>
-                    <p>もじを みつけて<br>スコアを きそおう！</p>
-                </a>
-                <a href="kotoba_puzzle.html" class="app-link">
-                    <h3>🧩 ことば<br>パズル</h3>
-                    <p>もじを ならべて<br>ことばを つくろう！</p>
-                </a>
-            </div>
-        </div>
+#canvas:focus {
+	outline: none;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🔢 すうじと パズル</h2>
-            <div class="app-grid">
-                <a href="calculation.html" class="app-link">
-                    <h3>➕ けいさん</h3>
-                    <p>たしざん ひきざんの<br>れんしゅう！</p>
-                </a>
-                <a href="slide-puzzle.html" class="app-link">
-                    <h3>🧩 スライドパズル</h3>
-                    <p>パネルを うごかして<br>えを そろえよう！</p>
-                </a>
-                <a href="jigsaw-puzzle.html" class="app-link">
-                    <h3>🧩 ジグソーパズル</h3>
-                    <p>ピースを くみあわせて<br>えを かんせいさせよう！</p>
-                </a>
-                <a href="shape-matching.html" class="app-link">
-                    <h3>かたちあわせ</h3>
-                    <p>おなじ かたちを<br>みつけて あわせよう！</p>
-                </a>
-                <a href="spot-difference.html" class="app-link">
-                    <h3>👀 まちがいさがし</h3>
-                    <p>２つの えを みくらべて<br>ちがう ところを さがそう！</p>
-                </a>
-                <a href="memory-game.html" class="app-link">
-                    <h3>しんけいすいじゃく</h3>
-                    <p>カードを めくって<br>ペアを さがそう！</p>
-                </a>
-                <a href="maze-game.html" class="app-link">
-                    <h3>めいろゲーム</h3>
-                    <p>ゴールを めざして<br>めいろを すすもう！</p>
-                </a>
-                <a href="igo.html" class="app-link">
-                    <h3>囲碁 (いご)</h3>
-                    <p>いしで あいてより<br>たくさんの じんちを とろう！</p>
-                </a>
-                <a href="othello.html" class="app-link">
-                    <h3>⚪⚫ オセロ</h3>
-                    <p>あいての いしを<br>はさんで ひっくりかえそう！</p>
-                </a>
-                <a href="connect4.html" class="app-link">
-                    <h3>🟡🔴 ４もくならべ</h3>
-                    <p>４つの いろを<br>ならべて かとう！</p>
-                </a>
-                <a href="shogi.html" class="app-link">
-                    <h3>☗☖ 将棋 (しょうぎ)</h3>
-                    <p>あいての おうさまを<br>つかまえよう！</p>
-                </a>
-                <a href="colorfound.html" class="app-link">
-                    <h3>いろさがしゲーム</h3>
-                    <p>おなじ いろを<br>みつけて タッチ！</p>
-                </a>
-                <a href="japan-puzzle.html" class="app-link">
-                    <h3>🗾 にほんちず<br>パズル</h3>
-                    <p>ピースを うごかして<br>ちずを かんせいさせよう！</p>
-                </a>
-            </div>
-        </div>
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🏠 せいかつと ルール</h2>
-            <div class="app-grid">
-                <a href="clock.html" class="app-link">
-                    <h3>🕒 とけい</h3>
-                    <p>とけいの よみかたを<br>おぼえよう！</p>
-                </a>
-                <a href="traffic-signal.html" class="app-link">
-                    <h3>🚦 しんごうき</h3>
-                    <p>こうつうルールを<br>たのしく まなぼう！</p>
-                </a>
-                <a href="shopping-mission.html" class="app-link">
-                    <h3>🛒 おかいもの<br>ミッション</h3>
-                    <p>たのまれた ものを<br>おみせで かおう！</p>
-                </a>
-            </div>
-        </div>
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🏃‍♂️ からだを うごかす</h2>
-            <div class="app-grid">
-                <a href="fruit-catcher.html" class="app-link">
-                    <h3>🍎 フルーツキャッチャー</h3>
-                    <p>て をつかって<br>フルーツをキャッチ！</p>
-                </a>
-            </div>
-        </div>
+#status {
+	background-color: #242424;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🎵 おんがく</h2>
-            <div class="app-grid">
-                <a href="keyboard.html" class="app-link">
-                    <h3>🎹 けんばんあそび</h3>
-                    <p>ピアノを ひいて<br>おとを たのしもう！</p>
-                </a>
-                <a href="movies.html" class="app-link">
-                    <h3>🎬 うたのどうが</h3>
-                    <p>たのしい うたを<br>みて きいてみよう！</p>
-                </a>
-            </div>
-        </div>
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🎨 おえかきと こうさく</h2>
-            <div class="app-grid">
-                <a href="drawing-board.html" class="app-link">
-                    <h3>おえかき</h3>
-                    <p>じゆうに えを<br>かいてみよう！</p>
-                </a>
-                <a href="coloring-select.html" class="app-link">
-                    <h3>ぬりえ</h3>
-                    <p>すきな えを<br>えらんで ぬろう！</p>
-                </a>
-                <a href="color-mixing.html" class="app-link">
-                    <h3>🎨 いろまぜ<br>じっけん</h3>
-                    <p>いろを まぜると<br>なにいろに なるかな？</p>
-                </a>
-            </div>
-        </div>
+#status-splash.show-image--false {
+	display: none;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🤖 プログラミング</h2>
-            <div class="app-grid">
-                <a href="programming-game.html" class="app-link">
-                    <h3>プログラミング</h3>
-                    <p>めいれいを ならべて<br>うごかしてみよう！</p>
-                </a>
-            </div>
-        </div>
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
 
-        <div class="category-group">
-            <h2 class="category-title">🎁 おたのしみ</h2>
-            <div class="app-grid">
-                <a href="gacha.html" class="app-link">
-                    <h3>がちゃ</h3>
-                    <p>ほしを つかって<br>がちゃを まわそう！</p>
-                </a>
-                <a href="collection.html" class="app-link">
-                    <h3>コレクション</h3>
-                    <p>あつめた アイテムを<br>みてみよう！</p>
-                </a>
-            </div>
-        </div>
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
 
-        
-    </main>
-    <script src="settings.js"></script>
-    <script>
-        // ユーザーが最初に画面をクリックしたときにBGMを再生します
-        document.body.addEventListener('click', () => {
-            const bgm = document.getElementById('bgm');
-            if (bgm && bgm.paused) {
-                bgm.play().catch(e => console.error("BGMの再生に失敗しました:", e));
-            }
-        }, { once: true });
-    </script>
-    <!-- Live server refresh comment -->
-</body>
+#status-progress, #status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+<link rel="manifest" href="index.manifest.json">
+
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+
+		<script src="index.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":99713400,"index.wasm":37900721},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
 </html>
+
